@@ -9,9 +9,10 @@ const app = express();
 app.use(express.json());
 
 // Routes
-app.use("/api/auth",  require("./routes/authRoutes"));
-app.use("/api/turfs", require("./routes/turfRoutes"));
-app.use("/api/slots", require("./routes/slotRoutes")); // ← new
+app.use("/api/auth",     require("./routes/authRoutes"));
+app.use("/api/turfs",    require("./routes/turfRoutes"));
+app.use("/api/slots",    require("./routes/slotRoutes"));
+app.use("/api/bookings", require("./routes/bookingRoutes")); // ← new
 
 // Health check
 app.get("/", (req, res) => {
