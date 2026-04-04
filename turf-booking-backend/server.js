@@ -12,7 +12,8 @@ app.use(express.json());
 app.use("/api/auth",     require("./routes/authRoutes"));
 app.use("/api/turfs",    require("./routes/turfRoutes"));
 app.use("/api/slots",    require("./routes/slotRoutes"));
-app.use("/api/bookings", require("./routes/bookingRoutes")); // ← new
+app.use("/api/bookings", require("./routes/bookingRoutes"));
+app.use("/api/payment",  require("./routes/paymentRoutes")); // ← new
 
 // Health check
 app.get("/", (req, res) => {
