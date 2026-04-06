@@ -20,6 +20,14 @@ const steps = [
 const fade = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } }
 
 function Home() {
+  const scrollToAllTurfs = () => {
+    const section = document.getElementById('allturfs')
+
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   return (
     <div className="home">
       <Navbar />
@@ -41,7 +49,7 @@ function Home() {
           </motion.p>
 
           <motion.div className="hero-actions" initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.3 }}>
-            <button className="btn-glow">Explore Turfs →</button>
+            <button className="btn-glow" onClick={scrollToAllTurfs}>Explore Turfs →</button>
             <button className="btn-ghost">Become a Host</button>
           </motion.div>
 
@@ -66,7 +74,7 @@ function Home() {
       </div>
 
       {/* All Turfs */}
-      <section className="turfs-section">
+      <section className="turfs-section" id="allturfs">
         <div className="section-header">
           <div>
             <div className="section-label">Available Now</div>
