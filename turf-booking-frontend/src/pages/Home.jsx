@@ -4,6 +4,7 @@ import { MapPin, Search } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
+
 const turfs = [
   { id: 1, name: "Six & Strike Turf", location: "Manickpur, Vasai West", price: 800, sport: "Cricket", image: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600&q=80" },
   { id: 2, name: "Kollide Turf",       location: "Cricket Ground, Umel",  price: 900, sport: "Football", image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&q=80" },
