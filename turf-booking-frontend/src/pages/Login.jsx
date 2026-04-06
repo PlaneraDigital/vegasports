@@ -48,15 +48,15 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen font-mono flex items-center justify-center px-4"
+    <div className="min-h-screen flex items-center justify-center px-4"
       style={{ background: 'radial-gradient(ellipse at top, #0d2b1a 0%, #0a0a0a 70%)' }}>
 
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl font-bold" style={{ color: '#4ade80' }}>
-            VegaSports
+          <Link to="/" className="text-2xl brand-wordmark" style={{ color: '#4ade80' }}>
+            vegasports
           </Link>
           <p className="text-gray-400 text-sm mt-2">Welcome back. Login to book your turf.</p>
         </div>
@@ -65,7 +65,7 @@ const Login = () => {
         <div className="rounded-2xl p-8 border border-gray-800"
           style={{ backgroundColor: '#111111' }}>
 
-          <h2 className="text-white text-xl font-bold mb-6">Login</h2>
+          <h2 className="text-white text-xl font-bold text-center mb-6">Login</h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
@@ -96,18 +96,14 @@ const Login = () => {
                 </a>
               </div>
 
-              <p className="text-xs text-gray-300 font-bold">
-                Min 7 characters
-              </p>
-
               {/* Input with show/hide */}
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your Password"
-                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-white outline-none transition
+                  placeholder="Enter your password (min 7 characters)"
+                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-white placeholder:text-gray-500 outline-none transition
                     border ${errors.password ? 'border-red-500' : 'border-gray-700'}
                     focus:border-green-500`}
                   style={{ backgroundColor: '#1a1a1a' }}

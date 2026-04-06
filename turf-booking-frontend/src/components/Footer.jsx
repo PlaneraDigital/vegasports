@@ -5,7 +5,7 @@ function Footer() {
     <footer className="footer">
       <div className="footer__grid">
         <div>
-          <h3 className="footer__brand">vegasports</h3>
+          <h3 className="footer__brand brand-wordmark">vegasports</h3>
           <p className="footer__text">Your premier destination for sports turf bookings.</p>
         </div>
         <div>

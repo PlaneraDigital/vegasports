@@ -1,1 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
+
+body {
+	font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+
+.brand-wordmark {
+	font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif !important;
+	font-weight: 800;
+	letter-spacing: -0.03em;
+	line-height: 1;
+	text-transform: lowercase;
+}

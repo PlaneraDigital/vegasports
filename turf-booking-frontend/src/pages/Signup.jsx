@@ -141,15 +141,15 @@ const Signup = () => {
   }
 
   return (
-    <div className="min-h-screen font-mono flex items-center justify-center px-4 py-12"
+    <div className="min-h-screen flex items-center justify-center px-4 py-12"
       style={{ background: 'radial-gradient(ellipse at top, #0d2b1a 0%, #0a0a0a 70%)' }}>
 
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl font-bold" style={{ color: '#4ade80' }}>
-            VegaSports
+          <Link to="/" className="text-2xl brand-wordmark" style={{ color: '#4ade80' }}>
+            vegasports
           </Link>
           <p className="text-gray-400 text-sm mt-2">
             {otpSent

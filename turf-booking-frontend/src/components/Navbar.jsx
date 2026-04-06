@@ -8,7 +8,7 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="sticky font-mono top-0 z-50 border-b border-gray-800"
+    <nav className="sticky top-0 z-50 border-b border-gray-800"
       style={{ backgroundColor: '#0a0a0a' }}>
 
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
@@ -17,7 +17,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2 text-2xl font-bold cursor-pointer group"
           style={{ color: '#4ade80' }}>
           <IoFootballSharp className="transition duration-700 group-hover:rotate-180" />
-          <span>VegaSports</span>
+          <span className="brand-wordmark">vegasports</span>
         </Link>
 
         {/* Desktop Links */}
