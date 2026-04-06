@@ -31,7 +31,7 @@ function Home() {
 
   return (
     <div className="home">
-      <Navbar />
+      {/* <Navbar /> */}
 
       {/* Hero */}
       <section className="hero">
@@ -151,7 +151,7 @@ function Home() {
         </div>
       </section>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   )
 }
