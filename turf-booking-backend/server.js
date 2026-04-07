@@ -15,23 +15,17 @@ app.use("/api/turfs",    require("./routes/turfRoutes"));
 app.use("/api/slots",    require("./routes/slotRoutes"));
 app.use("/api/bookings", require("./routes/bookingRoutes"));
 app.use("/api/payment",  require("./routes/paymentRoutes"));
+app.use("/api/admin",    require("./routes/adminRoutes")); // ← new
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
   res.json({
     message: "Turf Booking API is running",
     version: "1.0.0",
-    endpoints: {
-      auth:     "/api/auth",
-      turfs:    "/api/turfs",
-      slots:    "/api/slots",
-      bookings: "/api/bookings",
-      payment:  "/api/payment",
-    },
   });
 });
 
-// ─── Error Handling (must be LAST) ───────────────────────────────────────────
+// ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
 

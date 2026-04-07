@@ -1,11 +1,11 @@
-const jwt = require("jsonwebtoken");
+const jwt  = require("jsonwebtoken");
 const User = require("../models/User");
 
+// ─── Protect (any logged in user) ─────────────────────────────────────────────
 const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Check for Bearer token in headers
     if (
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
@@ -17,10 +17,8 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ message: "Not authorized, no token" });
     }
 
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach user to request (exclude password)
     req.user = await User.findById(decoded.id).select("-auth.password_hash");
 
     if (!req.user) {
@@ -36,4 +34,13 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+// ─── Admin Only ───────────────────────────────────────────────────────────────
+const adminOnly = (req, res, next) => {
+  if (req.user && req.user.role === "admin") {
+    next();
+  } else {
+    res.status(403).json({ message: "Access denied. Admins only." });
+  }
+};
+
+module.exports = { protect, adminOnly };

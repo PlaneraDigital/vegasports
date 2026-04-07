@@ -57,6 +57,11 @@ const userSchema = new mongoose.Schema(
         ref: "Booking",
       },
     ],
+    role: {
+  type:    String,
+  enum:    ["user", "admin"],
+  default: "user",
+},
     status: {
       type: String,
       enum: ["active", "suspended", "deleted"],
