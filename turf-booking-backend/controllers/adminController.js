@@ -3,6 +3,7 @@ const jwt    = require("jsonwebtoken");
 const User   = require("../models/User");
 const Turf   = require("../models/Turf");
 const Slot   = require("../models/Slot");
+const Booking = require("../models/Booking"); 
 
 // ─── Generate Token ───────────────────────────────────────────────────────────
 const generateToken = (userId) => {
@@ -384,14 +385,238 @@ const getAdminSlots = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// ══════════════════════════════════════════════════════════════════════════════
+//  BOOKING MANAGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ─── Get All Bookings ─────────────────────────────────────────────────────────
+const getAllBookings = async (req, res) => {
+  try {
+    const { status, turf_id, date, page = 1, limit = 10 } = req.query;
+
+    const filter = {};
+
+    if (status)  filter.booking_status = status;
+    if (turf_id) filter.turf_id        = turf_id;
+    if (date) {
+      const startOfDay = new Date(date);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+      filter.date = { $gte: startOfDay, $lte: endOfDay };
+    }
+
+    const skip  = (Number(page) - 1) * Number(limit);
+    const total = await Booking.countDocuments(filter);
+
+    const bookings = await Booking.find(filter)
+      .sort({ created_at: -1 })
+      .skip(skip)
+      .limit(Number(limit))
+      .populate("user_id",  "name email phone")
+      .populate("turf_id",  "name location.city location.address")
+      .populate("slot_ids", "start_time end_time price status");
+
+    res.status(200).json({
+      message: "Bookings fetched successfully",
+      total,
+      page:    Number(page),
+      limit:   Number(limit),
+      pages:   Math.ceil(total / Number(limit)),
+      bookings,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── Get Single Booking (Admin) ───────────────────────────────────────────────
+const getBookingByIdAdmin = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id)
+      .populate("user_id",  "name email phone")
+      .populate("turf_id",  "name location.city location.address price_per_hour")
+      .populate("slot_ids", "start_time end_time price status date");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    res.status(200).json({
+      message: "Booking fetched successfully",
+      booking,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── Cancel Booking (Admin) ───────────────────────────────────────────────────
+const cancelBookingAdmin = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const booking    = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    if (!["pending", "confirmed"].includes(booking.booking_status)) {
+      return res.status(400).json({
+        message: `Cannot cancel booking with status: ${booking.booking_status}`,
+      });
+    }
+
+    // Free up slots
+    await Slot.updateMany(
+      { _id: { $in: booking.slot_ids } },
+      {
+        $set: {
+          status:     "available",
+          booked_by:  null,
+          held_until: null,
+          booking_id: null,
+        },
+      }
+    );
+
+    // Refund if already paid
+    const refund_amount = booking.payment.status === "paid"
+      ? booking.total_amount
+      : 0;
+
+    const refund_status = booking.payment.status === "paid"
+      ? "pending"
+      : "na";
+
+    booking.booking_status   = "cancelled";
+    booking.cancellation     = {
+      cancelled_at:  new Date(),
+      reason:        reason || "Other",
+      cancelled_by:  "admin",
+      refund_amount,
+      refund_status,
+    };
+    await booking.save();
+
+    res.status(200).json({
+      message:        "Booking cancelled by admin successfully",
+      booking_id:     booking._id,
+      refund_amount,
+      refund_status,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+//  PRICING MANAGEMENT
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ─── Update Turf Pricing ──────────────────────────────────────────────────────
+const updatePricing = async (req, res) => {
+  try {
+    const {
+      price_per_hour,
+      weekend_price,
+      peak_hour_price,
+      peak_start,
+      peak_end,
+    } = req.body;
+
+    const turf = await Turf.findById(req.params.id);
+    if (!turf) {
+      return res.status(404).json({ message: "Turf not found" });
+    }
+
+    // Update base price
+    if (price_per_hour !== undefined) {
+      turf.price_per_hour = price_per_hour;
+    }
+
+    // Update pricing overrides
+    if (weekend_price !== undefined) {
+      turf.pricing_overrides.weekend_price = weekend_price;
+    }
+    if (peak_hour_price !== undefined) {
+      turf.pricing_overrides.peak_hour_price = peak_hour_price;
+    }
+    if (peak_start !== undefined) {
+      turf.pricing_overrides.peak_hours.start = peak_start;
+    }
+    if (peak_end !== undefined) {
+      turf.pricing_overrides.peak_hours.end = peak_end;
+    }
+
+    await turf.save();
+
+    res.status(200).json({
+      message: "Pricing updated successfully",
+      pricing: {
+        price_per_hour:    turf.price_per_hour,
+        pricing_overrides: turf.pricing_overrides,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── Update Slot Price Directly ───────────────────────────────────────────────
+const updateSlotPrice = async (req, res) => {
+  try {
+    const { price } = req.body;
+
+    if (!price) {
+      return res.status(400).json({ message: "price is required" });
+    }
+
+    const slot = await Slot.findById(req.params.id);
+    if (!slot) {
+      return res.status(404).json({ message: "Slot not found" });
+    }
+
+    if (slot.status === "booked") {
+      return res.status(400).json({ message: "Cannot update price of a booked slot" });
+    }
+
+    slot.price = price;
+    await slot.save();
+
+    res.status(200).json({
+      message: "Slot price updated successfully",
+      slot_id: slot._id,
+      start_time: slot.start_time,
+      end_time:   slot.end_time,
+      new_price:  slot.price,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 module.exports = {
+  // Auth
   adminRegister,
   adminLogin,
+
+  // Turf Management
   addTurf,
   editTurf,
   deleteTurf,
+
+  // Slot Management
   generateSlots,
   updateSlotStatus,
   getAdminSlots,
+
+  // Booking Management
+  getAllBookings,
+  getBookingByIdAdmin,
+  cancelBookingAdmin,
+
+  // Pricing Management
+  updatePricing,
+  updateSlotPrice,
 };
