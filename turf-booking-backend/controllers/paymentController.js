@@ -1,3 +1,5 @@
+const { sendBookingConfirmationEmail } = require("../utils/sendEmail");
+const User     = require("../models/User");
 const crypto   = require("crypto");
 const Booking  = require("../models/Booking");
 const Slot     = require("../models/Slot");
@@ -63,7 +65,6 @@ const createOrder = async (req, res) => {
   }
 };
 
-// ─── Verify Razorpay Payment ──────────────────────────────────────────────────
 const verifyPayment = async (req, res) => {
   try {
     const {
@@ -75,29 +76,24 @@ const verifyPayment = async (req, res) => {
 
     const user_id = req.user._id;
 
-    // Validate all fields
     if (!booking_id || !razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({
         message: "booking_id, razorpay_order_id, razorpay_payment_id and razorpay_signature are required",
       });
     }
 
-    // Find booking
     const booking = await Booking.findOne({ _id: booking_id, user_id });
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
 
-    // Check order_id matches
     if (booking.payment.razorpay_order_id !== razorpay_order_id) {
       return res.status(400).json({ message: "Order ID mismatch" });
     }
 
-    // ── Signature Verification (most important step) ──────────────────────────
-    // Razorpay signs the payment using:
-    // HMAC SHA256(razorpay_order_id + "|" + razorpay_payment_id, key_secret)
-    const body      = razorpay_order_id + "|" + razorpay_payment_id;
-    const expected  = crypto
+    // Verify signature
+    const body     = razorpay_order_id + "|" + razorpay_payment_id;
+    const expected = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
       .update(body)
       .digest("hex");
@@ -105,17 +101,13 @@ const verifyPayment = async (req, res) => {
     const isValid = expected === razorpay_signature;
 
     if (!isValid) {
-      // Payment is invalid — mark booking as failed
-      booking.booking_status        = "failed";
-      booking.payment.status        = "failed";
+      booking.booking_status = "failed";
+      booking.payment.status = "failed";
       await booking.save();
-
       return res.status(400).json({ message: "Payment verification failed. Invalid signature." });
     }
 
-    // ── Payment is valid — update everything ──────────────────────────────────
-
-    // 1. Update booking to confirmed
+    // Update booking
     booking.booking_status              = "confirmed";
     booking.payment.status              = "paid";
     booking.payment.razorpay_order_id   = razorpay_order_id;
@@ -125,7 +117,7 @@ const verifyPayment = async (req, res) => {
     booking.payment.paid_at             = new Date();
     await booking.save();
 
-    // 2. Update all slots to booked
+    // Update slots to booked
     await Slot.updateMany(
       { _id: { $in: booking.slot_ids } },
       {
@@ -136,6 +128,20 @@ const verifyPayment = async (req, res) => {
         },
       }
     );
+
+    // Send confirmation email
+    try {
+      const user = await User.findById(booking.user_id);
+      if (user && user.email) {
+        await sendBookingConfirmationEmail({
+          to:      user.email,
+          name:    user.name,
+          booking: booking,
+        });
+      }
+    } catch (emailErr) {
+      console.error("Email sending failed:", emailErr.message);
+    }
 
     res.status(200).json({
       message:        "Payment verified successfully. Booking confirmed!",

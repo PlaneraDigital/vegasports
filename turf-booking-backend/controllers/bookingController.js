@@ -2,6 +2,7 @@ const Booking = require("../models/Booking");
 const Slot    = require("../models/Slot");
 const Turf    = require("../models/Turf");
 const User    = require("../models/User");
+const { sendCancellationEmail } = require("../utils/sendEmail");
 
 const HOLD_MINUTES = 10; // slots held for 10 mins during payment
 
@@ -218,11 +219,77 @@ const cancelBooking = async (req, res) => {
     };
     await booking.save();
 
+     try {
+      const user = await User.findById(user_id);
+      if (user && user.email) {
+        await sendCancellationEmail({
+          to:      user.email,
+          name:    user.name,
+          booking: booking,
+        });
+      }
+    } catch (emailErr) {
+      console.error("Cancellation email failed:", emailErr.message);
+    }
+
     res.status(200).json({
       message:        "Booking cancelled successfully",
       booking_id:     booking._id,
       refund_amount,
       refund_status,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+// ─── Get Upcoming Bookings ────────────────────────────────────────────────────
+const getUpcomingBookings = async (req, res) => {
+  try {
+    const user_id = req.user._id;
+    const today   = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const bookings = await Booking.find({
+      user_id,
+      date:           { $gte: today },
+      booking_status: { $in: ["pending", "confirmed"] },
+    })
+      .sort({ date: 1, start_time: 1 })
+      .populate("turf_id",  "name location.address location.city images")
+      .populate("slot_ids", "start_time end_time price status");
+
+    res.status(200).json({
+      message: "Upcoming bookings fetched successfully",
+      count:   bookings.length,
+      bookings,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── Get Booking History ──────────────────────────────────────────────────────
+const getBookingHistory = async (req, res) => {
+  try {
+    const user_id = req.user._id;
+    const today   = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const bookings = await Booking.find({
+      user_id,
+      $or: [
+        { booking_status: { $in: ["completed", "cancelled", "failed"] } },
+        { date: { $lt: today } },
+      ],
+    })
+      .sort({ created_at: -1 })
+      .populate("turf_id",  "name location.address location.city images")
+      .populate("slot_ids", "start_time end_time price status");
+
+    res.status(200).json({
+      message: "Booking history fetched successfully",
+      count:   bookings.length,
+      bookings,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -234,4 +301,6 @@ module.exports = {
   getUserBookings,
   getBookingById,
   cancelBooking,
+  getUpcomingBookings,  // ← new
+  getBookingHistory,    // ← new
 };
