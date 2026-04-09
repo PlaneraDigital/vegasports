@@ -3,6 +3,7 @@ const Slot    = require("../models/Slot");
 const Turf    = require("../models/Turf");
 const User    = require("../models/User");
 const { sendCancellationEmail } = require("../utils/sendEmail");
+const generateInvoice = require("../utils/generateInvoice");
 
 const HOLD_MINUTES = 10; // slots held for 10 mins during payment
 
@@ -295,12 +296,49 @@ const getBookingHistory = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// ─── Download Invoice ─────────────────────────────────────────────────────────
+const downloadInvoice = async (req, res) => {
+  try {
+    const user_id    = req.user._id;
+    const booking_id = req.params.id;
 
+    const booking = await Booking.findOne({ _id: booking_id, user_id })
+      .populate("slot_ids", "start_time end_time price");
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Only allow invoice for confirmed or completed bookings
+    if (!["confirmed", "completed"].includes(booking.booking_status)) {
+      return res.status(400).json({
+        message: "Invoice only available for confirmed or completed bookings",
+      });
+    }
+
+    const user = await User.findById(user_id).select("name email phone");
+
+    // Generate PDF buffer
+    const pdfBuffer = await generateInvoice(booking, user);
+
+    // Set response headers for file download
+    res.setHeader("Content-Type",        "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=invoice_${booking._id}.pdf`
+    );
+
+    res.send(pdfBuffer);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 module.exports = {
   createBooking,
   getUserBookings,
   getBookingById,
   cancelBooking,
-  getUpcomingBookings,  // ← new
-  getBookingHistory,    // ← new
+  getUpcomingBookings,
+  getBookingHistory,
+  downloadInvoice,
 };
