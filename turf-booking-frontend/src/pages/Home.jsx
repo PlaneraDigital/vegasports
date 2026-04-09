@@ -1,9 +1,6 @@
 import '../styles/home.css'
 import { motion } from 'framer-motion'
 import { MapPin, Search } from 'lucide-react'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-
 import Card from '../components/Card'
 
 

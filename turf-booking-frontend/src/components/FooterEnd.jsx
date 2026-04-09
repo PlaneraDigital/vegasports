@@ -5,7 +5,7 @@ import { AiOutlineCheckCircle } from "react-icons/ai";
 
 const Footer = () => {
   return (
-    <footer className=" bottom-64 font-mono bg-black text-gray-400 text-sm">
+    <footer className=" bottom-64 bg-black text-gray-400 text-sm">
       
       {/* Top Section */}
       <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-700">
