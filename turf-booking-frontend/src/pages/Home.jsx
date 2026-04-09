@@ -4,12 +4,8 @@ import { MapPin, Search } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 
+import Card from '../components/Card'
 
-const turfs = [
-  { id: 1, name: "Six & Strike Turf", location: "Manickpur, Vasai West", price: 800, sport: "Cricket", image: "https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600&q=80" },
-  { id: 2, name: "Kollide Turf",       location: "Cricket Ground, Umel",  price: 900, sport: "Football", image: "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600&q=80" },
-  { id: 3, name: "Hobby Lobby Turf",   location: "Vasai West, Maharashtra", price: 750, sport: "Multi-Sport", image: "https://images.unsplash.com/photo-1551958219-acbc630e2914?w=600&q=80" },
-]
 
 const steps = [
   { icon: "🔍", title: "Find a Turf",  desc: "Search by sport, city or area" },
@@ -74,6 +70,7 @@ function Home() {
         </motion.div>
       </div>
 
+
       {/* All Turfs */}
       <section className="turfs-section" id="allturfs">
         <div className="section-header">
@@ -83,33 +80,11 @@ function Home() {
           </div>
           <a href="#">View all →</a>
         </div>
-        <div className="turf-grid">
-          {turfs.map((turf, i) => (
-            <motion.div
-              key={turf.id}
-              className="turf-card"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <div className="turf-img-wrap">
-                <img src={turf.image} alt={turf.name} />
-                <div className="turf-badge">{turf.sport}</div>
-              </div>
-              <div className="turf-card-body">
-                <h3>{turf.name}</h3>
-                <div className="turf-location">
-                  <MapPin size={12} /> {turf.location}
-                </div>
-                <div className="turf-footer">
-                  <div className="turf-price">₹{turf.price} <span>/ hour</span></div>
-                  <button className="turf-btn">Check slots →</button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
+        <Card />
+
+        
+        
       </section>
 
       {/* How It Works */}
