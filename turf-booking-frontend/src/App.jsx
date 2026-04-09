@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import TurfDetails from './TurfDetails'
+import FooterEnd from './components/FooterEnd'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       </main>
 
       <Footer />
+      <FooterEnd />
     </div>
   )
 }
