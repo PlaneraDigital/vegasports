@@ -1,11 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { IoFootballSharp } from "react-icons/io5";
 import { HiMenu, HiX } from "react-icons/hi";
+import { clearAuthSession, getAuthUser } from "../utils/auth";
 
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [authUser, setAuthUser] = useState(getAuthUser());
+
+  useEffect(() => {
+    const syncUser = () => setAuthUser(getAuthUser());
+
+    window.addEventListener("userUpdated", syncUser);
+    window.addEventListener("storage", syncUser);
+
+    return () => {
+      window.removeEventListener("userUpdated", syncUser);
+      window.removeEventListener("storage", syncUser);
+    };
+  }, []);
+
+  const handleLogout = () => {
+    clearAuthSession();
+    setOpen(false);
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-800"
@@ -34,13 +53,28 @@ const Navbar = () => {
           className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
           Become a Host
           </Link>
-          <Link to="/login"
-            className="ml-2 px-5 py-2 text-sm font-medium text-white rounded-md transition"
-            style={{ backgroundColor: '#16a34a' }}
-            onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
-            onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}>
-            Login
-          </Link>
+          {authUser ? (
+            <>
+              <span className="ml-2 px-3 py-2 text-sm text-gray-300">Hi, {authUser.name}</span>
+              <button
+                onClick={handleLogout}
+                className="px-5 py-2 text-sm font-medium text-white rounded-md transition cursor-pointer"
+                style={{ backgroundColor: '#16a34a' }}
+                onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
+                onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link to="/login"
+              className="ml-2 px-5 py-2 text-sm font-medium text-white rounded-md transition"
+              style={{ backgroundColor: '#16a34a' }}
+              onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
+              onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}>
+              Login
+            </Link>
+          )}
         </div>
 
         {/* Hamburger Icon */}
@@ -70,11 +104,26 @@ const Navbar = () => {
           className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
             Become a Host
           </Link>
-          <Link to="/login" onClick={() => setOpen(false)}
-            className="mt-1 px-8 py-2 text-sm font-medium text-white rounded-md transition"
-            style={{ backgroundColor: '#16a34a' }}>
-            Login
-          </Link>
+          {authUser ? (
+            <>
+              <div className="w-full text-center px-4 py-2 text-gray-300">
+                Hi, {authUser.name}
+              </div>
+              <button
+                onClick={handleLogout}
+                className="mt-1 px-8 py-2 text-sm font-medium text-white rounded-md transition"
+                style={{ backgroundColor: '#16a34a' }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link to="/login" onClick={() => setOpen(false)}
+              className="mt-1 px-8 py-2 text-sm font-medium text-white rounded-md transition"
+              style={{ backgroundColor: '#16a34a' }}>
+              Login
+            </Link>
+          )}
 
         </div>
       )}
