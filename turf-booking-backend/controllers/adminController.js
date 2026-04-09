@@ -1,9 +1,10 @@
-const bcrypt = require("bcryptjs");
-const jwt    = require("jsonwebtoken");
-const User   = require("../models/User");
-const Turf   = require("../models/Turf");
-const Slot   = require("../models/Slot");
-const Booking = require("../models/Booking"); 
+const mongoose = require("mongoose");
+const bcrypt   = require("bcryptjs");
+const jwt      = require("jsonwebtoken");
+const User     = require("../models/User");
+const Turf     = require("../models/Turf");
+const Slot     = require("../models/Slot");
+const Booking  = require("../models/Booking");
 
 // ─── Generate Token ───────────────────────────────────────────────────────────
 const generateToken = (userId) => {
@@ -595,6 +596,301 @@ const updateSlotPrice = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+// ══════════════════════════════════════════════════════════════════════════════
+//  ADMIN DASHBOARD + REPORTS
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ─── Overall Dashboard Stats ──────────────────────────────────────────────────
+const getDashboardStats = async (req, res) => {
+  try {
+    // Total counts
+    const totalBookings = await Booking.countDocuments();
+    const totalUsers    = await User.countDocuments({ role: "user" });
+    const totalTurfs    = await Turf.countDocuments({ status: "active" });
+
+    // Booking status breakdown
+    const bookingsByStatus = await Booking.aggregate([
+      {
+        $group: {
+          _id:   "$booking_status",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    // Total revenue (only paid bookings)
+    const revenueResult = await Booking.aggregate([
+      {
+        $match: { "payment.status": "paid" },
+      },
+      {
+        $group: {
+          _id:          null,
+          total_revenue: { $sum: "$total_amount" },
+        },
+      },
+    ]);
+    const total_revenue = revenueResult[0]?.total_revenue || 0;
+
+    // Today's stats
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setUTCHours(23, 59, 59, 999);
+
+    const todayBookings = await Booking.countDocuments({
+      created_at: { $gte: todayStart, $lte: todayEnd },
+    });
+
+    const todayRevenueResult = await Booking.aggregate([
+      {
+        $match: {
+          "payment.status": "paid",
+          "payment.paid_at": { $gte: todayStart, $lte: todayEnd },
+        },
+      },
+      {
+        $group: {
+          _id:           null,
+          today_revenue: { $sum: "$total_amount" },
+        },
+      },
+    ]);
+    const today_revenue = todayRevenueResult[0]?.today_revenue || 0;
+
+    // Format booking status breakdown
+    const statusMap = {};
+    bookingsByStatus.forEach((item) => {
+      statusMap[item._id] = item.count;
+    });
+
+    res.status(200).json({
+      message: "Dashboard stats fetched successfully",
+      stats: {
+        total_bookings:  totalBookings,
+        total_users:     totalUsers,
+        total_turfs:     totalTurfs,
+        total_revenue,
+        today: {
+          bookings: todayBookings,
+          revenue:  today_revenue,
+        },
+        bookings_by_status: {
+          pending:   statusMap["pending"]   || 0,
+          confirmed: statusMap["confirmed"] || 0,
+          completed: statusMap["completed"] || 0,
+          cancelled: statusMap["cancelled"] || 0,
+          failed:    statusMap["failed"]    || 0,
+        },
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── Revenue Report ───────────────────────────────────────────────────────────
+const getRevenueReport = async (req, res) => {
+  try {
+    const { period = "monthly", year, turf_id } = req.query;
+
+    const matchStage = { "payment.status": "paid" };
+
+    if (turf_id) matchStage.turf_id = new mongoose.Types.ObjectId(turf_id);
+
+    // Group by day or month
+    let groupId;
+    if (period === "daily") {
+      groupId = {
+        year:  { $year:  "$payment.paid_at" },
+        month: { $month: "$payment.paid_at" },
+        day:   { $dayOfMonth: "$payment.paid_at" },
+      };
+    } else {
+      groupId = {
+        year:  { $year:  "$payment.paid_at" },
+        month: { $month: "$payment.paid_at" },
+      };
+    }
+
+    // Filter by year if provided
+    if (year) {
+      matchStage["payment.paid_at"] = {
+        $gte: new Date(`${year}-01-01`),
+        $lte: new Date(`${year}-12-31`),
+      };
+    }
+
+    const revenueData = await Booking.aggregate([
+      { $match: matchStage },
+      {
+        $group: {
+          _id:            groupId,
+          total_revenue:  { $sum: "$total_amount" },
+          total_bookings: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1, "_id.day": 1 } },
+    ]);
+
+    // Total revenue
+    const totalRevenue = revenueData.reduce(
+      (sum, item) => sum + item.total_revenue, 0
+    );
+
+    res.status(200).json({
+      message: "Revenue report fetched successfully",
+      period,
+      total_revenue: totalRevenue,
+      data: revenueData.map((item) => ({
+        period: period === "daily"
+          ? `${item._id.year}-${String(item._id.month).padStart(2, "0")}-${String(item._id.day).padStart(2, "0")}`
+          : `${item._id.year}-${String(item._id.month).padStart(2, "0")}`,
+        total_revenue:  item.total_revenue,
+        total_bookings: item.total_bookings,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── Peak Hours Analysis ──────────────────────────────────────────────────────
+const getPeakHoursAnalysis = async (req, res) => {
+  try {
+    const { turf_id } = req.query;
+
+    const matchStage = { booking_status: "confirmed" };
+    if (turf_id) matchStage.turf_id = new mongoose.Types.ObjectId(turf_id);
+
+    const peakHours = await Booking.aggregate([
+      { $match: matchStage },
+      {
+        $group: {
+          _id:            "$start_time",
+          total_bookings: { $sum: 1 },
+          total_revenue:  { $sum: "$total_amount" },
+        },
+      },
+      { $sort: { total_bookings: -1 } },
+    ]);
+
+    res.status(200).json({
+      message: "Peak hours analysis fetched successfully",
+      peak_hours: peakHours.map((item) => ({
+        start_time:     item._id,
+        total_bookings: item.total_bookings,
+        total_revenue:  item.total_revenue,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── Per Turf Revenue Breakdown ───────────────────────────────────────────────
+const getTurfRevenueBreakdown = async (req, res) => {
+  try {
+    const turfRevenue = await Booking.aggregate([
+      { $match: { "payment.status": "paid" } },
+      {
+        $group: {
+          _id:            "$turf_id",
+          total_revenue:  { $sum: "$total_amount" },
+          total_bookings: { $sum: 1 },
+        },
+      },
+      {
+        $lookup: {
+          from:         "turfs",
+          localField:   "_id",
+          foreignField: "_id",
+          as:           "turf",
+        },
+      },
+      { $unwind: "$turf" },
+      {
+        $project: {
+          turf_name:      "$turf.name",
+          turf_city:      "$turf.location.city",
+          total_revenue:  1,
+          total_bookings: 1,
+        },
+      },
+      { $sort: { total_revenue: -1 } },
+    ]);
+
+    res.status(200).json({
+      message: "Turf revenue breakdown fetched successfully",
+      data: turfRevenue,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+// ─── User Analytics ───────────────────────────────────────────────────────────
+const getUserAnalytics = async (req, res) => {
+  try {
+    // Total users
+    const totalUsers  = await User.countDocuments({ role: "user" });
+    const activeUsers = await User.countDocuments({ role: "user", status: "active" });
+
+    // New users this month
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setUTCHours(0, 0, 0, 0);
+
+    const newUsersThisMonth = await User.countDocuments({
+      role:       "user",
+      created_at: { $gte: monthStart },
+    });
+
+    // Top users by bookings
+    const topUsers = await Booking.aggregate([
+      { $match: { "payment.status": "paid" } },
+      {
+        $group: {
+          _id:            "$user_id",
+          total_bookings: { $sum: 1 },
+          total_spent:    { $sum: "$total_amount" },
+        },
+      },
+      { $sort: { total_bookings: -1 } },
+      { $limit: 5 },
+      {
+        $lookup: {
+          from:         "profiles",
+          localField:   "_id",
+          foreignField: "_id",
+          as:           "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $project: {
+          name:           "$user.name",
+          email:          "$user.email",
+          phone:          "$user.phone",
+          total_bookings: 1,
+          total_spent:    1,
+        },
+      },
+    ]);
+
+    res.status(200).json({
+  message: "User analytics fetched successfully",
+  analytics: {
+    total_users:          totalUsers,   // ← fix: totalUsers not total_users
+    active_users:         activeUsers,
+    new_users_this_month: newUsersThisMonth,
+    top_users_by_bookings: topUsers,
+  },
+});
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
 module.exports = {
   // Auth
@@ -619,4 +915,11 @@ module.exports = {
   // Pricing Management
   updatePricing,
   updateSlotPrice,
+
+  // Dashboard + Reports
+  getDashboardStats,
+  getRevenueReport,
+  getPeakHoursAnalysis,
+  getTurfRevenueBreakdown,
+  getUserAnalytics,
 };
