@@ -5,8 +5,8 @@ const getAllTurfs = async (req, res) => {
   try {
     const { city, sport, surface } = req.query;
 
-    // Build filter object dynamically
-    const filter = { status: "active" };
+    // Build filter object dynamically without ANY status restrictions
+    const filter = {};
 
     if (city)    filter["location.city"]  = { $regex: city, $options: "i" };
     if (sport)   filter["sports"]         = { $in: [sport] };
