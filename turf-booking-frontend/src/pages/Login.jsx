@@ -140,7 +140,7 @@ const Login = () => {
               onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
               onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
             >
-              {isLoading ? 'Logging in...' : 'Login →'}
+              {isLoading ? 'Logging in...' : 'Login '}
             </button>
 
           </form>

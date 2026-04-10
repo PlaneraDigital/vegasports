@@ -223,7 +223,7 @@ const Signup = () => {
                 </div>
               )}
               {form.confirm.length > 0 && form.confirm === form.password && (
-                <span className="text-xs" style={{ color: '#4ade80' }}>✓ Passwords match</span>
+                <span className="text-xs" style={{ color: '#4ade80' }}>Passwords match</span>
               )}
             </div>
 
@@ -241,7 +241,7 @@ const Signup = () => {
               onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
               onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
             >
-              {isLoading ? 'Creating account...' : 'Create Account →'}
+              {isLoading ? 'Creating account...' : 'Create Account '}
             </button>
 
             <p className="text-center text-gray-500 text-sm mt-2">
