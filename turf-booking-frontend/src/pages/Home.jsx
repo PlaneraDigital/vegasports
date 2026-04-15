@@ -43,7 +43,7 @@ function Home() {
           </motion.p>
 
           <motion.div className="hero-actions" initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.3 }}>
-            <button className="btn-glow" onClick={scrollToAllTurfs}>Explore Turfs →</button>
+            <button className="btn-glow" onClick={scrollToAllTurfs}>Explore Turfs </button>
             <button className="btn-ghost">Become a Host</button>
           </motion.div>
 

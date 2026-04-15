@@ -3,8 +3,9 @@ const router = express.Router();
 const { getAllTurfs, getTurfById } = require("../controllers/turfController");
 const { protect } = require("../middleware/authMiddleware");
 
-// Both routes are protected — user must be logged in
-router.get("/", getAllTurfs);
-router.get("/:id", protect, getTurfById);
+// GET /        → public (anyone can browse)
+// GET /:id     → public (anyone can view turf details)
+router.get("/",    getAllTurfs);
+router.get("/:id", getTurfById);
 
 module.exports = router;
