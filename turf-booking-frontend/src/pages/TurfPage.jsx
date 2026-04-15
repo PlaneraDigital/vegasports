@@ -237,42 +237,92 @@ function AmenitiesGrid({ amenities }) {
 /* ─────────────────────────
    OPERATING HOURS
 ────────────────────────── */
-function OperatingHours({ hours }) {
+/* convert "06:00" → "6:00 AM" */
+function fmt(t) {
+  if (!t) return "";
+  const [h, m] = t.split(":").map(Number);
+  const ap = h >= 12 ? "PM" : "AM";
+  return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${ap}`;
+}
+
+/* group consecutive days that share identical open/close/is_closed */
+function groupDays(hours) {
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const groups = [];
+  let i = 0;
+  while (i < DAY_ORDER.length) {
+    const cur = hours[DAY_ORDER[i]];
+    let j = i;
+    while (
+      j + 1 < DAY_ORDER.length &&
+      hours[DAY_ORDER[j + 1]]?.open      === cur?.open &&
+      hours[DAY_ORDER[j + 1]]?.close     === cur?.close &&
+      hours[DAY_ORDER[j + 1]]?.is_closed === cur?.is_closed
+    ) j++;
+    groups.push({
+      label: j === i ? cap(DAY_ORDER[i]) : `${cap(DAY_ORDER[i])} – ${cap(DAY_ORDER[j])}`,
+      slot: cur,
+    });
+    i = j + 1;
+  }
+  return groups;
+}
+
+function OperatingHours({ hours, pricing_overrides }) {
   if (!hours) return null;
-  const todayJs = new Date().getDay();
-  const today   = DAY_ORDER[todayJs === 0 ? 6 : todayJs - 1];
+  const groups = groupDays(hours);
+  const peak   = pricing_overrides?.peak_hours;
 
   return (
     <section>
       <SectionHeading icon={CalendarDays} label="Operating Hours" />
-      <div className="rounded-xl border border-zinc-800 overflow-hidden">
-        {DAY_ORDER.map((day, idx) => {
-          const slot    = hours[day];
-          const isToday = day === today;
-          return (
-            <div key={day}
-              className={`flex items-center justify-between px-5 py-3 text-sm ${
-                idx !== DAY_ORDER.length - 1 ? "border-b border-zinc-800/60" : ""
-              } ${isToday ? "bg-green-950/25" : idx % 2 === 0 ? "bg-zinc-900/30" : ""}`}>
-              <div className="flex items-center gap-3 w-36">
-                {isToday && <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />}
-                <span className={`capitalize font-medium ${isToday ? "text-green-400" : "text-zinc-300"}`}>
-                  {day}
-                </span>
-                {isToday && (
-                  <span className="text-[10px] bg-green-900/60 text-green-400 border border-green-800/50 px-1.5 py-0.5 rounded-full font-medium">
-                    Today
-                  </span>
-                )}
+      <div className="grid sm:grid-cols-2 gap-6">
+
+        {/* Left — Regular Hours */}
+        <div>
+          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Regular Hours</p>
+          <div className="space-y-3">
+            {groups.map(({ label, slot }) => (
+              <div key={label} className="flex items-center justify-between">
+                <span className="text-sm text-zinc-300">{label}</span>
+                {slot?.is_closed
+                  ? <span className="text-red-400 text-sm font-medium">Closed</span>
+                  : (slot?.open && slot?.close)
+                    ? <span className="text-green-400 text-sm font-semibold tabular-nums">
+                        {fmt(slot.open)} – {fmt(slot.close)}
+                      </span>
+                    : <span className="text-zinc-600 text-sm">—</span>}
               </div>
-              {slot?.is_closed
-                ? <span className="text-red-400 text-xs font-medium">Closed</span>
-                : (slot?.open && slot?.close)
-                  ? <span className="text-zinc-300 tabular-nums">{slot.open} – {slot.close}</span>
-                  : <span className="text-zinc-600">—</span>}
+            ))}
+          </div>
+        </div>
+
+        {/* Right — Peak Hours + Holiday note */}
+        <div className="space-y-4">
+          {peak?.start && peak?.end && (
+            <div>
+              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Peak Hours</p>
+              <div className="bg-amber-950/40 border border-amber-700/40 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock size={14} className="text-amber-400" />
+                  <span className="text-amber-300 text-sm font-semibold">
+                    Evening Slots ({fmt(peak.start)} – {fmt(peak.end)})
+                  </span>
+                </div>
+                <p className="text-amber-500/80 text-xs leading-relaxed">
+                  Higher demand during these hours. We recommend booking in advance for evening slots.
+                </p>
+              </div>
             </div>
-          );
-        })}
+          )}
+          <div>
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">Holiday Schedule</p>
+            <p className="text-zinc-500 text-sm leading-relaxed">
+              Open on all public holidays. Special rates may apply on holidays.
+            </p>
+          </div>
+        </div>
+
       </div>
     </section>
   );
@@ -523,16 +573,6 @@ export default function TurfPage() {
             {/* Amenities */}
             <AmenitiesGrid amenities={turf.amenities} />
 
-            <Divider />
-
-            {/* Operating Hours */}
-            <OperatingHours hours={turf.operating_hours} />
-
-            <Divider />
-
-            {/* Rules */}
-            <Rules rules={turf.rules} />
-
           </div>
 
           {/* ════ RIGHT COLUMN (sticky sidebar) ════ */}
@@ -571,6 +611,13 @@ export default function TurfPage() {
           </div>
 
         </div>
+
+        {/* ── Full-width: Operating Hours + Rules ── */}
+        <Divider />
+        <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} />
+        <Divider />
+        <Rules rules={turf.rules} />
+
       </div>
 
       {/* ── MOBILE STICKY FOOTER ── */}
