@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { api } from "../utils/auth";
 import {
   MapPin, Star, Clock, IndianRupee, ChevronLeft, ChevronRight,
   Zap, Car, Droplets, ShieldCheck, Utensils, Dumbbell,
@@ -350,66 +351,6 @@ function Rules({ rules }) {
   );
 }
 
-/* ─────────────────────────
-   BOOKING SIDEBAR CARD
-────────────────────────── */
-function BookingCard({ turf }) {
-  const sym = turf.currency === "INR" ? "₹" : (turf.currency || "₹");
-  const hasOverrides = turf.pricing_overrides?.weekend_price || turf.pricing_overrides?.peak_hour_price;
-
-  return (
-    <div className="bg-zinc-900 border border-zinc-700/70 rounded-2xl overflow-hidden shadow-xl shadow-black/40">
-      <div className="px-6 pt-6 pb-5 border-b border-zinc-800">
-        <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold text-green-400">{sym}{turf.price_per_hour}</span>
-          <span className="text-zinc-500 text-sm">/ hr</span>
-        </div>
-        {turf.slot_duration_minutes && (
-          <p className="text-zinc-500 text-xs mt-1 flex items-center gap-1">
-            <Clock size={11} /> {turf.slot_duration_minutes}-min slots
-          </p>
-        )}
-      </div>
-
-      {hasOverrides && (
-        <div className="px-6 py-4 border-b border-zinc-800 space-y-3 text-sm">
-          {turf.pricing_overrides.weekend_price && (
-            <div className="flex justify-between items-center">
-              <span className="text-zinc-400">Weekend</span>
-              <span className="text-yellow-400 font-semibold">{sym}{turf.pricing_overrides.weekend_price}/hr</span>
-            </div>
-          )}
-          {turf.pricing_overrides.peak_hour_price && (
-            <div className="flex justify-between items-center">
-              <span className="text-zinc-400">Peak hours</span>
-              <span className="text-orange-400 font-semibold">{sym}{turf.pricing_overrides.peak_hour_price}/hr</span>
-            </div>
-          )}
-          {turf.pricing_overrides.peak_hours?.start && turf.pricing_overrides.peak_hours?.end && (
-            <div className="flex justify-between items-center">
-              <span className="text-zinc-500 text-xs">Peak time</span>
-              <span className="text-zinc-400 text-xs tabular-nums">
-                {turf.pricing_overrides.peak_hours.start} – {turf.pricing_overrides.peak_hours.end}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="px-6 py-5">
-        <button id="book-now-sidebar"
-          className="w-full py-3.5 bg-green-600 hover:bg-green-500 active:scale-95 text-white font-bold rounded-xl transition-all duration-150 text-sm tracking-wide shadow-lg shadow-green-900/40">
-          Book a Slot
-        </button>
-        <p className="text-center text-zinc-600 text-xs mt-3">Instant confirmation · No hidden charges</p>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════
-   MAIN PAGE
-═══════════════════════════════════ */
 export default function TurfPage() {
   const { id }    = useParams();
   const navigate  = useNavigate();
@@ -575,10 +516,26 @@ export default function TurfPage() {
 
           </div>
 
-          {/* ════ RIGHT COLUMN (sticky sidebar) ════ */}
-          <div className="hidden md:block">
+          {/* ════ RIGHT COLUMN (cta sidebar) ════ */}
+          <div className="w-full mt-8 md:mt-0">
             <div className="sticky top-24">
-              <BookingCard turf={turf} />
+              
+              <div className="bg-[#0a0a0a] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl p-7 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-green-500/5 before:to-transparent before:pointer-events-none">
+                <h3 className="text-white font-bold text-xl mb-2">Ready to play?</h3>
+                <p className="text-zinc-400 text-sm mb-6">Select your dates and check availability directly on our secure booking page.</p>
+                
+                <div className="flex items-baseline gap-1.5 mb-6">
+                  <span className="text-4xl font-extrabold text-white tracking-tight">{sym}{turf.price_per_hour}</span>
+                  <span className="text-zinc-500 text-sm font-medium">/ hour</span>
+                </div>
+
+                <button 
+                  onClick={() => navigate(`/turf/${turf._id}/book`)}
+                  className="w-full py-4 bg-white text-black text-[15px] font-bold rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:bg-zinc-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                  Book Slots <ChevronRight size={18} />
+                </button>
+              </div>
 
               {/* Location info card */}
               <div className="mt-4 bg-zinc-900/60 border border-zinc-800 rounded-xl px-5 py-4 space-y-2.5 text-sm">
@@ -634,6 +591,7 @@ export default function TurfPage() {
           )}
         </div>
         <button id="book-now-mobile"
+          onClick={() => navigate(`/turf/${turf._id}/book`)}
           className="px-7 py-2.5 bg-green-600 hover:bg-green-500 active:scale-95 text-white font-bold rounded-full transition-all text-sm">
           Book Now
         </button>
