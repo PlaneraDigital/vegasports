@@ -229,8 +229,130 @@ const cancelBooking = async (req, res) => {
   }
 };
 
+// ─── Confirm Booking Directly (No Payment) ───────────────────────────────────
+const confirmBookingDirect = async (req, res) => {
+  try {
+    const { turf_id, date, slot_ids } = req.body;
+    const user_id = req.user._id;
+
+    // Validate required fields
+    if (!turf_id || !date || !slot_ids || slot_ids.length === 0) {
+      return res.status(400).json({
+        message: "turf_id, date and slot_ids are required",
+      });
+    }
+
+    // Check turf exists
+    const turf = await Turf.findById(turf_id);
+    if (!turf) {
+      return res.status(404).json({ message: "Turf not found" });
+    }
+
+    // Auto-expire any stale on_hold slots first
+    await Slot.updateMany(
+      { status: "on_hold", held_until: { $lt: new Date() } },
+      { $set: { status: "available", held_until: null, booked_by: null } }
+    );
+
+    // Fetch requested slots
+    const slots = await Slot.find({
+      _id:     { $in: slot_ids },
+      turf_id: turf_id,
+    });
+
+    // Check all slot_ids were found
+    if (slots.length !== slot_ids.length) {
+      return res.status(400).json({
+        message: "One or more slots not found for this turf",
+      });
+    }
+
+    // Check all slots are available
+    const unavailableSlots = slots.filter((s) => s.status !== "available");
+    if (unavailableSlots.length > 0) {
+      return res.status(400).json({
+        message: "One or more slots are no longer available",
+        unavailable: unavailableSlots.map((s) => ({
+          slot_id:    s._id,
+          start_time: s.start_time,
+          end_time:   s.end_time,
+          status:     s.status,
+        })),
+      });
+    }
+
+    // Calculate total amount
+    const total_amount = slots.reduce((sum, s) => sum + s.price, 0);
+
+    // Get start and end time from sorted slots
+    const sortedSlots = [...slots].sort((a, b) =>
+      a.start_time.localeCompare(b.start_time)
+    );
+    const start_time = sortedSlots[0].start_time;
+    const end_time   = sortedSlots[sortedSlots.length - 1].end_time;
+
+    // Mark slots as booked immediately
+    await Slot.updateMany(
+      { _id: { $in: slot_ids } },
+      {
+        $set: {
+          status:     "booked",
+          booked_by:  user_id,
+          held_until: null,
+        },
+      }
+    );
+
+    // Create booking with confirmed status (skip payment)
+    const booking = await Booking.create({
+      user_id,
+      turf_id,
+      slot_ids,
+      date:        new Date(date),
+      start_time,
+      end_time,
+      total_amount,
+
+      turf_name_snapshot:      turf.name,
+      turf_address_snapshot:   turf.location?.address || "",
+      price_per_slot_snapshot: slots[0].price,
+
+      payment: {
+        status:  "pending",   // will be updated when Razorpay is integrated
+        gateway: "razorpay",
+      },
+      booking_status: "confirmed",
+    });
+
+    // Link booking_id back onto the slots
+    await Slot.updateMany(
+      { _id: { $in: slot_ids } },
+      { $set: { booking_id: booking._id } }
+    );
+
+    // Add booking id to user's booking_ids
+    await User.findByIdAndUpdate(user_id, {
+      $push: { booking_ids: booking._id },
+    });
+
+    res.status(201).json({
+      message:      "Booking confirmed successfully!",
+      booking_id:   booking._id,
+      total_amount,
+      start_time,
+      end_time,
+      booking_status: "confirmed",
+      turf_name:    turf.name,
+      slots_booked: slot_ids.length,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   createBooking,
+  confirmBookingDirect,
   getUserBookings,
   getBookingById,
   cancelBooking,
