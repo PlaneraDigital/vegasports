@@ -7,6 +7,7 @@ import Signup from './pages/Signup'
 import TurfDetails from './pages/TurfDetails'
 import TurfPage from './pages/TurfPage'
 import BookingPage from './pages/BookingPage'
+import ProfilePage from './pages/ProfilePage'
 import FooterEnd from './components/FooterEnd'
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />            
           <Route path="/turf/:id" element={<TurfPage />} />
           <Route path="/turf/:id/book" element={<BookingPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </main>
 

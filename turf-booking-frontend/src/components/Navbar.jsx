@@ -55,7 +55,12 @@ const Navbar = () => {
           </Link>
           {authUser ? (
             <>
-              <span className="ml-2 px-3 py-2 text-sm text-gray-300">Hi, {authUser.name}</span>
+              <Link
+                to="/profile"
+                className="ml-2 px-3 py-2 text-sm text-gray-300 hover:text-green-400 transition"
+              >
+                Hi, {authUser.name}
+              </Link>
               <button
                 onClick={handleLogout}
                 className="px-5 py-2 text-sm font-medium text-white rounded-md transition cursor-pointer"
@@ -106,9 +111,10 @@ const Navbar = () => {
           </Link>
           {authUser ? (
             <>
-              <div className="w-full text-center px-4 py-2 text-gray-300">
+              <Link to="/profile" onClick={() => setOpen(false)}
+                className="w-full text-center px-4 py-3 text-gray-300 hover:text-green-400 transition font-medium">
                 Hi, {authUser.name}
-              </div>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="mt-1 px-8 py-2 text-sm font-medium text-white rounded-md transition"
