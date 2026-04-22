@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
 const Slot    = require("../models/Slot");
 const Turf    = require("../models/Turf");
@@ -30,9 +31,13 @@ const createBooking = async (req, res) => {
       { $set: { status: "available", held_until: null, booked_by: null } }
     );
 
+    // Convert string IDs to ObjectIds
+    // Convert string IDs to ObjectIds
+    const objectIds = slot_ids.map(id => new mongoose.Types.ObjectId(id));
+
     // Fetch requested slots
     const slots = await Slot.find({
-      _id:     { $in: slot_ids },
+      _id:     { $in: objectIds },
       turf_id: turf_id,
     });
 
@@ -71,7 +76,7 @@ const createBooking = async (req, res) => {
     const held_until = new Date(Date.now() + HOLD_MINUTES * 60 * 1000);
 
     await Slot.updateMany(
-      { _id: { $in: slot_ids } },
+      { _id: { $in: objectIds } },
       {
         $set: {
           status:    "on_hold",
@@ -254,9 +259,13 @@ const confirmBookingDirect = async (req, res) => {
       { $set: { status: "available", held_until: null, booked_by: null } }
     );
 
+    // Convert string IDs to ObjectIds
+    // Convert string IDs to ObjectIds
+    const objectIds = slot_ids.map(id => new mongoose.Types.ObjectId(id));
+
     // Fetch requested slots
     const slots = await Slot.find({
-      _id:     { $in: slot_ids },
+      _id:     { $in: objectIds },
       turf_id: turf_id,
     });
 
@@ -291,9 +300,9 @@ const confirmBookingDirect = async (req, res) => {
     const start_time = sortedSlots[0].start_time;
     const end_time   = sortedSlots[sortedSlots.length - 1].end_time;
 
-    // Mark slots as booked immediately
-    await Slot.updateMany(
-      { _id: { $in: slot_ids } },
+    // Mark slots as booked immediately (with status, booked_by, and held_until)
+    const updateResult = await Slot.updateMany(
+      { _id: { $in: objectIds } },
       {
         $set: {
           status:     "booked",
@@ -302,6 +311,8 @@ const confirmBookingDirect = async (req, res) => {
         },
       }
     );
+
+    console.log(`Updated ${updateResult.modifiedCount} slots to 'booked' status`);
 
     // Create booking with confirmed status (skip payment)
     const booking = await Booking.create({
@@ -325,10 +336,12 @@ const confirmBookingDirect = async (req, res) => {
     });
 
     // Link booking_id back onto the slots
-    await Slot.updateMany(
-      { _id: { $in: slot_ids } },
+    const finalUpdate = await Slot.updateMany(
+      { _id: { $in: objectIds } },
       { $set: { booking_id: booking._id } }
     );
+
+    console.log(`Linked booking ID to ${finalUpdate.modifiedCount} slots`);
 
     // Add booking id to user's booking_ids
     await User.findByIdAndUpdate(user_id, {

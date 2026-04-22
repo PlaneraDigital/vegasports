@@ -44,6 +44,7 @@ const getSlotsByTurfAndDate = async (req, res) => {
           status:     "available",
           held_until: null,
           booked_by:  null,
+          booking_id: null,
         },
       }
     );
