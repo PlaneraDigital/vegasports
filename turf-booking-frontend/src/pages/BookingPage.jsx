@@ -103,18 +103,68 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, sym, onBook
       const rawDate  = new Date(selectedSlots[0].date);
       const date     = `${rawDate.getUTCFullYear()}-${String(rawDate.getUTCMonth() + 1).padStart(2, "0")}-${String(rawDate.getUTCDate()).padStart(2, "0")}`;
 
-      const res = await api.post("/api/bookings/confirm-direct", {
+      // 1. Create a hold (pending booking)
+      const bookingRes = await api.post("/api/bookings", {
         turf_id: turf._id,
         date,
         slot_ids,
       });
 
-      onBookingSuccess(res.data);
+      const { booking_id } = bookingRes.data;
+
+      // 2. Initialize Razorpay order
+      const orderRes = await api.post("/api/payment/create-order", {
+        booking_id,
+      });
+
+      const orderData = orderRes.data;
+
+      // 3. Open Razorpay checkout
+      const options = {
+        key: orderData.razorpay_key_id,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: turf.name,
+        description: `Booking for ${selectedSlots.length} slot(s)`,
+        order_id: orderData.order_id,
+        handler: async function (response) {
+          try {
+            setBooking(true); // show loader during verification
+            // 4. Verify payment
+            const verifyRes = await api.post("/api/payment/verify", {
+              booking_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            onBookingSuccess(verifyRes.data);
+          } catch (verifyErr) {
+            setBookingErr(
+              verifyErr.response?.data?.message || "Payment verification failed. Please contact support."
+            );
+          } finally {
+            setBooking(false);
+          }
+        },
+        theme: {
+          color: "#22c55e",
+        },
+      };
+
+      const razorpayInstance = new window.Razorpay(options);
+      
+      razorpayInstance.on("payment.failed", function (response) {
+        setBookingErr(response.error.description || "Payment failed.");
+      });
+
+      razorpayInstance.open();
     } catch (err) {
       setBookingErr(
         err.response?.data?.message || "Booking failed. Please try again."
       );
     } finally {
+      // Hide loader so the user can interact with the Razorpay modal
       setBooking(false);
     }
   };

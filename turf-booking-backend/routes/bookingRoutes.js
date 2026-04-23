@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const {
   createBooking,
-  confirmBookingDirect,
   getUserBookings,
   getBookingById,
   cancelBooking,

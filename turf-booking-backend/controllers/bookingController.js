@@ -340,7 +340,6 @@ const downloadInvoice = async (req, res) => {
 };
 module.exports = {
   createBooking,
-  confirmBookingDirect,
   getUserBookings,
   getBookingById,
   cancelBooking,
