@@ -46,8 +46,8 @@ const register = async (req, res) => {
       message: "User registered successfully",
       token,
       user: {
-        id:    user._id,
-        name:  user.name,
+        id: user._id,
+        name: user.name,
         email: user.email,
         phone: user.phone,
       },
@@ -95,8 +95,8 @@ const login = async (req, res) => {
       message: "Login successful",
       token,
       user: {
-        id:    user._id,
-        name:  user.name,
+        id: user._id,
+        name: user.name,
         email: user.email,
         phone: user.phone,
       },
@@ -122,4 +122,36 @@ const getProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile };
+// ─── Update Profile ───────────────────────────────────────────────────────────
+const updateProfile = async (req, res) => {
+  try {
+    const { dob, gender, location, preferred_sports } = req.body;
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (dob !== undefined) user.dob = dob;
+    if (gender !== undefined) user.gender = gender;
+    if (location) {
+      user.location = {
+        city: location.city !== undefined ? location.city : user.location.city,
+        state: location.state !== undefined ? location.state : user.location.state,
+        pincode: location.pincode !== undefined ? location.pincode : user.location.pincode,
+      };
+    }
+    if (preferred_sports !== undefined) {
+      user.preferred_sports = preferred_sports;
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(req.user.id).select("-auth.password_hash");
+    res.status(200).json({ message: "Profile updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { register, login, getProfile, updateProfile };
