@@ -1,7 +1,8 @@
+const mongoose = require("mongoose");
 const Booking = require("../models/Booking");
-const Slot    = require("../models/Slot");
-const Turf    = require("../models/Turf");
-const User    = require("../models/User");
+const Slot = require("../models/Slot");
+const Turf = require("../models/Turf");
+const User = require("../models/User");
 const { sendCancellationEmail } = require("../utils/sendEmail");
 const generateInvoice = require("../utils/generateInvoice");
 
@@ -32,9 +33,13 @@ const createBooking = async (req, res) => {
       { $set: { status: "available", held_until: null, booked_by: null } }
     );
 
+    // Convert string IDs to ObjectIds
+    // Convert string IDs to ObjectIds
+    const objectIds = slot_ids.map(id => new mongoose.Types.ObjectId(id));
+
     // Fetch requested slots
     const slots = await Slot.find({
-      _id:     { $in: slot_ids },
+      _id: { $in: slot_ids },
       turf_id: turf_id,
     });
 
@@ -51,10 +56,10 @@ const createBooking = async (req, res) => {
       return res.status(400).json({
         message: "One or more slots are not available",
         unavailable: unavailableSlots.map((s) => ({
-          slot_id:    s._id,
+          slot_id: s._id,
           start_time: s.start_time,
-          end_time:   s.end_time,
-          status:     s.status,
+          end_time: s.end_time,
+          status: s.status,
         })),
       });
     }
@@ -67,16 +72,16 @@ const createBooking = async (req, res) => {
       a.start_time.localeCompare(b.start_time)
     );
     const start_time = sortedSlots[0].start_time;
-    const end_time   = sortedSlots[sortedSlots.length - 1].end_time;
+    const end_time = sortedSlots[sortedSlots.length - 1].end_time;
 
     // Hold all slots for 10 minutes
     const held_until = new Date(Date.now() + HOLD_MINUTES * 60 * 1000);
 
     await Slot.updateMany(
-      { _id: { $in: slot_ids } },
+      { _id: { $in: objectIds } },
       {
         $set: {
-          status:    "on_hold",
+          status: "on_hold",
           booked_by: user_id,
           held_until,
         },
@@ -88,17 +93,17 @@ const createBooking = async (req, res) => {
       user_id,
       turf_id,
       slot_ids,
-      date:        new Date(date),
+      date: new Date(date),
       start_time,
       end_time,
       total_amount,
 
-      turf_name_snapshot:      turf.name,
-      turf_address_snapshot:   turf.location?.address || "",
+      turf_name_snapshot: turf.name,
+      turf_address_snapshot: turf.location?.address || "",
       price_per_slot_snapshot: slots[0].price,
 
       payment: {
-        status:  "pending",
+        status: "pending",
         gateway: "razorpay",
       },
       booking_status: "pending",
@@ -111,12 +116,12 @@ const createBooking = async (req, res) => {
 
     res.status(201).json({
       message: "Booking created and slots held for 10 minutes. Complete payment to confirm.",
-      booking_id:   booking._id,
+      booking_id: booking._id,
       total_amount,
       start_time,
       end_time,
       held_until,
-      slots_held:   slot_ids.length,
+      slots_held: slot_ids.length,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -135,7 +140,7 @@ const getUserBookings = async (req, res) => {
 
     res.status(200).json({
       message: "Bookings fetched successfully",
-      count:   bookings.length,
+      count: bookings.length,
       bookings,
     });
   } catch (error) {
@@ -146,11 +151,11 @@ const getUserBookings = async (req, res) => {
 // ─── Get Single Booking ───────────────────────────────────────────────────────
 const getBookingById = async (req, res) => {
   try {
-    const user_id    = req.user._id;
+    const user_id = req.user._id;
     const booking_id = req.params.id;
 
     const booking = await Booking.findOne({ _id: booking_id, user_id })
-      .populate("turf_id",  "name location.address location.city images rating")
+      .populate("turf_id", "name location.address location.city images rating")
       .populate("slot_ids", "start_time end_time price status date");
 
     if (!booking) {
@@ -169,7 +174,7 @@ const getBookingById = async (req, res) => {
 // ─── Cancel Booking ───────────────────────────────────────────────────────────
 const cancelBooking = async (req, res) => {
   try {
-    const user_id    = req.user._id;
+    const user_id = req.user._id;
     const booking_id = req.params.id;
     const { reason } = req.body;
 
@@ -191,8 +196,8 @@ const cancelBooking = async (req, res) => {
       { _id: { $in: booking.slot_ids } },
       {
         $set: {
-          status:     "available",
-          booked_by:  null,
+          status: "available",
+          booked_by: null,
           held_until: null,
           booking_id: null,
         },
@@ -210,22 +215,22 @@ const cancelBooking = async (req, res) => {
       : "na";
 
     // Update booking
-    booking.booking_status        = "cancelled";
+    booking.booking_status = "cancelled";
     booking.cancellation = {
-      cancelled_at:  new Date(),
-      reason:        reason || "Other",
-      cancelled_by:  "user",
+      cancelled_at: new Date(),
+      reason: reason || "Other",
+      cancelled_by: "user",
       refund_amount,
       refund_status,
     };
     await booking.save();
 
-     try {
+    try {
       const user = await User.findById(user_id);
       if (user && user.email) {
         await sendCancellationEmail({
-          to:      user.email,
-          name:    user.name,
+          to: user.email,
+          name: user.name,
           booking: booking,
         });
       }
@@ -234,8 +239,8 @@ const cancelBooking = async (req, res) => {
     }
 
     res.status(200).json({
-      message:        "Booking cancelled successfully",
-      booking_id:     booking._id,
+      message: "Booking cancelled successfully",
+      booking_id: booking._id,
       refund_amount,
       refund_status,
     });
@@ -247,21 +252,21 @@ const cancelBooking = async (req, res) => {
 const getUpcomingBookings = async (req, res) => {
   try {
     const user_id = req.user._id;
-    const today   = new Date();
+    const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
     const bookings = await Booking.find({
       user_id,
-      date:           { $gte: today },
+      date: { $gte: today },
       booking_status: { $in: ["pending", "confirmed"] },
     })
       .sort({ date: 1, start_time: 1 })
-      .populate("turf_id",  "name location.address location.city images")
+      .populate("turf_id", "name location.address location.city images")
       .populate("slot_ids", "start_time end_time price status");
 
     res.status(200).json({
       message: "Upcoming bookings fetched successfully",
-      count:   bookings.length,
+      count: bookings.length,
       bookings,
     });
   } catch (error) {
@@ -273,7 +278,7 @@ const getUpcomingBookings = async (req, res) => {
 const getBookingHistory = async (req, res) => {
   try {
     const user_id = req.user._id;
-    const today   = new Date();
+    const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
     const bookings = await Booking.find({
@@ -284,12 +289,12 @@ const getBookingHistory = async (req, res) => {
       ],
     })
       .sort({ created_at: -1 })
-      .populate("turf_id",  "name location.address location.city images")
+      .populate("turf_id", "name location.address location.city images")
       .populate("slot_ids", "start_time end_time price status");
 
     res.status(200).json({
       message: "Booking history fetched successfully",
-      count:   bookings.length,
+      count: bookings.length,
       bookings,
     });
   } catch (error) {
@@ -299,7 +304,7 @@ const getBookingHistory = async (req, res) => {
 // ─── Download Invoice ─────────────────────────────────────────────────────────
 const downloadInvoice = async (req, res) => {
   try {
-    const user_id    = req.user._id;
+    const user_id = req.user._id;
     const booking_id = req.params.id;
 
     const booking = await Booking.findOne({ _id: booking_id, user_id })
@@ -322,7 +327,7 @@ const downloadInvoice = async (req, res) => {
     const pdfBuffer = await generateInvoice(booking, user);
 
     // Set response headers for file download
-    res.setHeader("Content-Type",        "application/pdf");
+    res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
       `attachment; filename=invoice_${booking._id}.pdf`
@@ -335,6 +340,7 @@ const downloadInvoice = async (req, res) => {
 };
 module.exports = {
   createBooking,
+  confirmBookingDirect,
   getUserBookings,
   getBookingById,
   cancelBooking,

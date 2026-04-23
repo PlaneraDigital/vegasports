@@ -5,8 +5,8 @@ const getAllTurfs = async (req, res) => {
   try {
     const { city, sport, surface } = req.query;
 
-    // Build filter object dynamically
-    const filter = { status: "active" };
+    // Build filter object dynamically without ANY status restrictions
+    const filter = {};
 
     if (city)    filter["location.city"]  = { $regex: city, $options: "i" };
     if (sport)   filter["sports"]         = { $in: [sport] };
@@ -35,10 +35,8 @@ const getTurfById = async (req, res) => {
       return res.status(404).json({ message: "Turf not found" });
     }
 
-    if (turf.status !== "active") {
-      return res.status(400).json({ message: "Turf is not available" });
-    }
-
+    // Status is returned in the response — frontend shows it.
+    // Blocking booking for non-active turfs is handled at the booking layer.
     res.status(200).json({
       message: "Turf fetched successfully",
       turf,

@@ -44,15 +44,80 @@ const getSlotsByTurfAndDate = async (req, res) => {
           status:     "available",
           held_until: null,
           booked_by:  null,
+          booking_id: null,
         },
       }
     );
 
     // Fetch slots
-    const slots = await Slot.find({
+    let slots = await Slot.find({
       turf_id,
       date: { $gte: startOfDay, $lte: endOfDay },
     }).sort({ start_time: 1 });
+
+    // Auto-generate if empty
+    if (slots.length === 0 && turf.operating_hours) {
+      const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+      const dayName = days[startOfDay.getUTCDay()];
+      const daySchedule = turf.operating_hours[dayName];
+      const slotDuration = turf.slot_duration_minutes;
+
+      if (daySchedule && !daySchedule.is_closed && daySchedule.open && daySchedule.close && slotDuration) {
+        const [openH, openM]   = daySchedule.open.split(":").map(Number);
+        const [closeH, closeM] = daySchedule.close.split(":").map(Number);
+        
+        let startMinutes = openH * 60 + openM;
+        let endMinutes   = closeH * 60 + closeM;
+        if (endMinutes <= startMinutes) endMinutes += 24 * 60; // Next morning overlap
+
+        const newSlots = [];
+        const { weekend_price, peak_hour_price, peak_hours } = turf.pricing_overrides || {};
+        
+        let peakStartMin = -1, peakEndMin = -1;
+        if (peak_hours && peak_hours.start && peak_hours.end) {
+            const [psH, psM] = peak_hours.start.split(":").map(Number);
+            peakStartMin = psH * 60 + psM;
+            const [peH, peM] = peak_hours.end.split(":").map(Number);
+            peakEndMin = peH * 60 + peM;
+            if (peakEndMin <= peakStartMin) peakEndMin += 24 * 60;
+        }
+
+        for (let m = startMinutes; m + slotDuration <= endMinutes; m += slotDuration) {
+           const formatM = (mins) => {
+               const hm = mins % (24 * 60);
+               return `${String(Math.floor(hm/60)).padStart(2, "0")}:${String(hm%60).padStart(2, "0")}`;
+           };
+
+           let price = turf.price_per_hour;
+           const isWeekend = dayName === "saturday" || dayName === "sunday";
+           if (isWeekend && weekend_price) price = weekend_price;
+
+           if (peak_hour_price && peakStartMin !== -1) {
+              const currentSm = m % (24 * 60);
+              if (currentSm >= peakStartMin && currentSm < peakEndMin) {
+                 price = peak_hour_price;
+              }
+           }
+
+           newSlots.push({
+               turf_id: turf._id,
+               date: startOfDay,
+               start_time: formatM(m),
+               end_time: formatM(m + slotDuration),
+               price: price,
+               status: "available"
+           });
+        }
+
+        if (newSlots.length > 0) {
+            await Slot.insertMany(newSlots);
+            slots = await Slot.find({
+              turf_id,
+              date: { $gte: startOfDay, $lte: endOfDay },
+            }).sort({ start_time: 1 });
+        }
+      }
+    }
 
     // Summary count
     const summary = {
