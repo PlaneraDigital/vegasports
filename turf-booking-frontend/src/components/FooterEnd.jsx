@@ -6,11 +6,11 @@ import { AiOutlineCheckCircle } from "react-icons/ai";
 const Footer = () => {
   return (
     <footer className=" bottom-64 bg-black text-gray-400 text-sm">
-      
+
       {/* Top Section */}
       <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-700">
-        
-        <p>© 2026 vegasports. All rights reserved.</p>
+
+        <p>© 2026 Infinity Sports Turf. All rights reserved.</p>
 
         <div className="flex gap-6">
           <Link to="/terms_&_conditions" className="hover:text-green-600 transition">
@@ -24,7 +24,7 @@ const Footer = () => {
 
       {/* Bottom Section */}
       <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-center items-center gap-6 text-green-400">
-        
+
         <div className="flex items-center gap-2">
           <FaShieldAlt />
           <span>Secure SSL Booking</span>

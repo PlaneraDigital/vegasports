@@ -5,8 +5,8 @@ import Card from '../components/Card'
 
 
 const steps = [
-  { icon: "🔍", title: "Find a Turf",  desc: "Search by sport, city or area" },
-  { icon: "📅", title: "Pick a Slot",  desc: "Real-time availability, no guessing" },
+  { icon: "🔍", title: "Find a Turf", desc: "Search by sport, city or area" },
+  { icon: "📅", title: "Pick a Slot", desc: "Real-time availability, no guessing" },
   { icon: "💳", title: "Pay Securely", desc: "Instant confirmation via Razorpay" },
   { icon: "⚽", title: "Play & Enjoy", desc: "Show up and play, zero hassle" },
 ]
@@ -80,8 +80,8 @@ function Home() {
 
         <Card />
 
-        
-        
+
+
       </section>
 
       {/* How It Works */}
@@ -115,7 +115,7 @@ function Home() {
           Own a Turf?
         </motion.h2>
         <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 }}>
-          List on vegasports and start getting digital bookings today. Zero commission for early partners.
+          List on Infinity Sports Turf and start getting digital bookings today. Zero commission for early partners.
         </motion.p>
         <div className="cta-buttons">
           <button className="btn-glow">List Your Turf</button>

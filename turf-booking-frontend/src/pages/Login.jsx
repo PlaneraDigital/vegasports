@@ -58,7 +58,7 @@ const Login = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="text-2xl brand-wordmark" style={{ color: '#4ade80' }}>
-            vegasports
+            Infinity Sports Turf
           </Link>
           <p className="text-gray-400 text-sm mt-2">Welcome back. Login to book your turf.</p>
         </div>

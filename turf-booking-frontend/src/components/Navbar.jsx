@@ -36,7 +36,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2 text-2xl font-bold cursor-pointer group"
           style={{ color: '#4ade80' }}>
           <IoFootballSharp className="transition duration-700 group-hover:rotate-180" />
-          <span className="brand-wordmark">vegasports</span>
+          <span className="brand-wordmark">Infinity Sports Turf</span>
         </Link>
 
         {/* Desktop Links */}
@@ -46,12 +46,12 @@ const Navbar = () => {
             Home
           </Link>
           <Link to="/turf-played"
-          className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
-          Turf Played
+            className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
+            Turf Played
           </Link>
           <Link to="/become-a-host"
-          className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
-          Become a Host
+            className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
+            Become a Host
           </Link>
           {authUser ? (
             <>
@@ -105,8 +105,8 @@ const Navbar = () => {
             className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
             Turf Played
           </Link>
-          <Link to="/Become-A-Host" onClick={() => setOpen(false)}            
-          className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
+          <Link to="/Become-A-Host" onClick={() => setOpen(false)}
+            className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
             Become a Host
           </Link>
           {authUser ? (

@@ -5,7 +5,7 @@ function Footer() {
     <footer className="footer">
       <div className="footer__grid">
         <div>
-          <h3 className="footer__brand brand-wordmark">vegasports</h3>
+          <h3 className="footer__brand brand-wordmark">Infinity Sports Turf</h3>
           <p className="footer__text">Your premier destination for sports turf bookings.</p>
         </div>
         <div>
@@ -22,7 +22,7 @@ function Footer() {
         </div>
         <div className="footer__contact">
           <p>📞 +91 7387628021</p>
-          <p>✉️ vegasports83@gmail.com</p>
+          <p>✉️ Infinity Sports Turf83@gmail.com</p>
           <p>📍 Vasai Maharashtra, India</p>
         </div>
       </div>
