@@ -1,6 +1,6 @@
-const express   = require("express");
-const dotenv    = require("dotenv");
-const cors      = require("cors");
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
 const connectDB = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
@@ -8,20 +8,22 @@ dotenv.config();
 connectDB();
 
 const app = express();
-
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
-  credentials: true,
+  origin: [
+    "http://localhost:5173",
+    "https://www.infinitysports-turf.com"
+  ],
+  credentials: true
 }));
 app.use(express.json());
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-app.use("/api/auth",     require("./routes/authRoutes"));
-app.use("/api/turfs",    require("./routes/turfRoutes"));
-app.use("/api/slots",    require("./routes/slotRoutes"));
+app.use("/api/auth", require("./routes/authRoutes"));
+app.use("/api/turfs", require("./routes/turfRoutes"));
+app.use("/api/slots", require("./routes/slotRoutes"));
 app.use("/api/bookings", require("./routes/bookingRoutes"));
-app.use("/api/payment",  require("./routes/paymentRoutes"));
-app.use("/api/admin",    require("./routes/adminRoutes")); // ← new
+app.use("/api/payment", require("./routes/paymentRoutes"));
+app.use("/api/admin", require("./routes/adminRoutes")); // ← new
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
