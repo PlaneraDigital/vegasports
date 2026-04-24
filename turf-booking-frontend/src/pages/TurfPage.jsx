@@ -31,9 +31,9 @@ const DAY_ORDER = [
 ];
 
 const AMENITY_META = {
-  floodlights:          { icon: Zap,        label: "Floodlights"      },
-  parking:              { icon: Car,         label: "Parking"          },
-  washroom:             { icon: Droplets,    label: "Washroom"         },
+  floodlights:          { icon: Zap,         label: "Floodlights"      },
+  parking:              { icon: Car,          label: "Parking"           },
+  washroom:             { icon: Droplets,    label: "Washroom"          },
   changing_room:        { icon: Shirt,       label: "Changing Room"    },
   drinking_water:       { icon: Droplets,    label: "Drinking Water"   },
   professional_surface: { icon: Layers,      label: "Pro Surface"      },
@@ -47,10 +47,10 @@ const SPORT_EMOJI = {
 };
 
 const STATUS_STYLE = {
-  active:           "bg-emerald-950/60 border-emerald-700/50 text-emerald-400",
-  inactive:         "bg-zinc-800 border-zinc-600 text-zinc-400",
-  pending_approval: "bg-yellow-950/60 border-yellow-700/50 text-yellow-400",
-  suspended:        "bg-red-950/60 border-red-700/50 text-red-400",
+  active:           "bg-emerald-50 border-emerald-200 text-emerald-700",
+  inactive:         "bg-zinc-100 border-zinc-200 text-zinc-500",
+  pending_approval: "bg-amber-50 border-amber-200 text-amber-700",
+  suspended:        "bg-red-50 border-red-200 text-red-700",
 };
 
 /* ─────────────────────────
@@ -58,34 +58,28 @@ const STATUS_STYLE = {
 ────────────────────────── */
 function SkeletonLoader() {
   return (
-    <div className="bg-black min-h-screen animate-pulse">
+    <div className="bg-zinc-50 min-h-screen animate-pulse">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-6">
-        <div className="w-32 h-4 bg-zinc-800 rounded-full" />
+        <div className="w-32 h-4 bg-zinc-200 rounded-full" />
       </div>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-5">
-        <div className="w-full h-[300px] md:h-[460px] bg-zinc-800 rounded-2xl" />
+        <div className="w-full h-[300px] md:h-[460px] bg-zinc-200 rounded-2xl" />
       </div>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-8">
         <div className="grid md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] gap-10 lg:gap-14">
           <div className="space-y-5">
             <div className="flex gap-2">
-              <div className="w-24 h-6 bg-zinc-800 rounded-full" />
-              <div className="w-20 h-6 bg-zinc-800 rounded-full" />
+              <div className="w-24 h-6 bg-zinc-200 rounded-full" />
+              <div className="w-20 h-6 bg-zinc-200 rounded-full" />
             </div>
-            <div className="w-3/4 h-10 bg-zinc-800 rounded-xl" />
-            <div className="w-1/2 h-4 bg-zinc-800 rounded-full" />
+            <div className="w-3/4 h-10 bg-zinc-200 rounded-xl" />
+            <div className="w-1/2 h-4 bg-zinc-200 rounded-full" />
             <div className="flex gap-3 mt-2">
-              {[1,2,3,4].map(i => <div key={i} className="w-28 h-10 bg-zinc-800 rounded-xl" />)}
-            </div>
-            <div className="border-t border-zinc-800 pt-8 space-y-3">
-              <div className="w-32 h-5 bg-zinc-800 rounded-full" />
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {[1,2,3,4,5,6].map(i => <div key={i} className="h-11 bg-zinc-800 rounded-xl" />)}
-              </div>
+              {[1,2,3,4].map(i => <div key={i} className="w-28 h-10 bg-zinc-200 rounded-xl" />)}
             </div>
           </div>
           <div className="hidden md:block">
-            <div className="w-full h-64 bg-zinc-800 rounded-2xl" />
+            <div className="w-full h-64 bg-zinc-200 rounded-2xl" />
           </div>
         </div>
       </div>
@@ -98,12 +92,12 @@ function SkeletonLoader() {
 ────────────────────────── */
 function ErrorScreen({ message, onBack }) {
   return (
-    <div className="bg-black min-h-screen flex flex-col items-center justify-center text-center px-6">
+    <div className="bg-zinc-50 min-h-screen flex flex-col items-center justify-center text-center px-6">
       <div className="text-6xl mb-5">🏟️</div>
-      <h1 className="text-2xl font-bold text-white mb-2">Turf Not Found</h1>
+      <h1 className="text-2xl font-bold text-zinc-900 mb-2">Turf Not Found</h1>
       <p className="text-zinc-500 text-sm mb-7 max-w-xs">{message}</p>
       <button onClick={onBack}
-        className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-full transition text-sm">
+        className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full transition text-sm">
         <ArrowLeft size={15} /> Back to listings
       </button>
     </div>
@@ -118,7 +112,7 @@ function ImageGallery({ images }) {
 
   if (!images || images.length === 0) {
     return (
-      <div className="w-full h-[400px] bg-zinc-900 rounded-2xl flex items-center justify-center text-zinc-600">
+      <div className="w-full h-[400px] bg-zinc-200 rounded-2xl flex items-center justify-center text-zinc-500 border border-zinc-300">
         No images available
       </div>
     );
@@ -129,7 +123,7 @@ function ImageGallery({ images }) {
 
   return (
     <div className="relative">
-      <div className="relative w-full overflow-hidden rounded-2xl group">
+      <div className="relative w-full overflow-hidden rounded-2xl group border border-zinc-200">
         <img
           key={active}
           src={images[active].url}
@@ -137,29 +131,24 @@ function ImageGallery({ images }) {
           className="w-full h-[300px] md:h-[460px] object-cover"
           onError={e => { e.target.src = "/images/turf1.jpg"; }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
 
         {images.length > 1 && (
           <>
             <button onClick={prev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm">
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-zinc-900 p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-md shadow-sm">
               <ChevronLeft size={18} />
             </button>
             <button onClick={next}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-sm">
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-zinc-900 p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 backdrop-blur-md shadow-sm">
               <ChevronRight size={18} />
             </button>
           </>
         )}
 
-        <span className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-zinc-300 text-xs px-3 py-1 rounded-full">
+        <span className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
           {active + 1} / {images.length}
         </span>
-        {images[active].label && (
-          <span className="absolute top-4 left-4 bg-black/60 backdrop-blur-sm text-zinc-300 text-xs px-3 py-1 rounded-full capitalize">
-            {images[active].label.replace(/-/g, " ")}
-          </span>
-        )}
       </div>
 
       {images.length > 1 && (
@@ -167,7 +156,7 @@ function ImageGallery({ images }) {
           {images.map((img, i) => (
             <button key={i} onClick={() => setActive(i)}
               className={`flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all duration-150 ${
-                i === active ? "border-green-500 opacity-100" : "border-transparent opacity-50 hover:opacity-80"
+                i === active ? "border-green-600 opacity-100 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
               }`}>
               <img src={img.url} alt="" className="w-full h-full object-cover"
                 onError={e => { e.target.src = "/images/turf1.jpg"; }} />
@@ -185,10 +174,10 @@ function ImageGallery({ images }) {
 function SectionHeading({ icon: Icon, label }) {
   return (
     <div className="flex items-center gap-2.5 mb-5">
-      <div className="w-8 h-8 rounded-lg bg-green-950 border border-green-800/60 flex items-center justify-center flex-shrink-0">
-        <Icon size={15} className="text-green-400" />
+      <div className="w-8 h-8 rounded-lg bg-green-50 border border-green-100 flex items-center justify-center flex-shrink-0">
+        <Icon size={15} className="text-green-600" />
       </div>
-      <h2 className="text-base font-semibold text-white tracking-tight">{label}</h2>
+      <h2 className="text-base font-bold text-zinc-900 tracking-tight">{label}</h2>
     </div>
   );
 }
@@ -197,7 +186,7 @@ function SectionHeading({ icon: Icon, label }) {
    DIVIDER
 ────────────────────────── */
 function Divider() {
-  return <hr className="border-zinc-800/80 my-8" />;
+  return <hr className="border-zinc-200 my-8" />;
 }
 
 /* ─────────────────────────
@@ -217,16 +206,16 @@ function AmenitiesGrid({ amenities }) {
           const Icon = meta.icon;
           return (
             <div key={key}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-colors ${
                 val
-                  ? "bg-green-950/30 border-green-800/40 text-green-300"
-                  : "bg-zinc-900/60 border-zinc-800 text-zinc-600"
+                  ? "bg-white border-green-200 text-zinc-700 shadow-sm"
+                  : "bg-zinc-50 border-zinc-200 text-zinc-400"
               }`}>
-              <Icon size={14} className="flex-shrink-0" />
+              <Icon size={14} className={`flex-shrink-0 ${val ? "text-green-600" : "text-zinc-400"}`} />
               <span className="flex-1 font-medium">{meta.label}</span>
               {val
                 ? <CheckCircle2 size={14} className="text-green-500 flex-shrink-0" />
-                : <XCircle     size={14} className="text-zinc-700 flex-shrink-0" />}
+                : <XCircle     size={14} className="text-zinc-300 flex-shrink-0" />}
             </div>
           );
         })}
@@ -238,7 +227,6 @@ function AmenitiesGrid({ amenities }) {
 /* ─────────────────────────
    OPERATING HOURS
 ────────────────────────── */
-/* convert "06:00" → "6:00 AM" */
 function fmt(t) {
   if (!t) return "";
   const [h, m] = t.split(":").map(Number);
@@ -246,7 +234,6 @@ function fmt(t) {
   return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${ap}`;
 }
 
-/* group consecutive days that share identical open/close/is_closed */
 function groupDays(hours) {
   const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
   const groups = [];
@@ -278,60 +265,53 @@ function OperatingHours({ hours, pricing_overrides }) {
     <section>
       <SectionHeading icon={CalendarDays} label="Operating Hours" />
       <div className="grid sm:grid-cols-2 gap-6">
-
-        {/* Left — Regular Hours */}
         <div>
-          <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-4">Regular Hours</p>
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Regular Hours</p>
           <div className="space-y-3">
             {groups.map(({ label, slot }) => (
-              <div key={label} className="flex items-center justify-between">
-                <span className="text-sm text-zinc-300">{label}</span>
+              <div key={label} className="flex items-center justify-between border-b border-zinc-100 pb-2 last:border-0">
+                <span className="text-sm text-zinc-600">{label}</span>
                 {slot?.is_closed
-                  ? <span className="text-red-400 text-sm font-medium">Closed</span>
+                  ? <span className="text-red-500 text-sm font-semibold">Closed</span>
                   : (slot?.open && slot?.close)
-                    ? <span className="text-green-400 text-sm font-semibold tabular-nums">
+                    ? <span className="text-zinc-900 text-sm font-bold tabular-nums">
                         {fmt(slot.open)} – {fmt(slot.close)}
                       </span>
-                    : <span className="text-zinc-600 text-sm">—</span>}
+                    : <span className="text-zinc-400 text-sm">—</span>}
               </div>
             ))}
           </div>
         </div>
 
-        {/* Right — Peak Hours + Holiday note */}
         <div className="space-y-4">
           {peak?.start && peak?.end && (
             <div>
-              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-3">Peak Hours</p>
-              <div className="bg-amber-950/40 border border-amber-700/40 rounded-xl p-4">
+              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Peak Hours</p>
+              <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <Clock size={14} className="text-amber-400" />
-                  <span className="text-amber-300 text-sm font-semibold">
+                  <Clock size={14} className="text-amber-600" />
+                  <span className="text-amber-800 text-sm font-bold">
                     Evening Slots ({fmt(peak.start)} – {fmt(peak.end)})
                   </span>
                 </div>
-                <p className="text-amber-500/80 text-xs leading-relaxed">
+                <p className="text-amber-700/80 text-xs leading-relaxed">
                   Higher demand during these hours. We recommend booking in advance for evening slots.
                 </p>
               </div>
             </div>
           )}
           <div>
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">Holiday Schedule</p>
+            <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2">Holiday Schedule</p>
             <p className="text-zinc-500 text-sm leading-relaxed">
-              Open on all public holidays. Special rates may apply on holidays.
+              Open on all public holidays. Special rates may apply.
             </p>
           </div>
         </div>
-
       </div>
     </section>
   );
 }
 
-/* ─────────────────────────
-   RULES
-────────────────────────── */
 function Rules({ rules }) {
   if (!rules || rules.length === 0) return null;
   return (
@@ -339,11 +319,11 @@ function Rules({ rules }) {
       <SectionHeading icon={Info} label="Turf Rules" />
       <ul className="space-y-3">
         {rules.map((rule, i) => (
-          <li key={i} className="flex items-start gap-3.5">
-            <span className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-zinc-900 border border-zinc-700 text-zinc-400 text-xs flex items-center justify-center font-semibold">
+          <li key={i} className="flex items-start gap-3.5 group">
+            <span className="flex-shrink-0 mt-0.5 w-6 h-6 rounded-lg bg-zinc-100 text-zinc-500 text-xs flex items-center justify-center font-bold group-hover:bg-zinc-900 group-hover:text-white transition-colors">
               {i + 1}
             </span>
-            <span className="text-zinc-300 text-sm leading-relaxed">{rule}</span>
+            <span className="text-zinc-600 text-sm leading-relaxed font-medium">{rule}</span>
           </li>
         ))}
       </ul>
@@ -354,7 +334,6 @@ function Rules({ rules }) {
 export default function TurfPage() {
   const { id }    = useParams();
   const navigate  = useNavigate();
-
   const [turf,    setTurf]    = useState(null);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState(null);
@@ -367,12 +346,10 @@ export default function TurfPage() {
         setTurf(res.data.turf);
       } catch (err) {
         setError(err.response?.data?.message || "Could not load turf details.");
-        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
     if (id) fetchTurf();
   }, [id]);
 
@@ -381,16 +358,15 @@ export default function TurfPage() {
 
   const sym             = turf.currency === "INR" ? "₹" : (turf.currency || "₹");
   const activeAmenities = turf.amenities ? Object.values(turf.amenities).filter(Boolean).length : 0;
-  const fullAddress     = [turf.location?.address, turf.location?.city, turf.location?.state]
-                            .filter(Boolean).join(", ");
+  const fullAddress     = [turf.location?.address, turf.location?.city, turf.location?.state].filter(Boolean).join(", ");
 
   return (
-    <div className="bg-black text-white min-h-screen">
-
+    <div className="bg-zinc-50 text-zinc-900 min-h-screen pb-20">
+      
       {/* ── BACK NAV ── */}
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-6">
         <button onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-medium transition group">
+          className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 text-sm font-bold transition group">
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to listings
         </button>
@@ -402,106 +378,69 @@ export default function TurfPage() {
       </div>
 
       {/* ── MAIN CONTENT ── */}
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-8 pb-32 md:pb-16">
+      <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-8">
         <div className="grid md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] gap-10 lg:gap-14 items-start">
 
           {/* ════ LEFT COLUMN ════ */}
           <div>
-
-            {/* Badges */}
             <div className="flex flex-wrap gap-2">
               {turf.turf_type && (
-                <span className="bg-green-950/60 border border-green-800/50 text-green-400 text-xs px-3 py-1 rounded-full font-medium">
+                <span className="bg-green-100 border border-green-200 text-green-700 text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">
                   {TURF_TYPE_LABEL[turf.turf_type] || turf.turf_type}
                 </span>
               )}
-              {turf.surface && (
-                <span className="bg-zinc-800/80 border border-zinc-700/50 text-zinc-300 text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1.5">
-                  <Layers size={11} />
-                  {SURFACE_LABEL[turf.surface] || turf.surface}
-                </span>
-              )}
               {turf.status && (
-                <span className={`text-xs px-3 py-1 rounded-full font-medium border ${STATUS_STYLE[turf.status] || STATUS_STYLE.inactive}`}>
+                <span className={`text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${STATUS_STYLE[turf.status] || STATUS_STYLE.inactive}`}>
                   {turf.status.replace(/_/g, " ")}
                 </span>
               )}
             </div>
 
-            {/* Name */}
-            <h1 className="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight leading-snug">
+            <h1 className="mt-4 text-3xl md:text-4xl font-black tracking-tight text-zinc-900">
               {turf.name}
             </h1>
 
-            {/* Location + Rating */}
             <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
               {fullAddress && (
-                <p className="flex items-center gap-1.5 text-sm text-zinc-400">
-                  <MapPin size={13} className="text-green-500 flex-shrink-0" />
+                <p className="flex items-center gap-1.5 text-sm font-medium text-zinc-500">
+                  <MapPin size={14} className="text-green-600" />
                   {fullAddress}
-                  {turf.location?.pincode && (
-                    <span className="text-zinc-600"> – {turf.location.pincode}</span>
-                  )}
                 </p>
               )}
-              {turf.rating?.total_reviews > 0 ? (
-                <>
-                  <span className="text-zinc-700 hidden sm:inline">·</span>
-                  <div className="flex items-center gap-1.5">
-                    <Star size={13} fill="#facc15" className="text-yellow-400" />
-                    <span className="text-yellow-300 font-semibold text-sm">
-                      {turf.rating.average?.toFixed(1)}
-                    </span>
-                    <span className="text-zinc-500 text-xs">({turf.rating.total_reviews} reviews)</span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <span className="text-zinc-700 hidden sm:inline">·</span>
-                  <span className="text-zinc-500 text-xs">No reviews yet</span>
-                </>
+              {turf.rating?.total_reviews > 0 && (
+                <div className="flex items-center gap-1.5 bg-zinc-100 px-2 py-0.5 rounded-md">
+                  <Star size={13} fill="#eab308" className="text-yellow-500" />
+                  <span className="text-zinc-900 font-bold text-sm">{turf.rating.average?.toFixed(1)}</span>
+                  <span className="text-zinc-500 text-xs font-bold">({turf.rating.total_reviews})</span>
+                </div>
               )}
             </div>
 
             {/* Quick stats pills */}
             <div className="mt-6 flex flex-wrap gap-3">
-              <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
-                <IndianRupee size={14} className="text-green-400" />
-                <span className="text-zinc-200 font-semibold">{sym}{turf.price_per_hour}</span>
+              <div className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2.5 rounded-2xl shadow-sm text-sm">
+                <IndianRupee size={14} className="text-green-600" />
+                <span className="text-zinc-900 font-bold">{sym}{turf.price_per_hour}</span>
                 <span className="text-zinc-500">/hr</span>
               </div>
-              {turf.slot_duration_minutes && (
-                <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
-                  <Clock size={14} className="text-green-400" />
-                  <span className="text-zinc-200 font-semibold">{turf.slot_duration_minutes} min</span>
-                  <span className="text-zinc-500">slots</span>
-                </div>
-              )}
-              {turf.surface && (
-                <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
-                  <Layers size={14} className="text-green-400" />
-                  <span className="text-zinc-200 font-semibold">{SURFACE_LABEL[turf.surface]}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
-                <ShieldCheck size={14} className="text-green-400" />
-                <span className="text-zinc-200 font-semibold">{activeAmenities}</span>
-                <span className="text-zinc-500">amenities</span>
+              <div className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2.5 rounded-2xl shadow-sm text-sm">
+                <ShieldCheck size={14} className="text-green-600" />
+                <span className="text-zinc-900 font-bold">{activeAmenities}</span>
+                <span className="text-zinc-500">Amenities</span>
               </div>
             </div>
 
             <Divider />
 
-            {/* Sports */}
-            {turf.sports && turf.sports.length > 0 && (
+            {turf.sports?.length > 0 && (
               <>
                 <section>
                   <SectionHeading icon={Tag} label="Sports Available" />
                   <div className="flex flex-wrap gap-2.5">
                     {turf.sports.map(sport => (
                       <span key={sport}
-                        className="flex items-center gap-2 bg-zinc-900 border border-zinc-700/60 text-zinc-200 text-sm px-4 py-2.5 rounded-xl capitalize font-medium">
-                        <span className="text-base">{SPORT_EMOJI[sport] || "🏅"}</span>
+                        className="flex items-center gap-2 bg-white border border-zinc-200 text-zinc-800 text-sm px-4 py-2.5 rounded-xl capitalize font-bold shadow-sm">
+                        <span>{SPORT_EMOJI[sport] || "🏅"}</span>
                         {sport}
                       </span>
                     ))}
@@ -511,88 +450,61 @@ export default function TurfPage() {
               </>
             )}
 
-            {/* Amenities */}
             <AmenitiesGrid amenities={turf.amenities} />
-
           </div>
 
-          {/* ════ RIGHT COLUMN (cta sidebar) ════ */}
-          <div className="w-full mt-8 md:mt-0">
+          {/* ════ RIGHT COLUMN ════ */}
+          <div className="w-full">
             <div className="sticky top-24">
-              
-              <div className="bg-[#0a0a0a] border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl p-7 relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-green-500/5 before:to-transparent before:pointer-events-none">
-                <h3 className="text-white font-bold text-xl mb-2">Ready to play?</h3>
-                <p className="text-zinc-400 text-sm mb-6">Select your dates and check availability directly on our secure booking page.</p>
+              <div className="bg-white border border-zinc-200 rounded-[32px] shadow-xl shadow-zinc-200/50 p-7 relative">
+                <h3 className="text-zinc-900 font-black text-xl mb-2">Ready to play?</h3>
+                <p className="text-zinc-500 text-sm font-medium mb-6">Secure your slot in seconds. Instant confirmation.</p>
                 
                 <div className="flex items-baseline gap-1.5 mb-6">
-                  <span className="text-4xl font-extrabold text-white tracking-tight">{sym}{turf.price_per_hour}</span>
-                  <span className="text-zinc-500 text-sm font-medium">/ hour</span>
+                  <span className="text-4xl font-black text-zinc-900 tracking-tight">{sym}{turf.price_per_hour}</span>
+                  <span className="text-zinc-400 text-sm font-bold uppercase tracking-widest">/ hour</span>
                 </div>
 
                 <button 
                   onClick={() => navigate(`/turf/${turf._id}/book`)}
-                  className="w-full py-4 bg-white text-black text-[15px] font-bold rounded-2xl shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:bg-zinc-200 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-4 bg-zinc-900 text-white text-[15px] font-bold rounded-2xl hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                 >
                   Book Slots <ChevronRight size={18} />
                 </button>
               </div>
 
-              {/* Location info card */}
-              <div className="mt-4 bg-zinc-900/60 border border-zinc-800 rounded-xl px-5 py-4 space-y-2.5 text-sm">
-                {turf.location?.city && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-500">City</span>
-                    <span className="text-zinc-200 font-medium">{turf.location.city}</span>
-                  </div>
-                )}
-                {turf.location?.state && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-500">State</span>
-                    <span className="text-zinc-200 font-medium">{turf.location.state}</span>
-                  </div>
-                )}
-                {turf.location?.pincode && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-500">Pincode</span>
-                    <span className="text-zinc-200 font-medium">{turf.location.pincode}</span>
-                  </div>
-                )}
-                {turf.slot_duration_minutes && (
-                  <div className="flex items-center justify-between border-t border-zinc-800 pt-2.5 mt-1">
-                    <span className="text-zinc-500">Slot duration</span>
-                    <span className="text-zinc-200 font-medium">{turf.slot_duration_minutes} min</span>
-                  </div>
-                )}
+              <div className="mt-4 bg-white border border-zinc-200 rounded-2xl px-5 py-4 space-y-2.5 text-sm font-medium">
+                <div className="flex items-center justify-between">
+                  <span className="text-zinc-400">Location</span>
+                  <span className="text-zinc-900">{turf.location?.city}</span>
+                </div>
+                <div className="flex items-center justify-between border-t border-zinc-100 pt-2.5">
+                  <span className="text-zinc-400">Duration</span>
+                  <span className="text-zinc-900">{turf.slot_duration_minutes} min slots</span>
+                </div>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* ── Full-width: Operating Hours + Rules ── */}
         <Divider />
         <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} />
         <Divider />
         <Rules rules={turf.rules} />
-
       </div>
 
       {/* ── MOBILE STICKY FOOTER ── */}
-      <div className="fixed bottom-0 left-0 right-0 md:hidden z-50
-                      bg-zinc-950/95 backdrop-blur-md border-t border-zinc-800
-                      px-5 py-3 flex items-center justify-between">
+      <div className="fixed bottom-0 left-0 right-0 md:hidden z-50 bg-white/90 backdrop-blur-lg border-t border-zinc-200 px-5 py-4 flex items-center justify-between shadow-2xl">
         <div>
-          <p className="text-green-400 font-bold text-xl leading-none">
+          <p className="text-zinc-900 font-black text-xl leading-none">
             {sym}{turf.price_per_hour}
-            <span className="text-zinc-500 font-normal text-sm"> /hr</span>
+            <span className="text-zinc-400 font-bold text-xs uppercase ml-1">/hr</span>
           </p>
-          {turf.slot_duration_minutes && (
-            <p className="text-zinc-500 text-xs mt-1">{turf.slot_duration_minutes} min slots</p>
-          )}
         </div>
-        <button id="book-now-mobile"
+        <button 
           onClick={() => navigate(`/turf/${turf._id}/book`)}
-          className="px-7 py-2.5 bg-green-600 hover:bg-green-500 active:scale-95 text-white font-bold rounded-full transition-all text-sm">
+          className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-200 active:scale-95 transition-all text-sm">
           Book Now
         </button>
       </div>

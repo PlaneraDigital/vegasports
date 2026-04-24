@@ -1,7 +1,8 @@
 .footer {
-  background-color: #0d0d0d;
-  border-top: 1px solid rgba(255,255,255,0.06);
-  color: white;
+  /* Rich brand green background */
+  background-color: #16a34a; 
+  border-top: none; /* Removed border since the color change is enough separation */
+  color: #ffffff;
   padding: 64px 60px;
 }
 
@@ -16,41 +17,64 @@
 .footer__brand {
   font-weight: 800;
   font-size: 1.2rem;
-  color: #4ade80;
+  /* Pure white brand name for contrast */
+  color: #ffffff;
   margin-bottom: 10px;
 }
 
 .footer__text {
-  color: rgba(255,255,255,0.4);
+  /* Slightly transparent white for secondary text */
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
   line-height: 1.6;
 }
 
 .footer__heading {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.9rem;
-  color: white;
+  color: #ffffff;
   margin-bottom: 14px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .footer__link {
-  color: rgba(255,255,255,0.4);
+  /* Slightly transparent white to distinguish from headings */
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.85rem;
   margin-bottom: 8px;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s;
 }
 
-.footer__link:hover { color: #4ade80; }
+.footer__link:hover { 
+  /* Brighter white or mint on hover */
+  color: #ffffff;
+  padding-left: 4px; /* Subtle movement effect on hover */
+}
 
 .footer__contact p {
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 0.85rem;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
+/* Responsiveness */
+@media (max-width: 768px) {
+  .footer {
+    padding: 40px 24px;
+  }
+  .footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer__grid {
+    grid-template-columns: 1fr;
+  }
+}
 /* ================= MOBILE RESPONSIVENESS ================= */
 
 @media (max-width: 1024px) {

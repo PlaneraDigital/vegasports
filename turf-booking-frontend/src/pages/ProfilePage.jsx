@@ -23,37 +23,37 @@ function fmtDate(d) {
 }
 
 const STATUS_CONFIG = {
-  confirmed: { label: "Confirmed",  color: "bg-green-950/60 border-green-700/50 text-green-400",  icon: CheckCircle2 },
-  pending:   { label: "Pending",    color: "bg-yellow-950/60 border-yellow-700/50 text-yellow-400", icon: Clock },
-  cancelled: { label: "Cancelled",  color: "bg-red-950/60 border-red-700/50 text-red-400",         icon: XCircle },
-  completed: { label: "Completed",  color: "bg-blue-950/60 border-blue-700/50 text-blue-400",      icon: CheckCircle2 },
-  failed:    { label: "Failed",     color: "bg-zinc-900 border-zinc-700 text-zinc-500",              icon: AlertCircle },
+  confirmed: { label: "Confirmed", color: "bg-green-50 border-green-200 text-green-700", icon: CheckCircle2 },
+  pending:   { label: "Pending",   color: "bg-yellow-50 border-yellow-200 text-yellow-700", icon: Clock },
+  cancelled: { label: "Cancelled", color: "bg-red-50 border-red-200 text-red-700",         icon: XCircle },
+  completed: { label: "Completed", color: "bg-blue-50 border-blue-200 text-blue-700",       icon: CheckCircle2 },
+  failed:    { label: "Failed",    color: "bg-gray-100 border-gray-200 text-gray-500",      icon: AlertCircle },
 };
 
 const CANCEL_REASONS = ["Changed plans", "Emergency", "Weather", "Other"];
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   CANCEL MODAL
+   CANCEL MODAL (Light)
 ───────────────────────────────────────────────────────────────────────────── */
 function CancelModal({ booking, onClose, onConfirm, loading }) {
   const [reason, setReason] = useState("Changed plans");
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-[2px] p-4">
-      <div className="bg-[#0a0a0a] border border-zinc-800 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
-        <div className="px-7 pt-7 pb-5 border-b border-zinc-800/80">
-          <div className="w-12 h-12 rounded-2xl bg-red-950/60 border border-red-800/50 flex items-center justify-center mb-4">
-            <Ban size={22} className="text-red-400" />
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-white border border-gray-200 rounded-3xl w-full max-w-sm overflow-hidden shadow-2xl">
+        <div className="px-7 pt-7 pb-5 border-b border-gray-100">
+          <div className="w-12 h-12 rounded-2xl bg-red-50 border border-red-100 flex items-center justify-center mb-4">
+            <Ban size={22} className="text-red-500" />
           </div>
-          <h2 className="text-lg font-bold text-white">Cancel Booking?</h2>
-          <p className="text-zinc-500 text-sm mt-1">
+          <h2 className="text-lg font-bold text-gray-900">Cancel Booking?</h2>
+          <p className="text-gray-500 text-sm mt-1">
             This will free up your slot at{" "}
-            <span className="text-zinc-300 font-medium">{booking.turf_name_snapshot}</span>.
+            <span className="text-gray-900 font-semibold">{booking.turf_name_snapshot}</span>.
           </p>
         </div>
 
         <div className="px-7 py-6">
-          <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Reason for cancellation</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Reason for cancellation</p>
           <div className="grid grid-cols-2 gap-2">
             {CANCEL_REASONS.map((r) => (
               <button
@@ -61,8 +61,8 @@ function CancelModal({ booking, onClose, onConfirm, loading }) {
                 onClick={() => setReason(r)}
                 className={`py-2.5 px-3 rounded-xl border text-sm font-medium transition-all text-left ${
                   reason === r
-                    ? "bg-red-950/50 border-red-600/60 text-red-300"
-                    : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600"
+                    ? "bg-red-50 border-red-200 text-red-600"
+                    : "bg-gray-50 border-gray-100 text-gray-500 hover:border-gray-300"
                 }`}
               >
                 {r}
@@ -75,17 +75,17 @@ function CancelModal({ booking, onClose, onConfirm, loading }) {
           <button
             onClick={onClose}
             disabled={loading}
-            className="flex-1 py-3 bg-zinc-900 border border-zinc-800 text-zinc-400 text-sm font-bold rounded-2xl hover:bg-zinc-800 transition-colors"
+            className="flex-1 py-3 bg-white border border-gray-200 text-gray-600 text-sm font-bold rounded-2xl hover:bg-gray-50 transition-colors"
           >
-            Keep Booking
+            Keep
           </button>
           <button
             onClick={() => onConfirm(reason)}
             disabled={loading}
-            className="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white text-sm font-bold rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60"
+            className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-2xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60 shadow-lg shadow-red-100"
           >
             {loading ? <Loader2 size={16} className="animate-spin" /> : <Ban size={16} />}
-            {loading ? "Cancelling..." : "Yes, Cancel"}
+            Cancel
           </button>
         </div>
       </div>
@@ -94,7 +94,7 @@ function CancelModal({ booking, onClose, onConfirm, loading }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   BOOKING CARD
+   BOOKING CARD (Light)
 ───────────────────────────────────────────────────────────────────────────── */
 function BookingCard({ booking, onCancelClick, navigate }) {
   const cfg    = STATUS_CONFIG[booking.booking_status] || STATUS_CONFIG.pending;
@@ -102,13 +102,13 @@ function BookingCard({ booking, onCancelClick, navigate }) {
   const canCancel = ["confirmed", "pending"].includes(booking.booking_status);
 
   return (
-    <div className="bg-[#0a0a0a] border border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-700 transition-colors">
+    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md transition-shadow">
       {/* Header row */}
-      <div className="px-5 py-4 border-b border-zinc-800/60 flex items-center justify-between gap-3">
+      <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-white font-bold text-sm truncate">{booking.turf_name_snapshot}</p>
-          <p className="text-zinc-500 text-xs mt-0.5 flex items-center gap-1">
-            <MapPin size={11} />
+          <p className="text-gray-900 font-bold text-sm truncate">{booking.turf_name_snapshot}</p>
+          <p className="text-gray-500 text-xs mt-0.5 flex items-center gap-1">
+            <MapPin size={11} className="text-gray-400" />
             {booking.turf_address_snapshot || "Address not available"}
           </p>
         </div>
@@ -121,18 +121,18 @@ function BookingCard({ booking, onCancelClick, navigate }) {
       {/* Details */}
       <div className="px-5 py-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
         <div>
-          <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mb-1">Date</p>
-          <p className="text-zinc-200 text-sm font-semibold">{fmtDate(booking.date)}</p>
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Date</p>
+          <p className="text-gray-800 text-sm font-semibold">{fmtDate(booking.date)}</p>
         </div>
         <div>
-          <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mb-1">Time</p>
-          <p className="text-zinc-200 text-sm font-semibold">
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Time</p>
+          <p className="text-gray-800 text-sm font-semibold">
             {fmt(booking.start_time)} – {fmt(booking.end_time)}
           </p>
         </div>
         <div>
-          <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest mb-1">Amount</p>
-          <p className="text-green-400 text-sm font-bold flex items-center gap-0.5">
+          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">Amount</p>
+          <p className="text-green-600 text-sm font-bold flex items-center gap-0.5">
             <IndianRupee size={12} />
             {booking.total_amount}
           </p>
@@ -140,42 +140,33 @@ function BookingCard({ booking, onCancelClick, navigate }) {
       </div>
 
       {/* Booking ID + actions */}
-      <div className="px-5 py-3 bg-zinc-950/50 border-t border-zinc-800/60 flex items-center justify-between gap-3">
-        <p className="text-zinc-600 text-[10px] font-mono">
+      <div className="px-5 py-3 bg-gray-50/50 border-t border-gray-100 flex items-center justify-between gap-3">
+        <p className="text-gray-400 text-[10px] font-mono">
           #{booking._id?.toString().slice(-10).toUpperCase()}
         </p>
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(`/turf/${typeof booking.turf_id === "object" ? booking.turf_id._id : booking.turf_id}`)}
-            className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 rounded-xl transition-colors flex items-center gap-1"
+            className="px-3 py-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 rounded-xl transition-colors flex items-center gap-1 bg-white"
           >
             View Turf <ChevronRight size={12} />
           </button>
           {canCancel && (
             <button
               onClick={() => onCancelClick(booking)}
-              className="px-3 py-1.5 text-xs font-bold text-red-400 hover:text-red-300 border border-red-900/50 hover:border-red-700/60 bg-red-950/20 rounded-xl transition-colors flex items-center gap-1"
+              className="px-3 py-1.5 text-xs font-bold text-red-500 hover:text-red-600 border border-red-100 hover:border-red-200 bg-red-50 rounded-xl transition-colors flex items-center gap-1"
             >
               <Ban size={11} /> Cancel
             </button>
           )}
         </div>
       </div>
-
-      {/* Cancellation info if cancelled */}
-      {booking.booking_status === "cancelled" && booking.cancellation?.reason && (
-        <div className="px-5 py-3 bg-red-950/10 border-t border-red-900/30">
-          <p className="text-red-400/70 text-xs">
-            Cancelled on {fmtDate(booking.cancellation.cancelled_at)} · Reason: {booking.cancellation.reason}
-          </p>
-        </div>
-      )}
     </div>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   PROFILE PAGE
+   PROFILE PAGE (Light)
 ───────────────────────────────────────────────────────────────────────────── */
 export default function ProfilePage() {
   const navigate  = useNavigate();
@@ -191,24 +182,19 @@ export default function ProfilePage() {
   const [cancelError, setCancelError]     = useState(null);
   const [cancelSuccess, setCancelSuccess] = useState(null);
 
-  // Redirect if not logged in
   useEffect(() => {
     if (!authUser) navigate("/login");
   }, [authUser, navigate]);
 
-  // Fetch bookings on mount
   useEffect(() => {
     if (authUser) fetchBookings();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
 
   const handleLogout = () => {
     clearAuthSession();
     navigate("/");
   };
 
-  // ── Shared fetch helper so we can call it from multiple places ───────────────
   const fetchBookings = async () => {
     setLoading(true);
     setError(null);
@@ -227,15 +213,11 @@ export default function ProfilePage() {
     setCancelError(null);
     try {
       await api.put(`/api/bookings/${cancelTarget._id}/cancel`, { reason });
-
       setCancelTarget(null);
-      setCancelSuccess("Booking cancelled! Slot is now available again.");
-
-      // ── Re-fetch from DB so UI matches MongoDB exactly ──────────────────────
+      setCancelSuccess("Booking cancelled successfully.");
       await fetchBookings();
-
     } catch (err) {
-      setCancelError(err.response?.data?.message || "Cancellation failed. Please try again.");
+      setCancelError(err.response?.data?.message || "Cancellation failed.");
     } finally {
       setCancelling(false);
     }
@@ -243,44 +225,37 @@ export default function ProfilePage() {
 
   if (!authUser) return null;
 
-  // Filter bookings
   const FILTERS = ["all", "confirmed", "pending", "cancelled", "completed"];
   const filtered = filter === "all" ? bookings : bookings.filter((b) => b.booking_status === filter);
 
-  // Stats
   const stats = {
     total:     bookings.length,
     confirmed: bookings.filter((b) => b.booking_status === "confirmed").length,
-    cancelled: bookings.filter((b) => b.booking_status === "cancelled").length,
-    spent:     bookings
-      .filter((b) => b.booking_status !== "cancelled")
-      .reduce((s, b) => s + (b.total_amount || 0), 0),
+    spent:     bookings.filter((b) => b.booking_status !== "cancelled").reduce((s, b) => s + (b.total_amount || 0), 0),
   };
 
   return (
-    <div className="bg-black min-h-screen pb-20 pt-8">
+    <div className="bg-[#f9fafb] min-h-screen pb-20 pt-8">
       <div className="max-w-4xl mx-auto px-5 sm:px-8">
 
         {/* ── Profile Hero ── */}
-        <div className="bg-[#0a0a0a] border border-zinc-800 rounded-3xl p-7 mb-6 relative overflow-hidden">
-          {/* Background glow */}
+        <div className="bg-white border border-gray-100 rounded-3xl p-7 mb-6 relative overflow-hidden shadow-sm">
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-green-500/5 blur-[80px] pointer-events-none" />
 
           <div className="flex items-start justify-between gap-4 relative z-10">
             <div className="flex items-center gap-5">
-              {/* Avatar */}
-              <div className="w-16 h-16 rounded-2xl bg-green-950/60 border-2 border-green-800/60 flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl font-black text-green-400">
+              <div className="w-16 h-16 rounded-2xl bg-green-50 border-2 border-green-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-2xl font-black text-green-600">
                   {authUser.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
               <div>
-                <h1 className="text-xl font-extrabold text-white tracking-tight">{authUser.name}</h1>
-                <p className="text-zinc-500 text-sm mt-0.5 flex items-center gap-1.5">
-                  <Mail size={12} /> {authUser.email}
+                <h1 className="text-xl font-extrabold text-gray-900 tracking-tight">{authUser.name}</h1>
+                <p className="text-gray-500 text-sm mt-0.5 flex items-center gap-1.5">
+                  <Mail size={12} className="text-gray-400" /> {authUser.email}
                 </p>
                 {authUser.phone && (
-                  <p className="text-zinc-600 text-xs mt-0.5 flex items-center gap-1.5">
+                  <p className="text-gray-400 text-xs mt-0.5 flex items-center gap-1.5">
                     <Phone size={11} /> {authUser.phone}
                   </p>
                 )}
@@ -288,23 +263,22 @@ export default function ProfilePage() {
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-red-400 hover:text-red-300 border border-red-900/50 hover:border-red-700 bg-red-950/20 rounded-xl transition-colors flex-shrink-0"
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-red-500 hover:text-red-600 border border-red-100 hover:border-red-200 bg-red-50 rounded-xl transition-colors"
             >
               <LogOut size={13} /> Logout
             </button>
           </div>
 
-          {/* Stats row */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 relative z-10">
             {[
-              { label: "Total Bookings", value: stats.total, color: "text-white" },
-              { label: "Confirmed",      value: stats.confirmed, color: "text-green-400" },
-              { label: "Cancelled",      value: stats.cancelled, color: "text-red-400" },
-              { label: "Total Spent",    value: `₹${stats.spent}`, color: "text-yellow-400" },
+              { label: "Bookings", value: stats.total, color: "text-gray-900" },
+              { label: "Confirmed", value: stats.confirmed, color: "text-green-600" },
+              { label: "Cancelled", value: bookings.filter(b => b.booking_status === 'cancelled').length, color: "text-red-500" },
+              { label: "Spent", value: `₹${stats.spent}`, color: "text-blue-600" },
             ].map((s) => (
-              <div key={s.label} className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 text-center">
+              <div key={s.label} className="bg-gray-50/50 border border-gray-100 rounded-2xl p-4 text-center">
                 <p className={`text-xl font-black ${s.color}`}>{s.value}</p>
-                <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-wider mt-0.5">{s.label}</p>
+                <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -313,25 +287,24 @@ export default function ProfilePage() {
         {/* ── Bookings Section ── */}
         <div>
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-white">My Bookings</h2>
+            <h2 className="text-lg font-bold text-gray-900">My Bookings</h2>
             <button
               onClick={fetchBookings}
-              className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+              className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
             >
               <RotateCcw size={13} /> Refresh
             </button>
           </div>
 
-          {/* Filter tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-1 mb-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex gap-2 overflow-x-auto pb-1 mb-5 scrollbar-hide">
             {FILTERS.map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`flex-shrink-0 px-4 py-2 rounded-xl border text-xs font-bold capitalize transition-all ${
                   filter === f
-                    ? "bg-green-600 border-green-500 text-white shadow-[0_0_16px_rgba(34,197,94,0.3)]"
-                    : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300"
+                    ? "bg-green-600 border-green-600 text-white shadow-lg shadow-green-100"
+                    : "bg-white border-gray-200 text-gray-500 hover:border-gray-400 hover:text-gray-700"
                 }`}
               >
                 {f === "all" ? `All (${bookings.length})` : f}
@@ -339,21 +312,12 @@ export default function ProfilePage() {
             ))}
           </div>
 
-          {/* Success / error banners */}
+          {/* Success / error banners (Light) */}
           {cancelSuccess && (
-            <div className="flex items-center gap-3 bg-green-950/40 border border-green-700/50 rounded-2xl p-4 mb-4">
-              <CheckCircle2 size={16} className="text-green-400 flex-shrink-0" />
-              <p className="text-green-300 text-sm font-medium">{cancelSuccess}</p>
-              <button onClick={() => setCancelSuccess(null)} className="ml-auto text-green-600 hover:text-green-400">
-                <XCircle size={15} />
-              </button>
-            </div>
-          )}
-          {cancelError && (
-            <div className="flex items-center gap-3 bg-red-950/40 border border-red-700/50 rounded-2xl p-4 mb-4">
-              <AlertCircle size={16} className="text-red-400 flex-shrink-0" />
-              <p className="text-red-300 text-sm font-medium">{cancelError}</p>
-              <button onClick={() => setCancelError(null)} className="ml-auto text-red-600 hover:text-red-400">
+            <div className="flex items-center gap-3 bg-green-50 border border-green-100 rounded-2xl p-4 mb-4">
+              <CheckCircle2 size={16} className="text-green-600" />
+              <p className="text-green-700 text-sm font-medium">{cancelSuccess}</p>
+              <button onClick={() => setCancelSuccess(null)} className="ml-auto text-green-300 hover:text-green-500">
                 <XCircle size={15} />
               </button>
             </div>
@@ -363,32 +327,15 @@ export default function ProfilePage() {
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4">
               <Loader2 size={32} className="text-green-500 animate-spin" />
-              <p className="text-zinc-500 text-sm">Loading your bookings...</p>
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3 text-center">
-              <AlertCircle size={32} className="text-red-500" />
-              <p className="text-red-400 text-sm">{error}</p>
+              <p className="text-gray-400 text-sm">Loading your bookings...</p>
             </div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
               <div className="text-5xl">🏟️</div>
               <div>
-                <p className="text-white font-bold text-lg mb-1">
-                  {filter === "all" ? "No bookings yet" : `No ${filter} bookings`}
-                </p>
-                <p className="text-zinc-500 text-sm">
-                  {filter === "all" ? "Go book a turf and start playing!" : "Try a different filter."}
-                </p>
+                <p className="text-gray-900 font-bold text-lg mb-1">No bookings found</p>
+                <p className="text-gray-500 text-sm">Try a different filter or book a new turf.</p>
               </div>
-              {filter === "all" && (
-                <button
-                  onClick={() => navigate("/")}
-                  className="mt-2 px-6 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-full transition-all"
-                >
-                  Browse Turfs
-                </button>
-              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -405,7 +352,6 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* Cancel modal */}
       {cancelTarget && (
         <CancelModal
           booking={cancelTarget}

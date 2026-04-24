@@ -15,7 +15,8 @@ const TurfCard = ({ turf }) => {
   return (
     <div
       onClick={() => navigate(`/turf/${turf._id}`)}
-      className="bg-zinc-900 text-white rounded-2xl overflow-hidden shadow-lg cursor-pointer transition duration-300 hover:scale-[1.02] hover:border hover:border-green-600"
+      /* Updated to Light Theme: bg-white, text-gray-900, border-gray-200 */
+      className="bg-white text-gray-900 rounded-2xl overflow-hidden shadow-md hover:shadow-xl cursor-pointer transition duration-300 hover:scale-[1.02] border border-gray-100 hover:border-green-500"
     >
       {/* Image */}
       <div className="relative">
@@ -28,26 +29,27 @@ const TurfCard = ({ turf }) => {
           }}
         />
 
-        <span className="absolute top-3 left-3 bg-green-700 text-xs sm:text-sm px-3 py-1 rounded-full">
+        {/* Vibrant Green Badge */}
+        <span className="absolute top-3 left-3 bg-green-600 text-white text-xs sm:text-sm px-3 py-1 rounded-full font-medium shadow-sm">
           {turf.turf_type || "Multi-Sport"}
         </span>
       </div>
 
       {/* Content */}
       <div className="p-4 sm:p-5">
-        <h2 className="text-lg sm:text-xl font-semibold">
+        <h2 className="text-lg sm:text-xl font-bold text-gray-800">
           {turf.name}
         </h2>
 
-        <p className="text-gray-400 text-sm mt-1 leading-relaxed">
-          <MapPin size={12} className="inline mr-1" />
+        <p className="text-gray-500 text-sm mt-1 leading-relaxed flex items-center">
+          <MapPin size={14} className="mr-1 text-gray-400" />
           {turf.location?.address}, {turf.location?.city}
         </p>
 
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
-          <span className="text-green-400 font-bold text-lg sm:text-xl">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-5">
+          <span className="text-green-600 font-extrabold text-lg sm:text-xl">
             ₹{turf.price_per_hour}
-            <span className="text-gray-400 font-normal text-xs sm:text-sm">
+            <span className="text-gray-400 font-normal text-xs sm:text-sm ml-1">
               /hour
             </span>
           </span>
@@ -57,9 +59,10 @@ const TurfCard = ({ turf }) => {
               e.stopPropagation()
               navigate(`/turf/${turf._id}`)
             }}
-            className="w-full sm:w-auto px-4 py-2 border border-green-600 rounded-md text-green-400 text-sm sm:text-base hover:bg-green-600 hover:text-white transition"
+            /* Updated Button for Light Theme */
+            className="w-full sm:w-auto px-5 py-2 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 transition shadow-sm"
           >
-            Check slots →
+            Check slots
           </button>
         </div>
       </div>
@@ -93,28 +96,29 @@ const Card = () => {
 
   if (loading)
     return (
-      <div className="text-center text-gray-400 py-10">
+      <div className="text-center text-gray-500 py-20 font-medium">
         Loading turfs...
       </div>
     )
 
   if (error)
     return (
-      <div className="text-center text-red-400 py-10">
+      <div className="text-center text-red-500 py-20 font-medium">
         {error}
       </div>
     )
 
   if (turfs.length === 0)
     return (
-      <div className="text-center text-gray-400 py-10">
-        No turfs available
+      <div className="text-center text-gray-500 py-20 font-medium">
+        No turfs available at the moment.
       </div>
     )
 
   return (
-    <div className="bg-black rounded-3xl p-4 sm:p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+    /* Changed bg-black to bg-transparent/white and used mx-auto to center */
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
         {turfs.map((turf) => (
           <TurfCard key={turf._id} turf={turf} />
         ))}

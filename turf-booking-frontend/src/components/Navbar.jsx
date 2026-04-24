@@ -27,43 +27,36 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-800"
-      style={{ backgroundColor: '#0a0a0a' }}>
+    <nav className="sticky top-0 z-50 border-b border-gray-200"
+      style={{ backgroundColor: '#ffffff' }}>
 
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-2xl font-bold cursor-pointer group"
-          style={{ color: '#4ade80' }}>
+          style={{ color: '#16a34a' }}>
           <IoFootballSharp className="transition duration-700 group-hover:rotate-180" />
-          <span className="brand-wordmark">Infinity Sports Turf</span>
+          <span className="brand-wordmark text-gray-900">Infinity <span style={{ color: '#16a34a' }}>Sports Turf</span></span>
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-2">
           <Link to="/"
-            className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
+            className="px-4 py-2 text-gray-600 hover:text-gray-900 transition uppercase text-sm font-semibold tracking-wider">
             Home
           </Link>
-          {/* <Link to="/turf-played"
-            className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
-            Turf Played
-          </Link>
-          <Link to="/become-a-host"
-            className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
-            Become a Host
-          </Link> */}
+          
           {authUser ? (
             <>
               <Link
                 to="/profile"
-                className="ml-2 px-3 py-2 text-sm text-gray-300 hover:text-green-400 transition"
+                className="ml-2 px-3 py-2 text-sm text-gray-600 hover:text-green-600 transition font-medium"
               >
                 Hi, {authUser.name}
               </Link>
               <button
                 onClick={handleLogout}
-                className="px-5 py-2 text-sm font-medium text-white rounded-md transition cursor-pointer"
+                className="px-6 py-2 text-sm font-bold text-white rounded-full transition cursor-pointer uppercase tracking-tighter"
                 style={{ backgroundColor: '#16a34a' }}
                 onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
                 onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
@@ -73,17 +66,17 @@ const Navbar = () => {
             </>
           ) : (
             <Link to="/login"
-              className="ml-2 px-5 py-2 text-sm font-medium text-white rounded-md transition"
+              className="ml-2 px-6 py-2 text-sm font-bold text-white rounded-full transition uppercase tracking-tighter"
               style={{ backgroundColor: '#16a34a' }}
               onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
               onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}>
-              Login
+              Book Now
             </Link>
           )}
         </div>
 
         {/* Hamburger Icon */}
-        <div className="md:hidden text-2xl cursor-pointer text-gray-300 hover:text-white transition">
+        <div className="md:hidden text-2xl cursor-pointer text-gray-600 hover:text-gray-900 transition">
           {open ? (
             <HiX onClick={() => setOpen(false)} />
           ) : (
@@ -94,30 +87,23 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="md:hidden flex flex-col items-center gap-2 pb-6 pt-2 border-t border-gray-800"
-          style={{ backgroundColor: '#0a0a0a' }}>
+        <div className="md:hidden flex flex-col items-center gap-2 pb-6 pt-2 border-t border-gray-100"
+          style={{ backgroundColor: '#ffffff' }}>
 
           <Link to="/" onClick={() => setOpen(false)}
-            className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
+            className="w-full text-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition uppercase text-sm font-semibold">
             Home
           </Link>
-          {/* <Link to="/Turf-Played" onClick={() => setOpen(false)}
-            className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
-            Turf Played
-          </Link>
-          <Link to="/Become-A-Host" onClick={() => setOpen(false)}
-            className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
-            Become a Host
-          </Link> */}
+
           {authUser ? (
             <>
               <Link to="/profile" onClick={() => setOpen(false)}
-                className="w-full text-center px-4 py-3 text-gray-300 hover:text-green-400 transition font-medium">
+                className="w-full text-center px-4 py-3 text-gray-600 hover:text-green-600 transition font-medium">
                 Hi, {authUser.name}
               </Link>
               <button
                 onClick={handleLogout}
-                className="mt-1 px-8 py-2 text-sm font-medium text-white rounded-md transition"
+                className="mt-1 px-8 py-2 text-sm font-bold text-white rounded-full transition uppercase"
                 style={{ backgroundColor: '#16a34a' }}
               >
                 Logout
@@ -125,7 +111,7 @@ const Navbar = () => {
             </>
           ) : (
             <Link to="/login" onClick={() => setOpen(false)}
-              className="mt-1 px-8 py-2 text-sm font-medium text-white rounded-md transition"
+              className="mt-1 px-8 py-2 text-sm font-bold text-white rounded-full transition uppercase"
               style={{ backgroundColor: '#16a34a' }}>
               Login
             </Link>

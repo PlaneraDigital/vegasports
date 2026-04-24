@@ -79,122 +79,122 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12"
-      style={{ background: 'radial-gradient(ellipse at top, #0d2b1a 0%, #0a0a0a 70%)' }}>
+      style={{ background: 'radial-gradient(ellipse at top, #f0fdf4 0%, #ffffff 70%)' }}>
 
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl brand-wordmark" style={{ color: '#4ade80' }}>
-            Infinity Sports Turf
+          <Link to="/" className="text-2xl font-black" style={{ color: '#16a34a' }}>
+            <span style={{ color: '#1a1d1e' }}>Infinity</span> Sports Turf
           </Link>
-          <p className="text-gray-400 text-sm mt-2">
+          <p className="text-gray-500 text-sm mt-2">
             Create your account and start booking.
           </p>
         </div>
 
-        <div className="rounded-2xl p-8 border border-gray-800"
-          style={{ backgroundColor: '#111111' }}>
-          <h2 className="text-white text-xl font-bold mb-6">Create Account</h2>
+        {/* Card */}
+        <div className="rounded-2xl p-8 border border-gray-100 shadow-xl bg-zinc-100">
+          <h2 className="text-gray-900 text-2xl font-bold mb-6">Create Account</h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
             {/* Name */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-gray-300 font-bold text-sm">Full Name</label>
+              <label className="text-gray-700 font-bold text-sm">Full Name</label>
               <input
                 type="text"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
                 placeholder="Enter your Full Name"
-                className={`rounded-xl px-4 py-3 text-sm text-white outline-none transition
-                  border ${errors.name ? 'border-red-500' : 'border-gray-700'}
-                  focus:border-green-500`}
-                style={{ backgroundColor: '#1a1a1a' }}
+                className={`rounded-xl px-4 py-3 text-sm text-gray-900 outline-none transition
+                  border ${errors.name ? 'border-red-500' : 'border-gray-200'}
+                  focus:border-green-500 focus:ring-4 focus:ring-green-50/50`}
+                style={{ backgroundColor: '#f9fafb' }}
               />
               {errors.name && (
-                <div className="flex items-center gap-2 bg-red-950 border border-red-800 rounded-lg px-3 py-2">
-                  <span className="text-red-400 text-xs">⚠ {errors.name}</span>
+                <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 mt-1">
+                  <span className="text-red-600 text-xs font-medium">⚠ {errors.name}</span>
                 </div>
               )}
             </div>
 
             {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-gray-300 font-bold text-sm">Email</label>
+              <label className="text-gray-700 font-bold text-sm">Email</label>
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className={`rounded-xl px-4 py-3 text-sm text-white outline-none transition
-                  border ${errors.email ? 'border-red-500' : 'border-gray-700'}
-                  focus:border-green-500`}
-                style={{ backgroundColor: '#1a1a1a' }}
+                className={`rounded-xl px-4 py-3 text-sm text-gray-900 outline-none transition
+                  border ${errors.email ? 'border-red-500' : 'border-gray-200'}
+                  focus:border-green-500 focus:ring-4 focus:ring-green-50/50`}
+                style={{ backgroundColor: '#f9fafb' }}
               />
               {errors.email && (
-                <div className="flex items-center gap-2 bg-red-950 border border-red-800 rounded-lg px-3 py-2">
-                  <span className="text-red-400 text-xs">⚠ {errors.email}</span>
+                <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 mt-1">
+                  <span className="text-red-600 text-xs font-medium">⚠ {errors.email}</span>
                 </div>
               )}
             </div>
 
             {/* Phone */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-gray-300 font-bold text-sm">Phone Number</label>
+              <label className="text-gray-700 font-bold text-sm">Phone Number</label>
               <input
                 type="tel"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
-                placeholder="Enter your 10-digit phone number"
-                className={`rounded-xl px-4 py-3 text-sm text-white outline-none transition
-                  border ${errors.phone ? 'border-red-500' : 'border-gray-700'}
-                  focus:border-green-500`}
-                style={{ backgroundColor: '#1a1a1a' }}
+                placeholder="10-digit phone number"
+                className={`rounded-xl px-4 py-3 text-sm text-gray-900 outline-none transition
+                  border ${errors.phone ? 'border-red-500' : 'border-gray-200'}
+                  focus:border-green-500 focus:ring-4 focus:ring-green-50/50`}
+                style={{ backgroundColor: '#f9fafb' }}
               />
               {errors.phone && (
-                <div className="flex items-center gap-2 bg-red-950 border border-red-800 rounded-lg px-3 py-2">
-                  <span className="text-red-400 text-xs">⚠ {errors.phone}</span>
+                <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 mt-1">
+                  <span className="text-red-600 text-xs font-medium">⚠ {errors.phone}</span>
                 </div>
               )}
             </div>
 
             {/* Password */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-gray-300 font-bold text-sm">Password</label>
+              <label className="text-gray-700 font-bold text-sm">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="Enter your Password"
-                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-white outline-none transition
-                    border ${errors.password ? 'border-red-500' : 'border-gray-700'}
-                    focus:border-green-500`}
-                  style={{ backgroundColor: '#1a1a1a' }}
+                  placeholder="Create a password"
+                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-gray-900 outline-none transition
+                    border ${errors.password ? 'border-red-500' : 'border-gray-200'}
+                    focus:border-green-500 focus:ring-4 focus:ring-green-50/50`}
+                  style={{ backgroundColor: '#f9fafb' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition text-xs"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-xs font-bold"
                 >
-                  {showPassword ? 'Hide' : 'Show'}
+                  {showPassword ? 'HIDE' : 'SHOW'}
                 </button>
               </div>
               {errors.password && (
-                <div className="flex items-center gap-2 bg-red-950 border border-red-800 rounded-lg px-3 py-2">
-                  <span className="text-red-400 text-xs">⚠ {errors.password}</span>
+                <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 mt-1">
+                  <span className="text-red-600 text-xs font-medium">⚠ {errors.password}</span>
                 </div>
               )}
             </div>
 
             {/* Confirm Password */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-gray-300 font-bold text-sm">Confirm Password</label>
+              <label className="text-gray-700 font-bold text-sm">Confirm Password</label>
               <div className="relative">
                 <input
                   type={showConfirm ? 'text' : 'password'}
@@ -202,51 +202,51 @@ const Signup = () => {
                   value={form.confirm}
                   onChange={handleChange}
                   placeholder="Re-enter password"
-                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-white outline-none transition
+                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-gray-900 outline-none transition
                     border ${errors.confirm ? 'border-red-500' :
-                      form.confirm.length > 0 && form.confirm === form.password
-                        ? 'border-green-500' : 'border-gray-700'}
-                    focus:border-green-500`}
-                  style={{ backgroundColor: '#1a1a1a' }}
+                    form.confirm.length > 0 && form.confirm === form.password
+                      ? 'border-green-500' : 'border-gray-200'}
+                    focus:border-green-500 focus:ring-4 focus:ring-green-50/50`}
+                  style={{ backgroundColor: '#f9fafb' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition text-xs"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-xs font-bold"
                 >
-                  {showConfirm ? 'Hide' : 'Show'}
+                  {showConfirm ? 'HIDE' : 'SHOW'}
                 </button>
               </div>
               {errors.confirm && (
-                <div className="flex items-center gap-2 bg-red-950 border border-red-800 rounded-lg px-3 py-2">
-                  <span className="text-red-400 text-xs">⚠ {errors.confirm}</span>
+                <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-1.5 mt-1">
+                  <span className="text-red-600 text-xs font-medium">⚠ {errors.confirm}</span>
                 </div>
               )}
               {form.confirm.length > 0 && form.confirm === form.password && (
-                <span className="text-xs" style={{ color: '#4ade80' }}>Passwords match</span>
+                <span className="text-xs font-bold" style={{ color: '#16a34a' }}>✓ Passwords match</span>
               )}
             </div>
 
             {serverError && (
-              <div className="flex items-center gap-2 bg-red-950 border border-red-800 rounded-lg px-3 py-2">
-                <span className="text-red-400 text-xs">{serverError}</span>
+              <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                <span className="text-red-600 text-xs font-medium">{serverError}</span>
               </div>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full cursor-pointer py-3 rounded-xl text-sm font-bold text-white transition disabled:opacity-60"
+              className="w-full cursor-pointer py-3.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-60 shadow-lg shadow-green-200"
               style={{ backgroundColor: '#16a34a' }}
               onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
               onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
             >
-              {isLoading ? 'Creating account...' : 'Create Account '}
+              {isLoading ? 'Creating account...' : 'Create Account'}
             </button>
 
             <p className="text-center text-gray-500 text-sm mt-2">
               Already have an account?{' '}
-              <Link to="/login" style={{ color: '#4ade80' }} className="font-medium hover:underline">
+              <Link to="/login" style={{ color: '#16a34a' }} className="font-bold hover:underline">
                 Login
               </Link>
             </p>
