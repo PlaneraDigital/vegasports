@@ -57,7 +57,7 @@ const TurfDetails = () => {
         <p className="text-gray-400 mt-2">{location}</p>
 
         <p className="text-green-400 text-xl mt-4">
-          ₹{turf.price_per_hour}/hour
+          ₹{turf.price_per_hour} / {turf.slot_duration_minutes} mins
         </p>
 
         <button className="mt-6 px-6 py-2 bg-green-600 rounded-md hover:bg-green-700">

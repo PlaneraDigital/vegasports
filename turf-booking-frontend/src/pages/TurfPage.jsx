@@ -468,7 +468,7 @@ export default function TurfPage() {
               <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
                 <IndianRupee size={14} className="text-green-400" />
                 <span className="text-zinc-200 font-semibold">{sym}{turf.price_per_hour}</span>
-                <span className="text-zinc-500">/hr</span>
+                <span className="text-zinc-500">/ {turf.slot_duration_minutes} mins</span>
               </div>
               {turf.slot_duration_minutes && (
                 <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
@@ -526,7 +526,7 @@ export default function TurfPage() {
                 
                 <div className="flex items-baseline gap-1.5 mb-6">
                   <span className="text-4xl font-extrabold text-white tracking-tight">{sym}{turf.price_per_hour}</span>
-                  <span className="text-zinc-500 text-sm font-medium">/ hour</span>
+                  <span className="text-zinc-500 text-sm font-medium">/ {turf.slot_duration_minutes} mins</span>
                 </div>
 
                 <button 
@@ -584,7 +584,7 @@ export default function TurfPage() {
         <div>
           <p className="text-green-400 font-bold text-xl leading-none">
             {sym}{turf.price_per_hour}
-            <span className="text-zinc-500 font-normal text-sm"> /hr</span>
+            <span className="text-zinc-500 font-normal text-sm"> / {turf.slot_duration_minutes} mins</span>
           </p>
           {turf.slot_duration_minutes && (
             <p className="text-zinc-500 text-xs mt-1">{turf.slot_duration_minutes} min slots</p>

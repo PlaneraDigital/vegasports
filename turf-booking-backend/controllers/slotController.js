@@ -53,7 +53,7 @@ const getSlotsByTurfAndDate = async (req, res) => {
     let slots = await Slot.find({
       turf_id,
       date: { $gte: startOfDay, $lte: endOfDay },
-    }).sort({ start_time: 1 });
+    });
 
     // Auto-generate if empty
     if (slots.length === 0 && turf.operating_hours) {
@@ -94,7 +94,16 @@ const getSlotsByTurfAndDate = async (req, res) => {
 
            if (peak_hour_price && peakStartMin !== -1) {
               const currentSm = m % (24 * 60);
-              if (currentSm >= peakStartMin && currentSm < peakEndMin) {
+              let isPeak = false;
+              if (peakEndMin > 24 * 60) {
+                  // Wraps around midnight
+                  isPeak = currentSm >= peakStartMin || currentSm < (peakEndMin - 24 * 60);
+              } else {
+                  // Does not wrap around
+                  isPeak = currentSm >= peakStartMin && currentSm < peakEndMin;
+              }
+              
+              if (isPeak) {
                  price = peak_hour_price;
               }
            }
@@ -111,13 +120,38 @@ const getSlotsByTurfAndDate = async (req, res) => {
 
         if (newSlots.length > 0) {
             await Slot.insertMany(newSlots);
+            // Refresh slots after insertion
             slots = await Slot.find({
               turf_id,
               date: { $gte: startOfDay, $lte: endOfDay },
-            }).sort({ start_time: 1 });
+            });
         }
       }
     }
+
+    // ─── Custom Sort ──────────────────────────────────────────────────────────
+    // Sort slots based on turf opening time (e.g. 7 AM) to wrap around correctly
+    const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    // Get the local day name from the startOfDay (which is midnight UTC)
+    const dayName = days[new Date(date).getUTCDay()]; 
+    const daySchedule = turf.operating_hours?.[dayName];
+    const dayStartStr = daySchedule?.open || "00:00";
+    
+    const [openH, openM] = dayStartStr.split(":").map(Number);
+    const openTotal = openH * 60 + openM;
+
+    slots.sort((a, b) => {
+      const [ah, am] = a.start_time.split(":").map(Number);
+      let at = ah * 60 + am;
+      // If the slot time is earlier than the opening time, it belongs to the "next morning" part of this business day
+      if (at < openTotal) at += 24 * 60; 
+      
+      const [bh, bm] = b.start_time.split(":").map(Number);
+      let bt = bh * 60 + bm;
+      if (bt < openTotal) bt += 24 * 60;
+      
+      return at - bt;
+    });
 
     // Summary count
     const summary = {
