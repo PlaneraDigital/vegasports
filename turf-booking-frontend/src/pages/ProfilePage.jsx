@@ -354,215 +354,194 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* ── Profile Details Section ── */}
-        <div className="bg-[#0a0a0a] border border-zinc-800 rounded-3xl p-7 mb-6">
-          <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <User size={18} className="text-green-500" /> Account Details
-            </h2>
-            {!profileLoading && profile && !isEditingProfile && (
-              <button 
-                onClick={handleEditClick}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white border border-zinc-800 hover:border-zinc-600 bg-zinc-900/50 rounded-xl transition-colors"
-              >
-                <Pencil size={12} /> Edit
-              </button>
-            )}
+        {/* ── Profile Details Section (Light Theme) ── */}
+<div className="bg-white border border-gray-100 rounded-3xl p-7 mb-6 shadow-sm">
+  <div className="flex items-center justify-between mb-5">
+    <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+      <User size={18} className="text-green-600" /> Account Details
+    </h2>
+    {!profileLoading && profile && !isEditingProfile && (
+      <button 
+        onClick={handleEditClick}
+        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-300 bg-gray-50 rounded-xl transition-colors"
+      >
+        <Pencil size={12} /> Edit
+      </button>
+    )}
+  </div>
+  
+  {profileLoading ? (
+    <div className="flex items-center justify-center py-6">
+      <Loader2 size={24} className="text-green-600 animate-spin" />
+    </div>
+  ) : profile ? (
+    isEditingProfile ? (
+      <div className="space-y-5 bg-gray-50/50 border border-gray-200 rounded-2xl p-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {/* DOB */}
+          <div>
+            <label className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1.5 block">Date of Birth</label>
+            <input 
+              type="date" 
+              value={editFormData.dob}
+              onChange={(e) => setEditFormData({...editFormData, dob: e.target.value})}
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-600 transition-all"
+            />
+          </div>
+          {/* Gender */}
+          <div>
+            <label className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1.5 block">Gender</label>
+            <select 
+              value={editFormData.gender}
+              onChange={(e) => setEditFormData({...editFormData, gender: e.target.value})}
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-600 transition-all appearance-none"
+            >
+              <option value="">Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          {/* Location - City */}
+          <div>
+            <label className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1.5 block">City</label>
+            <input 
+              type="text" 
+              placeholder="e.g. Mumbai"
+              value={editFormData.location.city}
+              onChange={(e) => setEditFormData({...editFormData, location: {...editFormData.location, city: e.target.value}})}
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-600 transition-all"
+            />
+          </div>
+          {/* More Location fields similarly... */}
+        </div>
+        
+        {/* Preferred Sports */}
+        <div>
+          <label className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2 block">Preferred Sports</label>
+          <div className="flex flex-wrap gap-2">
+            {["football", "cricket", "badminton", "tennis", "basketball"].map((sport) => {
+              const isSelected = editFormData.preferred_sports.includes(sport);
+              return (
+                <button
+                  key={sport}
+                  onClick={() => toggleSport(sport)}
+                  className={`px-3 py-1.5 text-xs font-bold capitalize rounded-xl border transition-all ${
+                    isSelected 
+                      ? "bg-green-600 border-green-600 text-white shadow-md shadow-green-100" 
+                      : "bg-white border-gray-200 text-gray-500 hover:border-gray-400"
+                  }`}
+                >
+                  {sport}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-3 mt-5 border-t border-gray-200">
+          <button 
+            onClick={() => setIsEditingProfile(false)}
+            disabled={editSaving}
+            className="px-4 py-2 text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors"
+          >
+            Cancel
+          </button>
+          <button 
+            onClick={handleSaveProfile}
+            disabled={editSaving}
+            className="flex items-center gap-1.5 px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-bold rounded-xl transition-all disabled:opacity-50"
+          >
+            {editSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
+            {editSaving ? "Saving..." : "Save Changes"}
+          </button>
+        </div>
+      </div>
+    ) : (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Basic Info */}
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+              <Calendar size={18} className="text-gray-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date of Birth</p>
+              <p className="text-gray-700 text-sm font-semibold mt-0.5">
+                {profile.dob ? fmtDate(profile.dob) : "Not provided"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+              <UserCircle size={18} className="text-gray-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Gender</p>
+              <p className="text-gray-700 text-sm font-semibold mt-0.5 capitalize">
+                {profile.gender || "Not provided"}
+              </p>
+            </div>
           </div>
           
-          {profileLoading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 size={24} className="text-green-500 animate-spin" />
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+              <Map size={18} className="text-gray-500" />
             </div>
-          ) : profile ? (
-            isEditingProfile ? (
-              <div className="space-y-5 bg-zinc-900/30 border border-zinc-800/80 rounded-2xl p-5">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {/* DOB */}
-                  <div>
-                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1.5 block">Date of Birth</label>
-                    <input 
-                      type="date" 
-                      value={editFormData.dob}
-                      onChange={(e) => setEditFormData({...editFormData, dob: e.target.value})}
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 transition-colors [color-scheme:dark]"
-                    />
-                  </div>
-                  {/* Gender */}
-                  <div>
-                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1.5 block">Gender</label>
-                    <select 
-                      value={editFormData.gender}
-                      onChange={(e) => setEditFormData({...editFormData, gender: e.target.value})}
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-green-500/50 transition-colors appearance-none"
-                    >
-                      <option value="">Select gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-                  {/* Location - City */}
-                  <div>
-                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1.5 block">City</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Mumbai"
-                      value={editFormData.location.city}
-                      onChange={(e) => setEditFormData({...editFormData, location: {...editFormData.location, city: e.target.value}})}
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors"
-                    />
-                  </div>
-                  {/* Location - State */}
-                  <div>
-                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1.5 block">State</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Maharashtra"
-                      value={editFormData.location.state}
-                      onChange={(e) => setEditFormData({...editFormData, location: {...editFormData.location, state: e.target.value}})}
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors"
-                    />
-                  </div>
-                  {/* Location - Pincode */}
-                  <div>
-                    <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-1.5 block">Pincode</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. 400001"
-                      value={editFormData.location.pincode}
-                      onChange={(e) => setEditFormData({...editFormData, location: {...editFormData.location, pincode: e.target.value}})}
-                      className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors"
-                    />
-                  </div>
-                </div>
-                
-                {/* Preferred Sports */}
-                <div>
-                  <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2 block">Preferred Sports</label>
-                  <div className="flex flex-wrap gap-2">
-                    {["football", "cricket", "badminton", "tennis", "basketball"].map((sport) => {
-                      const isSelected = editFormData.preferred_sports.includes(sport);
-                      return (
-                        <button
-                          key={sport}
-                          onClick={() => toggleSport(sport)}
-                          className={`px-3 py-1.5 text-xs font-bold capitalize rounded-xl border transition-all ${
-                            isSelected 
-                              ? "bg-green-600 border-green-500 text-white shadow-[0_0_10px_rgba(34,197,94,0.3)]" 
-                              : "bg-black border-zinc-800 text-zinc-400 hover:border-zinc-600"
-                          }`}
-                        >
-                          {sport}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex justify-end gap-3 pt-3 mt-5 border-t border-zinc-800/80">
-                  <button 
-                    onClick={() => setIsEditingProfile(false)}
-                    disabled={editSaving}
-                    className="px-4 py-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleSaveProfile}
-                    disabled={editSaving}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-white hover:bg-zinc-200 text-black text-xs font-bold rounded-xl transition-all disabled:opacity-50"
-                  >
-                    {editSaving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />}
-                    {editSaving ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
-              </div>
-            ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Basic Info */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
-                    <Calendar size={18} className="text-zinc-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Date of Birth</p>
-                    <p className="text-zinc-200 text-sm font-medium mt-0.5">
-                      {profile.dob ? fmtDate(profile.dob) : "Not provided"}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
-                    <UserCircle size={18} className="text-zinc-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Gender</p>
-                    <p className="text-zinc-200 text-sm font-medium mt-0.5 capitalize">
-                      {profile.gender || "Not provided"}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
-                    <Map size={18} className="text-zinc-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Location</p>
-                    <p className="text-zinc-200 text-sm font-medium mt-0.5">
-                      {[profile.location?.city, profile.location?.state, profile.location?.pincode]
-                        .filter(Boolean).join(", ") || "Not provided"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Wallet & Preferences */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-yellow-950/20 border border-yellow-900/30 flex items-center justify-center flex-shrink-0">
-                    <Wallet size={18} className="text-yellow-500" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Wallet Balance</p>
-                    <p className="text-yellow-400 text-lg font-bold mt-0.5 flex items-center gap-1">
-                      <IndianRupee size={16} /> {profile.wallet?.balance || 0}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center flex-shrink-0">
-                    <Activity size={18} className="text-zinc-400" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Preferred Sports</p>
-                    {profile.preferred_sports?.length > 0 ? (
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {profile.preferred_sports.map(sport => (
-                          <span key={sport} className="px-2.5 py-1 text-xs font-medium text-green-300 bg-green-950/30 border border-green-800/50 rounded-lg capitalize">
-                            {sport}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-zinc-500 text-sm font-medium mt-0.5">Not provided</p>
-                    )}
-                  </div>
-                </div>
-                </div>
-              </div>
-            )
-          ) : (
-            <div className="text-center py-6 text-zinc-500 text-sm">
-              Failed to load profile details.
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Location</p>
+              <p className="text-gray-700 text-sm font-semibold mt-0.5">
+                {[profile.location?.city, profile.location?.state, profile.location?.pincode]
+                  .filter(Boolean).join(", ") || "Not provided"}
+              </p>
             </div>
-          )}
+          </div>
         </div>
+
+        {/* Wallet & Preferences */}
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center flex-shrink-0">
+              <Wallet size={18} className="text-orange-600" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Wallet Balance</p>
+              <p className="text-orange-600 text-lg font-bold mt-0.5 flex items-center gap-1">
+                <IndianRupee size={16} /> {profile.wallet?.balance || 0}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center flex-shrink-0">
+              <Activity size={18} className="text-gray-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Preferred Sports</p>
+              {profile.preferred_sports?.length > 0 ? (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {profile.preferred_sports.map(sport => (
+                    <span key={sport} className="px-2.5 py-1 text-xs font-bold text-green-700 bg-green-50 border border-green-100 rounded-lg capitalize">
+                      {sport}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm font-medium mt-0.5">Not provided</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  ) : (
+    <div className="text-center py-6 text-gray-400 text-sm font-medium">
+      Failed to load profile details.
+    </div>
+  )}
+</div>
 
         {/* ── Bookings Section ── */}
         <div>
