@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, Search, CheckCircle, XCircle, Layers } from 'lucid
 import TurfForm from './TurfForm'
 
 const statusBadge = {
-  active:           { color: '#16a34a', bg: '#f0fdf4', label: 'Active'   },
+  active:           { color: '#00844d', bg: '#ebf9f3', label: 'Active'   },
   inactive:         { color: '#64748b', bg: '#f8fafc', label: 'Inactive' },
   pending_approval: { color: '#d97706', bg: '#fffbeb', label: 'Pending'  },
   suspended:        { color: '#dc2626', bg: '#fef2f2', label: 'Suspended'},
@@ -59,7 +59,7 @@ const TurfManagement = () => {
       {toast && (
         <div style={{
           position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 1000,
-          background: toast.type === 'error' ? '#fef2f2' : '#f0fdf4',
+          background: toast.type === 'error' ? '#fef2f2' : '#ebf9f3',
           border: `1px solid ${toast.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
           color: toast.type === 'error' ? '#991b1b' : '#166534',
           borderRadius: '12px', padding: '0.875rem 1.25rem',
@@ -98,7 +98,7 @@ const TurfManagement = () => {
             onClick={() => { setEditTurf(null); setShowForm(true) }}
             style={{
               display: 'flex', alignItems: 'center', gap: '0.5rem',
-              background: 'linear-gradient(135deg, #16a34a, #15803d)',
+              background: 'linear-gradient(135deg, #00844d, #006b3e)',
               color: '#fff', border: 'none', borderRadius: '10px',
               padding: '0.6rem 1rem', fontSize: '0.8rem', fontWeight: 700,
               cursor: 'pointer', boxShadow: '0 4px 16px rgba(22,163,74,0.25)',
@@ -160,7 +160,7 @@ const TurfManagement = () => {
                           {t.sports?.length > 3 && <span style={{ color: '#94a3b8', fontSize: '0.65rem' }}>+{t.sports.length - 3}</span>}
                         </div>
                       </td>
-                      <td style={{ padding: '0.875rem 1rem', fontSize: '0.85rem', color: '#16a34a', fontWeight: 700 }}>
+                      <td style={{ padding: '0.875rem 1rem', fontSize: '0.85rem', color: '#00844d', fontWeight: 700 }}>
                         ₹{t.price_per_hour?.toLocaleString('en-IN')}
                       </td>
                       <td style={{ padding: '0.875rem 1rem' }}>

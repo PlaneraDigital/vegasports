@@ -54,7 +54,7 @@
 }
 
 .hero h1 span {
-  background: linear-gradient(135deg, #20e371, #16a34a);
+  background: linear-gradient(135deg, #009e5d, #00844d);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -70,7 +70,7 @@
 }
 
 .btn-glow {
-  background: linear-gradient(135deg, #20e371, #16a34a);
+  background: linear-gradient(135deg, #009e5d, #00844d);
   color: white;
   padding: 14px 36px;
   border-radius: 12px;
@@ -104,7 +104,7 @@
 .section-label {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #16a34a;
+  color: #00844d;
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -118,7 +118,7 @@
 }
 
 .section-header a {
-  color: #16a34a;
+  color: #00844d;
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
@@ -160,7 +160,7 @@
 }
 
 .how-card:hover {
-  border-color: #20e371;
+  border-color: #009e5d;
   transform: translateY(-5px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }

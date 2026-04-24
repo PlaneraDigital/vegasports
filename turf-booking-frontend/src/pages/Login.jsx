@@ -47,13 +47,13 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center px-4"
       /* Light theme background with subtle mint glow */
-      style={{ background: 'radial-gradient(ellipse at top, #f0fdf4 0%, #ffffff 70%)' }}>
+      style={{ background: 'radial-gradient(ellipse at top, #ebf9f3 0%, #ffffff 70%)' }}>
 
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl font-black" style={{ color: '#16a34a' }}>
+          <Link to="/" className="text-2xl font-black" style={{ color: '#00844d' }}>
             <span style={{ color: '#1a1d1e' }}>Infinity</span> Sports Turf
           </Link>
           <p className="text-gray-500 text-sm mt-2">Welcome back. Login to book your turf.</p>
@@ -88,7 +88,7 @@ const Login = () => {
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-gray-700 font-bold text-sm">Password</label>
-                <a href="#" className="text-xs font-semibold" style={{ color: '#16a34a' }}>
+                <a href="#" className="text-xs font-semibold" style={{ color: '#00844d' }}>
                   Forgot password?
                 </a>
               </div>
@@ -129,9 +129,9 @@ const Login = () => {
               type="submit"
               disabled={isLoading}
               className="w-full cursor-pointer py-3.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-60 shadow-lg shadow-green-200"
-              style={{ backgroundColor: '#16a34a' }}
-              onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
-              onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
+              style={{ backgroundColor: '#00844d' }}
+              onMouseEnter={e => e.target.style.backgroundColor = '#006b3e'}
+              onMouseLeave={e => e.target.style.backgroundColor = '#00844d'}
             >
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
@@ -141,7 +141,7 @@ const Login = () => {
           {/* Switch to signup */}
           <p className="text-center text-gray-500 text-sm mt-6">
             Don't have an account?{' '}
-            <Link to="/signup" style={{ color: '#16a34a' }} className="font-bold hover:underline">
+            <Link to="/signup" style={{ color: '#00844d' }} className="font-bold hover:underline">
               Sign up
             </Link>
           </p>
@@ -164,7 +164,7 @@ const Login = () => {
               textDecoration: 'none', transition: 'all 0.2s',
               boxSizing: 'border-box',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#16a34a'; e.currentTarget.style.color = '#16a34a'; e.currentTarget.style.background = '#f0fdf4'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#00844d'; e.currentTarget.style.color = '#00844d'; e.currentTarget.style.background = '#ebf9f3'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.background = '#f9fafb'; }}
           >
             <ShieldCheck size={16} />

@@ -35,7 +35,7 @@ const Input = ({ label, ...props }) => (
         width: '100%', boxSizing: 'border-box', transition: 'all 0.15s',
         ...props.style,
       }}
-      onFocus={e => { e.target.style.borderColor = '#16a34a'; e.target.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.05)' }}
+      onFocus={e => { e.target.style.borderColor = '#00844d'; e.target.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.05)' }}
       onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none' }}
     />
   </div>
@@ -43,8 +43,8 @@ const Input = ({ label, ...props }) => (
 
 const SectionTitle = ({ children }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '1.25rem 0 0.75rem' }}>
-    <ChevronRight size={14} color="#16a34a" />
-    <span style={{ color: '#16a34a', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+    <ChevronRight size={14} color="#00844d" />
+    <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
       {children}
     </span>
   </div>
@@ -186,9 +186,9 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                 style={{
                   padding: '0.4rem 0.875rem', borderRadius: '8px', border: '1px solid',
                   fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize',
-                  background: form.sports.includes(s) ? '#f0fdf4' : '#ffffff',
-                  borderColor: form.sports.includes(s) ? '#16a34a' : '#e2e8f0',
-                  color: form.sports.includes(s) ? '#16a34a' : '#64748b',
+                  background: form.sports.includes(s) ? '#ebf9f3' : '#ffffff',
+                  borderColor: form.sports.includes(s) ? '#00844d' : '#e2e8f0',
+                  color: form.sports.includes(s) ? '#00844d' : '#64748b',
                   transition: 'all 0.15s',
                 }}>
                 {s}
@@ -253,9 +253,9 @@ const TurfForm = ({ turf, onClose, onSave }) => {
           <SectionTitle>Amenities</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
             {AMENITY_KEYS.map(k => (
-              <label key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem 0.75rem', background: form.amenities[k] ? '#f0fdf4' : '#ffffff', borderRadius: '9px', border: `1px solid ${form.amenities[k] ? '#16a34a' : '#e2e8f0'}`, transition: 'all 0.15s' }}>
-                <input type="checkbox" checked={!!form.amenities[k]} onChange={e => set(`amenities.${k}`, e.target.checked)} style={{ accentColor: '#16a34a', width: '14px', height: '14px' }} />
-                <span style={{ color: form.amenities[k] ? '#16a34a' : '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>{labelOf(k)}</span>
+              <label key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem 0.75rem', background: form.amenities[k] ? '#ebf9f3' : '#ffffff', borderRadius: '9px', border: `1px solid ${form.amenities[k] ? '#00844d' : '#e2e8f0'}`, transition: 'all 0.15s' }}>
+                <input type="checkbox" checked={!!form.amenities[k]} onChange={e => set(`amenities.${k}`, e.target.checked)} style={{ accentColor: '#00844d', width: '14px', height: '14px' }} />
+                <span style={{ color: form.amenities[k] ? '#00844d' : '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>{labelOf(k)}</span>
               </label>
             ))}
           </div>
@@ -266,7 +266,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
             <input value={newRule} onChange={e => setNewRule(e.target.value)} placeholder="Add a rule..."
               style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
             <button type="button" onClick={() => { if (newRule.trim()) { setForm(p => ({ ...p, rules: [...p.rules, newRule.trim()] })); setNewRule('') } }}
-              style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 0.875rem', color: '#16a34a', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
+              style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 0.875rem', color: '#00844d', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
               +
             </button>
           </div>
@@ -294,7 +294,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                 <input value={newHighlight.description} onChange={e => setNewHighlight(p => ({ ...p, description: e.target.value }))} placeholder="e.g. Certified international standard synthetic grass"
                   style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
                 <button type="button" onClick={() => { if (newHighlight.title.trim() && newHighlight.description.trim()) { setForm(p => ({ ...p, highlights: [...p.highlights, { title: newHighlight.title.trim(), description: newHighlight.description.trim() }] })); setNewHighlight({ title: '', description: '' }) } }}
-                  style={{ background: '#16a34a', border: 'none', borderRadius: '10px', padding: '0 1rem', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
+                  style={{ background: '#00844d', border: 'none', borderRadius: '10px', padding: '0 1rem', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
                   Add
                 </button>
               </div>
@@ -360,7 +360,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                   style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.5rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} 
                 />
                 {newImage.url && (
-                  <div style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #16a34a' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #00844d' }}>
                     <img src={newImage.url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 )}
@@ -375,7 +375,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                 </select>
               </div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', paddingBottom: '0.75rem' }}>
-                <input type="checkbox" checked={newImage.is_primary} onChange={e => setNewImage(p => ({ ...p, is_primary: e.target.checked }))} style={{ accentColor: '#16a34a', width: '14px', height: '14px' }} />
+                <input type="checkbox" checked={newImage.is_primary} onChange={e => setNewImage(p => ({ ...p, is_primary: e.target.checked }))} style={{ accentColor: '#00844d', width: '14px', height: '14px' }} />
                 <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>Primary</span>
               </label>
               <button type="button" onClick={() => {
@@ -388,14 +388,14 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                   setNewImage({ url: '', label: 'main', is_primary: false });
                 }
               }}
-              style={{ background: '#16a34a', border: 'none', borderRadius: '10px', padding: '0.6rem 1.5rem', color: '#fff', fontWeight: 800, cursor: 'pointer', height: '42px' }}>
+              style={{ background: '#00844d', border: 'none', borderRadius: '10px', padding: '0.6rem 1.5rem', color: '#fff', fontWeight: 800, cursor: 'pointer', height: '42px' }}>
                 Add
               </button>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             {form.images.map((img, i) => (
-              <div key={i} style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: `2px solid ${img.is_primary ? '#16a34a' : '#e2e8f0'}`, background: '#fff' }}>
+              <div key={i} style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: `2px solid ${img.is_primary ? '#00844d' : '#e2e8f0'}`, background: '#fff' }}>
                 <img src={img.url} alt="" style={{ width: '100%', height: '80px', objectFit: 'cover', display: 'block' }} 
                   onError={e => { e.target.src = 'https://placehold.co/100x80?text=Invalid+URL' }} />
                 <div style={{ padding: '0.4rem', borderTop: '1px solid #f1f5f9' }}>
@@ -414,7 +414,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                         fontSize: '9px', 
                         fontWeight: 800, 
                         textTransform: 'uppercase', 
-                        background: img.is_primary ? '#16a34a' : '#f8fafc',
+                        background: img.is_primary ? '#00844d' : '#f8fafc',
                         color: img.is_primary ? '#fff' : '#64748b',
                         border: '1px solid #e2e8f0',
                         borderRadius: '4px',
@@ -441,7 +441,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
               Cancel
             </button>
             <button type="submit" disabled={saving}
-              style={{ flex: 2, padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg, #16a34a, #15803d)', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(22,163,74,0.2)' }}>
+              style={{ flex: 2, padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg, #00844d, #006b3e)', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(22,163,74,0.2)' }}>
               {saving ? 'Saving...' : turf ? 'Save Changes' : 'Add Turf'}
             </button>
           </div>

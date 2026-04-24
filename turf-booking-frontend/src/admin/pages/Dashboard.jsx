@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 
 // ─── Reusable Stat Card ───────────────────────────────────────────────────────
-const StatCard = ({ icon: Icon, label, value, sub, color = '#16a34a', iconBg }) => (
+const StatCard = ({ icon: Icon, label, value, sub, color = '#00844d', iconBg }) => (
   <div style={{
     background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px',
     padding: '1.25rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem',
@@ -37,7 +37,7 @@ const StatCard = ({ icon: Icon, label, value, sub, color = '#16a34a', iconBg }) 
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
 const statusStyle = {
-  confirmed:  { bg: '#f0fdf4', color: '#166534', label: 'Confirmed'  },
+  confirmed:  { bg: '#ebf9f3', color: '#166534', label: 'Confirmed'  },
   pending:    { bg: '#fffbeb', color: '#92400e', label: 'Pending'    },
   cancelled:  { bg: '#fef2f2', color: '#991b1b', label: 'Cancelled'  },
   completed:  { bg: '#eff6ff', color: '#1e40af', label: 'Completed'  },
@@ -60,7 +60,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.75rem 1rem', boxShadow: '0 10px 20px rgba(0,0,0,0.08)' }}>
       <div style={{ color: '#64748b', fontSize: '0.75rem', marginBottom: '0.25rem' }}>{label}</div>
       {payload.map((p, i) => (
-        <div key={i} style={{ color: p.color === '#4ade80' ? '#16a34a' : p.color, fontSize: '0.875rem', fontWeight: 800 }}>
+        <div key={i} style={{ color: p.color === '#4ade80' ? '#00844d' : p.color, fontSize: '0.875rem', fontWeight: 800 }}>
           {p.name === 'revenue' ? `₹${p.value.toLocaleString('en-IN')}` : p.value}
         </div>
       ))}
@@ -103,7 +103,7 @@ const Dashboard = () => {
   if (loading) return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh' }}>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#16a34a', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 1rem' }} />
+        <div style={{ width: '40px', height: '40px', border: '3px solid #e2e8f0', borderTopColor: '#00844d', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 1rem' }} />
         <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
         <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Loading dashboard...</p>
       </div>
@@ -133,7 +133,7 @@ const Dashboard = () => {
           icon={IndianRupee} label="Total Revenue"
           value={`₹${(stats?.total_revenue || 0).toLocaleString('en-IN')}`}
           sub={`Today: ₹${(stats?.today?.revenue || 0).toLocaleString('en-IN')}`}
-          color="#16a34a" iconBg="#f0fdf4"
+          color="#00844d" iconBg="#ebf9f3"
         />
         <StatCard
           icon={CalendarCheck} label="Total Bookings"
@@ -174,7 +174,7 @@ const Dashboard = () => {
                 <XAxis dataKey="period" tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fill: '#64748b', fontSize: 11 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-                <Bar dataKey="revenue" fill="#16a34a" radius={[4, 4, 0, 0]} name="revenue" />
+                <Bar dataKey="revenue" fill="#00844d" radius={[4, 4, 0, 0]} name="revenue" />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -192,7 +192,7 @@ const Dashboard = () => {
               <YAxis type="category" dataKey="name" tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} axisLine={false} tickLine={false} width={75} />
               <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
               <Bar dataKey="value" radius={[0, 4, 4, 0]} name="bookings"
-                fill="#16a34a"
+                fill="#00844d"
                 label={{ position: 'right', fill: '#64748b', fontSize: 11, fontWeight: 700 }}
               />
             </BarChart>
@@ -206,7 +206,7 @@ const Dashboard = () => {
           <h3 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 800, color: '#0f172a' }}>
             Recent Bookings
           </h3>
-          <a href="/admin/bookings" style={{ color: '#16a34a', fontSize: '0.75rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <a href="/admin/bookings" style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
             View all <ArrowUpRight size={13} />
           </a>
         </div>
@@ -241,7 +241,7 @@ const Dashboard = () => {
                       {b.date ? new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                       <div style={{ color: '#94a3b8', fontSize: '0.7rem', marginTop: '1px' }}>{b.start_time} – {b.end_time}</div>
                     </td>
-                    <td style={{ padding: '0.875rem 0.75rem', fontSize: '0.85rem', color: '#16a34a', fontWeight: 800 }}>
+                    <td style={{ padding: '0.875rem 0.75rem', fontSize: '0.85rem', color: '#00844d', fontWeight: 800 }}>
                       ₹{b.total_amount?.toLocaleString('en-IN')}
                     </td>
                     <td style={{ padding: '0.875rem 0.75rem' }}>

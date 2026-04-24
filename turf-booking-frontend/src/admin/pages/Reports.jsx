@@ -13,7 +13,7 @@ const TABS = [
   { id: 'users',    label: 'User Analytics', icon: Users      },
 ]
 
-const PIE_COLORS = ['#16a34a', '#2563eb', '#d97706', '#dc2626', '#7c3aed', '#ea580c']
+const PIE_COLORS = ['#00844d', '#2563eb', '#d97706', '#dc2626', '#7c3aed', '#ea580c']
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
@@ -21,7 +21,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '0.75rem 1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
       <div style={{ color: '#64748b', fontSize: '0.75rem', marginBottom: '0.25rem', fontWeight: 600 }}>{label}</div>
       {payload.map((p, i) => (
-        <div key={i} style={{ color: p.color || '#16a34a', fontSize: '0.875rem', fontWeight: 800 }}>
+        <div key={i} style={{ color: p.color || '#00844d', fontSize: '0.875rem', fontWeight: 800 }}>
           {p.name === 'revenue' || p.name === 'total_revenue' ? `₹${Number(p.value).toLocaleString('en-IN')}` : p.value}
         </div>
       ))}
@@ -30,7 +30,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 }
 
 const sectionStyle = { background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '1.5rem', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }
-const kpiCard = (label, value, color = '#16a34a') => (
+const kpiCard = (label, value, color = '#00844d') => (
   <div key={label} style={{ background: '#ffffff', borderRadius: '16px', padding: '1.25rem', border: '1px solid #e2e8f0', flex: 1, minWidth: '140px', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
     <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem' }}>{label}</div>
     <div style={{ fontSize: '1.5rem', fontWeight: 900, color }}>{value}</div>
@@ -116,8 +116,8 @@ const Reports = () => {
         {TABS.map(({ id, label, icon: Icon }) => (
           <button key={id} onClick={() => setActiveTab(id)}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.1rem', borderRadius: '12px', border: 'none', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 800, transition: 'all 0.15s', fontFamily: "'Plus Jakarta Sans', sans-serif",
-              background: activeTab === id ? '#f0fdf4' : 'transparent',
-              color: activeTab === id ? '#16a34a' : '#64748b',
+              background: activeTab === id ? '#ebf9f3' : 'transparent',
+              color: activeTab === id ? '#00844d' : '#64748b',
             }}>
             <Icon size={15} /> {label}
           </button>
@@ -148,7 +148,7 @@ const Reports = () => {
               </select>
             </div>
             <button onClick={fetchRevenue}
-              style={{ background: 'linear-gradient(135deg,#16a34a,#15803d)', border: 'none', borderRadius: '10px', padding: '0.65rem 1.25rem', color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(22,163,74,0.15)' }}>
+              style={{ background: 'linear-gradient(135deg,#00844d,#006b3e)', border: 'none', borderRadius: '10px', padding: '0.65rem 1.25rem', color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(22,163,74,0.15)' }}>
               Load
             </button>
           </div>
@@ -175,7 +175,7 @@ const Reports = () => {
                       <XAxis dataKey="period" tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} axisLine={false} tickLine={false} dy={10} />
                       <YAxis tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} axisLine={false} tickLine={false} tickFormatter={v => `₹${(v/1000).toFixed(0)}k`} />
                       <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-                      <Bar dataKey="total_revenue" fill="#16a34a" radius={[6, 6, 0, 0]} name="revenue" barSize={32} />
+                      <Bar dataKey="total_revenue" fill="#00844d" radius={[6, 6, 0, 0]} name="revenue" barSize={32} />
                     </BarChart>
                   </ResponsiveContainer>
                 )}
@@ -196,7 +196,7 @@ const Reports = () => {
                 {turfs.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
               </select>
             </div>
-            <button onClick={fetchPeak} style={{ background: 'linear-gradient(135deg,#16a34a,#15803d)', border: 'none', borderRadius: '10px', padding: '0.65rem 1.25rem', color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(22,163,74,0.15)' }}>
+            <button onClick={fetchPeak} style={{ background: 'linear-gradient(135deg,#00844d,#006b3e)', border: 'none', borderRadius: '10px', padding: '0.65rem 1.25rem', color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(22,163,74,0.15)' }}>
               Load
             </button>
           </div>
@@ -255,7 +255,7 @@ const Reports = () => {
                         <div style={{ fontSize: '0.85rem', fontWeight: 800, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t.turf_name}</div>
                         <div style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>{t.total_bookings} bookings</div>
                       </div>
-                      <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#16a34a' }}>₹{t.total_revenue?.toLocaleString('en-IN')}</div>
+                      <div style={{ fontSize: '0.9rem', fontWeight: 900, color: '#00844d' }}>₹{t.total_revenue?.toLocaleString('en-IN')}</div>
                     </div>
                   ))}
                 </div>
@@ -274,7 +274,7 @@ const Reports = () => {
               {/* KPI cards */}
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                 {kpiCard('Total Users',       userAnalytics.analytics?.total_users,          '#7c3aed')}
-                {kpiCard('Active Users',      userAnalytics.analytics?.active_users,         '#16a34a')}
+                {kpiCard('Active Users',      userAnalytics.analytics?.active_users,         '#00844d')}
                 {kpiCard('New This Month',    userAnalytics.analytics?.new_users_this_month,  '#2563eb')}
               </div>
               {/* Top users table */}
@@ -298,7 +298,7 @@ const Reports = () => {
                           <td style={{ padding: '0.875rem 1rem', fontSize: '0.85rem', fontWeight: 800, color: '#0f172a' }}>{u.name}</td>
                           <td style={{ padding: '0.875rem 1rem', fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>{u.email}</td>
                           <td style={{ padding: '0.875rem 1rem', fontSize: '0.85rem', fontWeight: 900, color: '#2563eb' }}>{u.total_bookings}</td>
-                          <td style={{ padding: '0.875rem 1rem', fontSize: '0.85rem', fontWeight: 900, color: '#16a34a' }}>₹{u.total_spent?.toLocaleString('en-IN')}</td>
+                          <td style={{ padding: '0.875rem 1rem', fontSize: '0.85rem', fontWeight: 900, color: '#00844d' }}>₹{u.total_spent?.toLocaleString('en-IN')}</td>
                         </tr>
                       ))}
                     </tbody>

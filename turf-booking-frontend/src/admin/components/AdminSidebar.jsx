@@ -32,7 +32,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <div style={{
             width: '32px', height: '32px', borderRadius: '9px',
-            background: 'linear-gradient(135deg, #16a34a, #15803d)',
+            background: 'linear-gradient(135deg, #00844d, #006b3e)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexShrink: 0, boxShadow: '0 4px 12px rgba(22,163,74,0.2)',
           }}>
@@ -42,7 +42,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
             <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#0f172a', letterSpacing: '-0.02em' }}>
               Infinity Sports Turf
             </span>
-            <div style={{ fontSize: '0.65rem', color: '#16a34a', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+            <div style={{ fontSize: '0.65rem', color: '#00844d', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Admin Panel
             </div>
           </div>
@@ -62,7 +62,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
               textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600,
               transition: 'all 0.15s',
               background: isActive ? 'rgba(22,163,74,0.08)' : 'transparent',
-              color: isActive ? '#16a34a' : '#64748b',
+              color: isActive ? '#00844d' : '#64748b',
               border: isActive ? '1px solid rgba(22,163,74,0.1)' : '1px solid transparent',
             })}
           >

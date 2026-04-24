@@ -66,7 +66,7 @@ const PricingManagement = () => {
       {toast && (
         <div style={{
           position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 1000,
-          background: toast.type === 'error' ? '#fef2f2' : '#f0fdf4',
+          background: toast.type === 'error' ? '#fef2f2' : '#ebf9f3',
           border: `1px solid ${toast.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
           color: toast.type === 'error' ? '#991b1b' : '#166534',
           borderRadius: '12px', padding: '0.875rem 1.25rem',
@@ -89,8 +89,8 @@ const PricingManagement = () => {
             <button key={t._id} onClick={() => handleSelectTurf(t)}
               style={{
                 width: '100%', textAlign: 'left', padding: '1rem 1.25rem', border: 'none',
-                background: selectedTurf?._id === t._id ? '#f0fdf4' : 'transparent',
-                borderLeft: `3px solid ${selectedTurf?._id === t._id ? '#16a34a' : 'transparent'}`,
+                background: selectedTurf?._id === t._id ? '#ebf9f3' : 'transparent',
+                borderLeft: `3px solid ${selectedTurf?._id === t._id ? '#00844d' : 'transparent'}`,
                 cursor: 'pointer', transition: 'all 0.15s',
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 borderBottom: '1px solid #f8fafc',
@@ -98,7 +98,7 @@ const PricingManagement = () => {
               onMouseEnter={e => { if (selectedTurf?._id !== t._id) e.currentTarget.style.background = '#f8fafc' }}
               onMouseLeave={e => { if (selectedTurf?._id !== t._id) e.currentTarget.style.background = 'transparent' }}
             >
-              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: selectedTurf?._id === t._id ? '#16a34a' : '#0f172a' }}>{t.name}</div>
+              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: selectedTurf?._id === t._id ? '#00844d' : '#0f172a' }}>{t.name}</div>
               <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '0.15rem', fontWeight: 600 }}>{t.location?.city} · ₹{t.price_per_hour}/slot</div>
             </button>
           ))}
@@ -122,14 +122,14 @@ const PricingManagement = () => {
             {/* Base Pricing */}
             <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '1.25rem', border: '1px solid #e2e8f0' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a' }} />
-                <span style={{ color: '#16a34a', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Base Pricing</span>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00844d' }} />
+                <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Base Pricing</span>
               </div>
               <div>
                 <label style={labelStyle}>Base Price per Hour (₹)</label>
                 <input type="number" value={form.price_per_hour} onChange={e => setForm(p => ({ ...p, price_per_hour: e.target.value }))}
                   style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = '#16a34a'}
+                  onFocus={e => e.target.style.borderColor = '#00844d'}
                   onBlur={e => e.target.style.borderColor = '#e2e8f0'}
                 />
                 <p style={{ color: '#64748b', fontSize: '0.7rem', margin: '0.4rem 0 0', fontWeight: 600 }}>Applied to all weekday normal slots</p>
@@ -191,12 +191,12 @@ const PricingManagement = () => {
             </div>
 
             {/* Current Pricing Summary */}
-            <div style={{ background: '#f0fdf4', borderRadius: '12px', padding: '1rem 1.25rem', border: '1px solid #bbf7d0' }}>
+            <div style={{ background: '#ebf9f3', borderRadius: '12px', padding: '1rem 1.25rem', border: '1px solid #bbf7d0' }}>
               <div style={{ color: '#166534', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
                 Current Saved Pricing
               </div>
               <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Base</div><div style={{ color: '#16a34a', fontWeight: 800, fontSize: '1rem' }}>₹{selectedTurf.price_per_hour}/slot</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Base</div><div style={{ color: '#00844d', fontWeight: 800, fontSize: '1rem' }}>₹{selectedTurf.price_per_hour}/slot</div></div>
                 <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Weekend</div><div style={{ color: '#2563eb', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.weekend_price ? `₹${selectedTurf.pricing_overrides.weekend_price}/slot` : '—'}</div></div>
                 <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Peak Hour</div><div style={{ color: '#d97706', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hour_price ? `₹${selectedTurf.pricing_overrides.peak_hour_price}/slot` : '—'}</div></div>
                 <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Peak Window</div><div style={{ color: '#475569', fontWeight: 700, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hours?.start ? `${selectedTurf.pricing_overrides.peak_hours.start} – ${selectedTurf.pricing_overrides.peak_hours.end}` : '—'}</div></div>
@@ -204,7 +204,7 @@ const PricingManagement = () => {
             </div>
 
             <button onClick={handleSave} disabled={saving}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'linear-gradient(135deg,#16a34a,#15803d)', border: 'none', borderRadius: '12px', padding: '0.8rem', color: '#fff', fontWeight: 700, fontSize: '0.9rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 20px rgba(22,163,74,0.2)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', background: 'linear-gradient(135deg,#00844d,#006b3e)', border: 'none', borderRadius: '12px', padding: '0.8rem', color: '#fff', fontWeight: 700, fontSize: '0.9rem', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 20px rgba(22,163,74,0.2)', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               <Save size={16} /> {saving ? 'Saving...' : 'Save Pricing'}
             </button>
           </div>
