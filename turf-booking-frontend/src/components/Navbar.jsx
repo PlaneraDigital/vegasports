@@ -45,14 +45,14 @@ const Navbar = () => {
             className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
             Home
           </Link>
-          <Link to="/turf-played"
+          {/* <Link to="/turf-played"
             className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
             Turf Played
           </Link>
           <Link to="/become-a-host"
             className="px-4 py-2 text-gray-300 hover:text-white hover:bg-gray-800 rounded-md transition">
             Become a Host
-          </Link>
+          </Link> */}
           {authUser ? (
             <>
               <Link
@@ -101,14 +101,14 @@ const Navbar = () => {
             className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
             Home
           </Link>
-          <Link to="/Turf-Played" onClick={() => setOpen(false)}
+          {/* <Link to="/Turf-Played" onClick={() => setOpen(false)}
             className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
             Turf Played
           </Link>
           <Link to="/Become-A-Host" onClick={() => setOpen(false)}
             className="w-full text-center px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition">
             Become a Host
-          </Link>
+          </Link> */}
           {authUser ? (
             <>
               <Link to="/profile" onClick={() => setOpen(false)}

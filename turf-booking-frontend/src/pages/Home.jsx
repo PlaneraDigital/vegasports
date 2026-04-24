@@ -42,7 +42,7 @@ function Home() {
             Browse top-rated sports grounds near you. Check live availability, book in seconds, and pay securely online.
           </motion.p>
 
-          <motion.div className="hero-actions" initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.3 }}>
+          {/* <motion.div className="hero-actions" initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.3 }}>
             <button className="btn-glow" onClick={scrollToAllTurfs}>Explore Turfs </button>
             <button className="btn-ghost">Become a Host</button>
           </motion.div>
@@ -54,18 +54,18 @@ function Home() {
                 <div className="stat-label">{label}</div>
               </div>
             ))}
-          </motion.div>
+          </motion.div> */}
         </div>
       </section>
 
-      {/* Search */}
+      {/* Search
       <div className="search-section">
         <motion.div className="search-card" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <Search size={18} color="rgba(255,255,255,0.35)" style={{ margin: 'auto 8px' }} />
           <input type="text" placeholder="Search by turf, area or city..." />
           <button>Find Turfs</button>
         </motion.div>
-      </div>
+      </div> */}
 
 
       {/* All Turfs */}

@@ -50,3 +50,48 @@
   font-size: 0.85rem;
   margin-bottom: 8px;
 }
+
+/* ================= MOBILE RESPONSIVENESS ================= */
+
+@media (max-width: 1024px) {
+  .footer__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .footer {
+    padding: 50px 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 40px 16px;
+  }
+
+  .footer__grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    text-align: center;
+  }
+
+  .footer__contact {
+    text-align: center;
+  }
+
+  .footer__brand {
+    font-size: 1.1rem;
+  }
+
+  .footer__heading {
+    font-size: 0.85rem;
+  }
+
+  .footer__link {
+    font-size: 0.8rem;
+  }
+
+  .footer__text {
+    font-size: 0.8rem;
+  }
+}
