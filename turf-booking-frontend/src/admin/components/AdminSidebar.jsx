@@ -76,7 +76,7 @@ const AdminSidebar = ({ isOpen, onClose }) => {
       <div style={{ padding: '1rem 0.75rem', borderTop: '1px solid #f1f5f9' }}>
         <div style={{ padding: '0.625rem 0.875rem', marginBottom: '0.5rem' }}>
           <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#0f172a' }}>
-            {adminUser?.name || 'Admin'}
+            Admin
           </div>
           <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '0.1rem' }}>
             {adminUser?.email || ''}

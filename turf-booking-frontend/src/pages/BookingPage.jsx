@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { api } from "../utils/auth";
 import {
-  Clock, CalendarDays, ShieldCheck, ChevronRight, XCircle, ArrowLeft,
-  CheckCircle2, AlertCircle, Loader2, Home, CalendarCheck,
+  ShieldCheck, ArrowLeft,
+  CheckCircle2, AlertCircle, Loader2, CalendarDays,
+  ChevronUp, ChevronDown,
 } from "lucide-react";
+
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 function fmt(t) {
@@ -143,14 +147,14 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, sym, onBook
           </div>
 
           <div className="space-y-3">
-             <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Slots</span>
-             <div className="flex flex-wrap gap-2">
-               {selectedSlots.map(s => (
-                 <div key={s._id} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-2 rounded-xl text-xs font-bold">
-                   {fmt(s.start_time)}
-                 </div>
-               ))}
-             </div>
+            <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Slots</span>
+            <div className="flex flex-wrap gap-2">
+              {selectedSlots.map(s => (
+                <div key={s._id} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-2 rounded-xl text-xs font-bold">
+                  {fmt(s.start_time)}
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="pt-4 border-t border-zinc-100 flex justify-between items-end">
@@ -189,11 +193,49 @@ function BookingCard({ turf, onConfirmBooking }) {
   const [slots, setSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const dates = Array.from({ length: 7 }).map((_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    return d;
-  });
+  const calRef = useRef(null);
+  const [calOpen, setCalOpen] = useState(false);
+  const [viewYear,  setViewYear]  = useState(new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
+
+  // Close calendar on outside click
+  useEffect(() => {
+    const handler = (e) => { if (calRef.current && !calRef.current.contains(e.target)) setCalOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const prevMonth = () => {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
+    else setViewMonth(m => m - 1);
+  };
+  const nextMonth = () => {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
+    else setViewMonth(m => m + 1);
+  };
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const isPrevDisabled = viewYear === today.getFullYear() && viewMonth === today.getMonth();
+
+  const firstDay    = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const calCells    = [];
+  for (let i = 0; i < firstDay; i++) calCells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) calCells.push(d);
+
+  const fmtDateDisplay = (d) => {
+    const dd = String(d.getDate()).padStart(2,'0');
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    return `${dd}-${mm}-${d.getFullYear()}`;
+  };
+
+  const pickDay = (day) => {
+    const d = new Date(viewYear, viewMonth, day);
+    setSelectedDate(d);
+    setSelectedSlots([]);
+    setCalOpen(false);
+  };
+
 
   useEffect(() => {
     const fetchSlots = async () => {
@@ -203,7 +245,7 @@ function BookingCard({ turf, onConfirmBooking }) {
         const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
         const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dateStr}`);
         setSlots(res.data.slots || []);
-      } catch (err) { console.error(err); } 
+      } catch (err) { console.error(err); }
       finally { setLoadingSlots(false); }
     };
     fetchSlots();
@@ -211,36 +253,76 @@ function BookingCard({ turf, onConfirmBooking }) {
 
   return (
     <div className="bg-white border border-zinc-200 rounded-[2rem] overflow-hidden shadow-xl flex flex-col">
-      {/* Price Header */}
-      <div className="px-8 pt-8 pb-6 bg-zinc-50/50 border-b border-zinc-100">
-        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Select Timings</span>
-        <div className="flex items-baseline gap-2 mt-1">
-          <span className="text-4xl font-black text-zinc-900">{sym}{turf.price_per_hour}</span>
-          <span className="text-zinc-400 text-sm font-bold">/ hour</span>
+      {/* Price Header + Date picker */}
+      <div className="px-8 pt-8 pb-6 bg-zinc-50/50 border-b border-zinc-100" style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between' }}>
+        <div>
+          <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Select Timings</span>
+          <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-4xl font-black text-zinc-900">{sym}{turf.price_per_hour}</span>
+            <span className="text-zinc-400 text-sm font-bold">/ hour</span>
+          </div>
         </div>
-      </div>
 
-      {/* Date Picker */}
-      <div className="px-8 pt-8 pb-4">
-        <h4 className="text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-4">Date Selection</h4>
-        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide">
-          {dates.map((d, i) => {
-            const isSelected = d.toDateString() === selectedDate.toDateString();
-            return (
-              <button
-                key={i}
-                onClick={() => setSelectedDate(d)}
-                className={`flex-shrink-0 flex flex-col items-center justify-center w-16 h-20 rounded-2xl border transition-all duration-200 ${
-                  isSelected ? "bg-zinc-900 border-zinc-900 text-white shadow-lg" : "bg-white border-zinc-100 text-zinc-500 hover:border-zinc-300"
-                }`}
-              >
-                <span className={`text-[10px] font-bold uppercase mb-1 ${isSelected ? "text-zinc-400" : "text-zinc-300"}`}>
-                  {d.toLocaleDateString("en-US", { weekday: "short" })}
-                </span>
-                <span className="text-xl font-black">{d.getDate()}</span>
-              </button>
-            );
-          })}
+        {/* Compact date picker — right side */}
+        <div ref={calRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setCalOpen(o => !o)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '0.5rem',
+              border: '1px solid #d4d4d8', borderRadius: '10px',
+              padding: '0.45rem 0.75rem', background: '#fff',
+              color: '#18181b', fontSize: '0.82rem', fontWeight: 600,
+              cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            }}
+          >
+            <span>{fmtDateDisplay(selectedDate)}</span>
+            <CalendarDays size={14} color="#71717a" />
+          </button>
+
+          {calOpen && (
+            <div style={{
+              position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 100,
+              background: '#fff', border: '1px solid #e4e4e7', borderRadius: '14px',
+              padding: '1rem', width: '240px',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+            }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem' }}>
+                <span style={{ fontWeight:800, fontSize:'0.8rem', color:'#18181b' }}>{MONTHS[viewMonth]}, {viewYear}</span>
+                <div style={{ display:'flex', flexDirection:'column', gap:'2px' }}>
+                  <button onClick={nextMonth} style={{ background:'none', border:'none', cursor:'pointer', color:'#52525b', padding:'1px' }}><ChevronUp size={13}/></button>
+                  <button onClick={prevMonth} disabled={isPrevDisabled} style={{ background:'none', border:'none', cursor: isPrevDisabled?'not-allowed':'pointer', color: isPrevDisabled?'#d4d4d8':'#52525b', padding:'1px' }}><ChevronDown size={13}/></button>
+                </div>
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:'4px' }}>
+                {DAYS_SHORT.map(d => <div key={d} style={{ textAlign:'center', fontSize:'0.65rem', fontWeight:800, color:'#10b981', padding:'3px 0' }}>{d}</div>)}
+              </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'2px' }}>
+                {calCells.map((day, idx) => {
+                  if (!day) return <div key={`e-${idx}`}/>;
+                  const cellDate = new Date(viewYear, viewMonth, day); cellDate.setHours(0,0,0,0);
+                  const isPast  = cellDate < today;
+                  const isToday = cellDate.getTime() === today.getTime();
+                  const isSel   = cellDate.getTime() === new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()).getTime();
+                  return (
+                    <button key={day} disabled={isPast} onClick={() => pickDay(day)} style={{
+                      height:'30px', borderRadius:'6px',
+                      border: isSel ? '2px solid #2563eb' : '1px solid transparent',
+                      background: isSel ? '#2563eb' : 'transparent',
+                      color: isPast ? '#d4d4d8' : isSel ? '#fff' : isToday ? '#10b981' : '#18181b',
+                      fontWeight: isSel || isToday ? 800 : 500, fontSize:'0.78rem',
+                      cursor: isPast ? 'not-allowed' : 'pointer',
+                    }}>{day}</button>
+                  );
+                })}
+              </div>
+              <div style={{ display:'flex', justifyContent:'space-between', marginTop:'0.75rem', borderTop:'1px solid #f4f4f5', paddingTop:'0.6rem' }}>
+                <button onClick={() => { setSelectedDate(today); setSelectedSlots([]); setCalOpen(false); setViewMonth(today.getMonth()); setViewYear(today.getFullYear()); }}
+                  style={{ background:'none', border:'none', color:'#10b981', fontWeight:700, fontSize:'0.75rem', cursor:'pointer' }}>Today</button>
+                <button onClick={() => setCalOpen(false)}
+                  style={{ background:'none', border:'none', color:'#10b981', fontWeight:700, fontSize:'0.75rem', cursor:'pointer' }}>Close</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -262,11 +344,10 @@ function BookingCard({ turf, onConfirmBooking }) {
                     if (isSelected) setSelectedSlots(prev => prev.filter(s => s._id !== slot._id));
                     else setSelectedSlots(prev => [...prev, slot]);
                   }}
-                  className={`py-3 rounded-xl border text-sm font-bold transition-all ${
-                    isBooked ? "bg-zinc-50 border-zinc-50 text-zinc-300 cursor-not-allowed" :
-                    isSelected ? "bg-emerald-600 border-emerald-600 text-white shadow-md" :
-                    "bg-white border-zinc-200 text-zinc-900 hover:border-emerald-500"
-                  }`}
+                  className={`py-3 rounded-xl border text-sm font-bold transition-all ${isBooked ? "bg-zinc-50 border-zinc-50 text-zinc-300 cursor-not-allowed" :
+                      isSelected ? "bg-emerald-600 border-emerald-600 text-white shadow-md" :
+                        "bg-white border-zinc-200 text-zinc-900 hover:border-emerald-500"
+                    }`}
                 >
                   {fmt(slot.start_time)}
                 </button>
@@ -319,7 +400,7 @@ export default function BookingPage() {
         const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
         const res = await axios.get(`${base}/api/turfs/${id}`);
         setTurf(res.data.turf);
-      } catch (err) { console.error(err); } 
+      } catch (err) { console.error(err); }
       finally { setLoading(false); }
     };
     fetchTurf();

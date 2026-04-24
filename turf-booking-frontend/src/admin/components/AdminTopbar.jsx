@@ -53,15 +53,10 @@ const AdminTopbar = ({ onMenuClick }) => {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '0.7rem', fontWeight: 800, color: '#fff', flexShrink: 0,
           }}>
-            {adminUser?.name?.[0]?.toUpperCase() || 'A'}
+            A
           </div>
-          <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0f172a' }}>
-              {adminUser?.name || 'Admin'}
-            </div>
-            <div style={{ fontSize: '0.6rem', color: '#16a34a', fontWeight: 600, letterSpacing: '0.05em' }}>
-              ADMIN
-            </div>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0f172a' }}>
+            Admin
           </div>
         </div>
       </div>
