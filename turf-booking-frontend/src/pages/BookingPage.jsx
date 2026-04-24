@@ -247,9 +247,9 @@ function BookingCard({ turf, onConfirmBooking }) {
       {/* Slots */}
       <div className="px-8 pt-4 pb-8 flex-1">
         <h4 className="text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-4">Available Timings</h4>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
           {loadingSlots ? (
-            <div className="col-span-3 text-center py-10"><Loader2 className="animate-spin mx-auto text-emerald-500" /></div>
+            <div className="col-span-full text-center py-10"><Loader2 className="animate-spin mx-auto text-emerald-500" /></div>
           ) : (
             slots.map((slot) => {
               const isBooked = ["booked", "on_hold", "blocked"].includes(slot.status);
@@ -331,7 +331,7 @@ export default function BookingPage() {
 
   return (
     <div className="bg-zinc-50 min-h-screen pb-20 pt-10">
-      <div className="max-w-xl mx-auto px-6">
+      <div className="max-w-5xl mx-auto px-6">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-zinc-900 transition-colors mb-8">
           <ArrowLeft size={16} /> Back
         </button>

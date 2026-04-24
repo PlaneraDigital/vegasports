@@ -85,6 +85,13 @@ const turfSchema = new mongoose.Schema(
 
     rules: [{ type: String }],
 
+    highlights: [
+      {
+        title: { type: String, required: true },
+        description: { type: String, required: true },
+      }
+    ],
+
     rating: {
       average: { type: Number, default: 0 },
       total_reviews: { type: Number, default: 0 },

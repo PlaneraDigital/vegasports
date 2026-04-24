@@ -225,6 +225,40 @@ function AmenitiesGrid({ amenities }) {
 }
 
 /* ─────────────────────────
+   HIGHLIGHTS LIST
+────────────────────────── */
+function Highlights({ highlights }) {
+  if (!highlights || highlights.length === 0) return null;
+  return (
+    <>
+      <section>
+        <SectionHeading icon={Star} label="Top Highlights" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {highlights.map((h, i) => (
+            <div key={i} className="group bg-white border border-zinc-200 p-4 rounded-2xl shadow-sm hover:border-emerald-300 hover:shadow-md transition-all duration-300">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-600 transition-colors">
+                    <CheckCircle2 size={12} className="text-emerald-500 group-hover:text-white" />
+                  </div>
+                  <h3 className="text-zinc-900 font-bold text-xs uppercase tracking-wider">
+                    {h.title}
+                  </h3>
+                </div>
+                <p className="text-zinc-500 font-medium text-[11px] leading-relaxed pl-1 px-1">
+                  {h.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <Divider />
+    </>
+  );
+}
+
+/* ─────────────────────────
    OPERATING HOURS
 ────────────────────────── */
 function fmt(t) {
@@ -428,29 +462,22 @@ export default function TurfPage() {
                 <span className="text-zinc-900 font-bold">{activeAmenities}</span>
                 <span className="text-zinc-500">Amenities</span>
               </div>
+              <div className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2.5 rounded-2xl shadow-sm text-sm">
+                <Clock size={14} className="text-blue-600" />
+                <span className="text-zinc-900 font-bold">{turf.slot_duration_minutes} min</span>
+                <span className="text-zinc-500">Slots</span>
+              </div>
             </div>
 
-            <Divider />
-
             {turf.sports?.length > 0 && (
-              <>
-                <section>
-                  <SectionHeading icon={Tag} label="Sports Available" />
-                  <div className="flex flex-wrap gap-2.5">
-                    {turf.sports.map(sport => (
-                      <span key={sport}
-                        className="flex items-center gap-2 bg-white border border-zinc-200 text-zinc-800 text-sm px-4 py-2.5 rounded-xl capitalize font-bold shadow-sm">
-                        <span>{SPORT_EMOJI[sport] || "🏅"}</span>
-                        {sport}
-                      </span>
-                    ))}
-                  </div>
-                </section>
-                <Divider />
-              </>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {turf.sports.map(sport => (
+                  <span key={sport} className="flex items-center gap-1.5 bg-white border border-zinc-200 text-zinc-700 text-[11px] font-bold uppercase py-1.5 px-3 rounded-lg shadow-sm">
+                    <span>{SPORT_EMOJI[sport] || "🏅"}</span> {sport}
+                  </span>
+                ))}
+              </div>
             )}
-
-            <AmenitiesGrid amenities={turf.amenities} />
           </div>
 
           {/* ════ RIGHT COLUMN ════ */}
@@ -472,22 +499,14 @@ export default function TurfPage() {
                   Book Slots <ChevronRight size={18} />
                 </button>
               </div>
-
-              <div className="mt-4 bg-white border border-zinc-200 rounded-2xl px-5 py-4 space-y-2.5 text-sm font-medium">
-                <div className="flex items-center justify-between">
-                  <span className="text-zinc-400">Location</span>
-                  <span className="text-zinc-900">{turf.location?.city}</span>
-                </div>
-                <div className="flex items-center justify-between border-t border-zinc-100 pt-2.5">
-                  <span className="text-zinc-400">Duration</span>
-                  <span className="text-zinc-900">{turf.slot_duration_minutes} min slots</span>
-                </div>
-              </div>
             </div>
           </div>
-
         </div>
 
+        {/* ── FULL WIDTH SECTIONS ── */}
+        <Divider />
+        <Highlights highlights={turf.highlights} />
+        <AmenitiesGrid amenities={turf.amenities} />
         <Divider />
         <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} />
         <Divider />

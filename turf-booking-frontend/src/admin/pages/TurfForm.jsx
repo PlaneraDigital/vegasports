@@ -19,6 +19,7 @@ const defaultForm = () => ({
   operating_hours: Object.fromEntries(DAYS.map(d => [d, { open: '', close: '', is_closed: false }])),
   pricing_overrides: { weekend_price: '', peak_hour_price: '', peak_hours: { start: '', end: '' } },
   rules: [],
+  highlights: [],
 })
 
 const Input = ({ label, ...props }) => (
@@ -52,6 +53,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [newRule, setNewRule] = useState('')
+  const [newHighlight, setNewHighlight] = useState({ title: '', description: '' })
 
   useEffect(() => {
     if (turf) {
@@ -72,6 +74,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
           peak_hours: { start: turf.pricing_overrides?.peak_hours?.start || '', end: turf.pricing_overrides?.peak_hours?.end || '' },
         },
         rules: turf.rules || [],
+        highlights: turf.highlights || [],
       })
     }
   }, [turf])
@@ -269,6 +272,39 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                 <span style={{ color: '#475569', fontSize: '0.8rem', fontWeight: 600 }}>• {r}</span>
                 <button type="button" onClick={() => setForm(p => ({ ...p, rules: p.rules.filter((_, j) => j !== i) }))}
                   style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.1rem', padding: '0 0.25rem' }}>×</button>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Highlights ── */}
+          <SectionTitle>Highlights</SectionTitle>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Highlight Heading</label>
+              <input value={newHighlight.title} onChange={e => setNewHighlight(p => ({ ...p, title: e.target.value }))} placeholder="e.g. FIFA Quality Pro"
+                style={{ width: '100%', boxSizing: 'border-box', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Short Description</label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input value={newHighlight.description} onChange={e => setNewHighlight(p => ({ ...p, description: e.target.value }))} placeholder="e.g. Certified international standard synthetic grass"
+                  style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+                <button type="button" onClick={() => { if (newHighlight.title.trim() && newHighlight.description.trim()) { setForm(p => ({ ...p, highlights: [...p.highlights, { title: newHighlight.title.trim(), description: newHighlight.description.trim() }] })); setNewHighlight({ title: '', description: '' }) } }}
+                  style={{ background: '#16a34a', border: 'none', borderRadius: '10px', padding: '0 1rem', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+            {form.highlights.map((h, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '0.75rem 1rem', shadow: 'sm' }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <span style={{ color: '#0f172a', fontSize: '0.85rem', fontWeight: 800 }}>★ {h.title}</span>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500 }}>{h.description}</span>
+                </div>
+                <button type="button" onClick={() => setForm(p => ({ ...p, highlights: p.highlights.filter((_, j) => j !== i) }))}
+                  style={{ background: '#fee2e2', border: 'none', color: '#ef4444', borderRadius: '8px', width: '28px', height: '28px', display: 'flex', itemsCenter: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.9rem' }}>×</button>
               </div>
             ))}
           </div>
