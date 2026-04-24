@@ -117,6 +117,14 @@ const adminLogin = async (req, res) => {
 //  TURF MANAGEMENT
 // ══════════════════════════════════════════════════════════════════════════════
 
+const formatTime = (mins) => {
+  const h = Math.floor((mins % 1440) / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
+const isValidTime = (t) => typeof t === "string" && /^\d{2}:\d{2}$/.test(t.trim());
+
 // ─── Add Turf ─────────────────────────────────────────────────────────────────
 const addTurf = async (req, res) => {
   try {
@@ -235,20 +243,35 @@ const generateSlots = async (req, res) => {
       return res.status(404).json({ message: "Turf not found" });
     }
 
-    // Get day of week from date
+    // Get day of week from date (YYYY-MM-DD)
+    // Using UTC ensures consistency between generation and retrieval regardless of server timezone
     const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    const dayName  = dayNames[new Date(date).getDay()];
-    const hours    = turf.operating_hours[dayName];
+    const [y, m, d] = date.split("-").map(Number);
+    const utcDate = new Date(Date.UTC(y, m - 1, d));
+    const dayName  = dayNames[utcDate.getUTCDay()];
+    const hours    = turf.operating_hours ? turf.operating_hours[dayName] : null;
 
     if (!hours || hours.is_closed) {
       return res.status(400).json({ message: `Turf is closed on ${dayName}` });
     }
 
-    const duration = turf.slot_duration_minutes; // e.g. 60
+    const duration = turf.slot_duration_minutes || 60; // fallback to 60 if somehow undefined
+    if (duration <= 0) {
+      return res.status(400).json({ message: "Invalid slot duration on turf config." });
+    }
 
     // Parse open and close times
+    if (!hours.open || !hours.close) {
+      return res.status(400).json({ message: `Operating hours for ${dayName} are not fully set (missing open/close).` });
+    }
     const [openH,  openM]  = hours.open.split(":").map(Number);
-    const [closeH, closeM] = hours.close.split(":").map(Number);
+    let [closeH, closeM] = hours.close.split(":").map(Number);
+
+    // Handle 24-hour case (00:00 to 00:00)
+    if (openH === closeH && openM === closeM) {
+      closeH = 23;
+      closeM = 59;
+    }
 
     let currentH = openH;
     let currentM = openM;
@@ -276,7 +299,7 @@ const generateSlots = async (req, res) => {
 
       slotsToInsert.push({
         turf_id,
-        date:       new Date(date),
+        date:       utcDate, 
         start_time: start,
         end_time:   end,
         price:      slotPrice,
@@ -361,16 +384,67 @@ const getAdminSlots = async (req, res) => {
       return res.status(400).json({ message: "turf_id and date are required" });
     }
 
-    const startOfDay = new Date(date);
-    startOfDay.setUTCHours(0, 0, 0, 0);
+    const [y, m, d] = date.split("-").map(Number);
+    const startOfDay = new Date(Date.UTC(y, m - 1, d));
+    const endOfDay   = new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999));
 
-    const endOfDay = new Date(date);
-    endOfDay.setUTCHours(23, 59, 59, 999);
+    const turf = await Turf.findById(turf_id);
+    if (!turf) {
+      return res.status(404).json({ message: "Turf not found" });
+    }
 
-    const slots = await Slot.find({
+    const slotsFromDb = await Slot.find({
       turf_id,
       date: { $gte: startOfDay, $lte: endOfDay },
     }).sort({ start_time: 1 });
+
+    // ── Full Schedule Hybrid Logic ───────────────────────────────────────────
+    const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    const dayName = dayNames[startOfDay.getUTCDay()];
+    const schedule = turf.operating_hours ? turf.operating_hours[dayName] : null;
+    const duration = turf.slot_duration_minutes;
+
+    let finalSlots = [];
+
+    if (schedule && !schedule.is_closed && duration > 0) {
+      const openStr = (schedule.open || "").trim();
+      const closeStr = (schedule.close || "").trim();
+      const is24Hours = openStr === "00:00" && closeStr === "00:00";
+
+      if (is24Hours || (isValidTime(openStr) && isValidTime(closeStr))) {
+        let startMin, endMin;
+        if (is24Hours) {
+          startMin = 0; endMin = 1440;
+        } else {
+          const [oH, oM] = openStr.split(":").map(Number);
+          const [cH, cM] = closeStr.split(":").map(Number);
+          startMin = oH * 60 + oM; endMin = cH * 60 + cM;
+          if (endMin <= startMin) endMin += 1440;
+        }
+
+        for (let tM = startMin; tM + duration <= endMin; tM += duration) {
+          const sT = formatTime(tM);
+          const existing = slotsFromDb.find(s => s.start_time === sT);
+          if (existing) {
+            finalSlots.push(existing);
+          } else {
+            finalSlots.push({
+              _id: `temp-${sT}`,
+              turf_id,
+              date: startOfDay,
+              start_time: sT,
+              end_time: formatTime(tM + duration),
+              price: turf.price_per_hour,
+              status: "available",
+              is_temp: true
+            });
+          }
+        }
+      }
+    }
+
+    if (finalSlots.length === 0) finalSlots = slotsFromDb;
+    const slots = finalSlots;
 
     const summary = {
       total:     slots.length,
