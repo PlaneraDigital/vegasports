@@ -461,7 +461,7 @@ export default function TurfPage() {
                 <p className="text-zinc-500 text-sm font-medium mb-6">Secure your slot in seconds. Instant confirmation.</p>
                 
                 <div className="flex items-baseline gap-1.5 mb-6">
-                  <span className="text-4xl font-extrabold text-white tracking-tight">{sym}{turf.price_per_hour}</span>
+                  <span className="text-4xl font-extrabold text-black tracking-tight">{sym}{turf.price_per_hour}</span>
                   <span className="text-zinc-500 text-sm font-medium">/ {turf.slot_duration_minutes} mins</span>
                 </div>
 

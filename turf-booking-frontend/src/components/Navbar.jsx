@@ -42,7 +42,7 @@ const Navbar = () => {
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-2">
           <Link to="/"
-            className="px-4 py-2 text-gray-600 hover:text-gray-900 transition uppercase text-sm font-semibold tracking-wider">
+            className="px-4 py-2 text-gray-600 hover:text-gray-900 transition  text-medium font-semibold tracking-wider">
             Home
           </Link>
           
@@ -50,7 +50,7 @@ const Navbar = () => {
             <>
               <Link
                 to="/profile"
-                className="ml-2 px-3 py-2 text-sm text-gray-600 hover:text-green-600 transition font-medium"
+                className="ml-2 px-3 py-2 text-medium text-gray-600 hover:text-green-600 transition font-medium"
               >
                 Hi, {authUser.name}
               </Link>
@@ -91,7 +91,7 @@ const Navbar = () => {
           style={{ backgroundColor: '#ffffff' }}>
 
           <Link to="/" onClick={() => setOpen(false)}
-            className="w-full text-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition uppercase text-sm font-semibold">
+            className="w-full text-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition text-sm font-semibold">
             Home
           </Link>
 
