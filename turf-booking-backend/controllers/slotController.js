@@ -228,13 +228,27 @@ const getSlotsByTurfAndDate = async (req, res) => {
       return toMins(a.start_time) - toMins(b.start_time);
     });
 
+    // ── Map Slots for Current User ────────────────────────────────────────────
+    const mappedSlots = slots.map((s) => {
+      const slotObj = typeof s.toObject === "function" ? s.toObject() : s;
+      if (
+        slotObj.status === "on_hold" &&
+        slotObj.booked_by &&
+        req.user &&
+        slotObj.booked_by.toString() === req.user._id.toString()
+      ) {
+        slotObj.status = "available";
+      }
+      return slotObj;
+    });
+
     // ── Summary ───────────────────────────────────────────────────────────────
     const summary = {
-      total: slots.length,
-      available: slots.filter((s) => s.status === "available").length,
-      booked: slots.filter((s) => s.status === "booked").length,
-      on_hold: slots.filter((s) => s.status === "on_hold").length,
-      blocked: slots.filter((s) => s.status === "blocked").length,
+      total: mappedSlots.length,
+      available: mappedSlots.filter((s) => s.status === "available").length,
+      booked: mappedSlots.filter((s) => s.status === "booked").length,
+      on_hold: mappedSlots.filter((s) => s.status === "on_hold").length,
+      blocked: mappedSlots.filter((s) => s.status === "blocked").length,
     };
 
     res.status(200).json({
@@ -247,7 +261,7 @@ const getSlotsByTurfAndDate = async (req, res) => {
       },
       date,
       summary,
-      slots,
+      slots: mappedSlots,
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });

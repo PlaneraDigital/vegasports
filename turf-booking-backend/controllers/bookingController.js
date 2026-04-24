@@ -50,8 +50,10 @@ const createBooking = async (req, res) => {
       });
     }
 
-    // Check all slots are available
-    const unavailableSlots = slots.filter((s) => s.status !== "available");
+    // Check all slots are available or held by the current user
+    const unavailableSlots = slots.filter(
+      (s) => s.status !== "available" && !(s.status === "on_hold" && s.booked_by?.toString() === user_id.toString())
+    );
     if (unavailableSlots.length > 0) {
       return res.status(400).json({
         message: "One or more slots are not available",

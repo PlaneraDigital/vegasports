@@ -42,7 +42,7 @@ const SlotManagement = () => {
     if (!selectedTurf || !selectedDate) return
     setLoading(true); setFetched(false)
     try {
-      const { data } = await api.get(`/api/slots?turf_id=${selectedTurf}&date=${selectedDate}`)
+      const { data } = await adminApi.get(`/slots?turf_id=${selectedTurf}&date=${selectedDate}`)
       setSlots(data.slots)
       setSummary(data.summary)
       setFetched(true)
