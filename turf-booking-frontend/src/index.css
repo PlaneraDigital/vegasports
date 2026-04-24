@@ -1,6 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-brand-green-50: #ebf9f3;
+  --color-brand-green-100: #d4f5e5;
+  --color-brand-green-200: #bbf7d0;
+  --color-brand-green-300: #86efac;
+  --color-brand-green-400: #4ade80;
+  --color-brand-green-500: #009e5d;
+  --color-brand-green-600: #00844d;
+  --color-brand-green-700: #006b3e;
+  --color-brand-green-800: #065f46;
+  --color-brand-green-900: #064e3b;
+
+  /* Overriding default green and emerald to ensure consistency everywhere */
+  --color-green-400: var(--color-brand-green-400);
+  --color-green-500: var(--color-brand-green-500);
+  --color-green-600: var(--color-brand-green-600);
+  --color-green-700: var(--color-brand-green-700);
+
+  --color-emerald-400: var(--color-brand-green-400);
+  --color-emerald-500: var(--color-brand-green-500);
+  --color-emerald-600: var(--color-brand-green-600);
+  --color-emerald-700: var(--color-brand-green-700);
+}
+
 body {
 	font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
 }

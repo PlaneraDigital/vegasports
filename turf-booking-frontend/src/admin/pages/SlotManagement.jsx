@@ -3,7 +3,7 @@ import { adminApi, api } from '../utils/adminApi'
 import { Clock, Lock, CheckCircle, AlertCircle, Zap, RefreshCw } from 'lucide-react'
 
 const slotColors = {
-  available: { bg: '#f0fdf4', border: '#bbf7d0', color: '#166534', label: 'Available' },
+  available: { bg: '#ebf9f3', border: '#bbf7d0', color: '#166534', label: 'Available' },
   booked: { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', label: 'Booked' },
   on_hold: { bg: '#fffbeb', border: '#fef3c7', color: '#92400e', label: 'On Hold' },
   blocked: { bg: '#f8fafc', border: '#e2e8f0', color: '#475569', label: 'Blocked' },
@@ -97,7 +97,7 @@ const SlotManagement = () => {
       {toast && (
         <div style={{
           position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 1000,
-          background: toast.type === 'error' ? '#fef2f2' : '#f0fdf4',
+          background: toast.type === 'error' ? '#fef2f2' : '#ebf9f3',
           border: `1px solid ${toast.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
           color: toast.type === 'error' ? '#991b1b' : '#166534',
           borderRadius: '12px', padding: '0.875rem 1.25rem',
@@ -126,7 +126,7 @@ const SlotManagement = () => {
             style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
         </div>
         <button onClick={fetchSlots} disabled={!selectedTurf || !selectedDate || loading}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'linear-gradient(135deg,#16a34a,#15803d)', border: 'none', borderRadius: '10px', padding: '0.6rem 1.25rem', color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', opacity: !selectedTurf ? 0.5 : 1, boxShadow: '0 4px 12px rgba(22,163,74,0.15)' }}>
+          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'linear-gradient(135deg,#00844d,#006b3e)', border: 'none', borderRadius: '10px', padding: '0.6rem 1.25rem', color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', opacity: !selectedTurf ? 0.5 : 1, boxShadow: '0 4px 12px rgba(22,163,74,0.15)' }}>
           <RefreshCw size={14} /> Load Slots
         </button>
       </div>
@@ -136,7 +136,7 @@ const SlotManagement = () => {
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {[
             { label: 'Total', value: summary.total, color: '#64748b' },
-            { label: 'Available', value: summary.available, color: '#16a34a' },
+            { label: 'Available', value: summary.available, color: '#00844d' },
             { label: 'Booked', value: summary.booked, color: '#dc2626' },
             { label: 'On Hold', value: summary.on_hold, color: '#d97706' },
             { label: 'Blocked', value: summary.blocked, color: '#475569' },
@@ -281,7 +281,7 @@ const SlotManagement = () => {
                   <button onClick={() => setActionSlot(null)} style={{ flex: 1, padding: '0.7rem', borderRadius: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>
                     Cancel
                   </button>
-                  <button onClick={handlePriceUpdate} disabled={saving} style={{ flex: 2, padding: '0.7rem', borderRadius: '12px', background: 'linear-gradient(135deg,#16a34a,#15803d)', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(22,163,74,0.2)' }}>
+                  <button onClick={handlePriceUpdate} disabled={saving} style={{ flex: 2, padding: '0.7rem', borderRadius: '12px', background: 'linear-gradient(135deg,#00844d,#006b3e)', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(22,163,74,0.2)' }}>
                     {saving ? 'Saving...' : 'Update Price'}
                   </button>
                 </div>

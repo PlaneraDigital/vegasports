@@ -3,7 +3,7 @@ import { adminApi, api } from '../utils/adminApi'
 import { Search, Filter, X, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Eye } from 'lucide-react'
 
 const statusStyle = {
-  confirmed: { color: '#166534', bg: '#f0fdf4', label: 'Confirmed' },
+  confirmed: { color: '#166534', bg: '#ebf9f3', label: 'Confirmed' },
   pending:   { color: '#92400e', bg: '#fffbeb', label: 'Pending'   },
   cancelled: { color: '#991b1b', bg: '#fef2f2', label: 'Cancelled' },
   completed: { color: '#1e40af', bg: '#eff6ff', label: 'Completed' },
@@ -11,7 +11,7 @@ const statusStyle = {
 }
 
 const payStyle = {
-  paid:     { color: '#166534', bg: '#f0fdf4', label: 'Paid'    },
+  paid:     { color: '#166534', bg: '#ebf9f3', label: 'Paid'    },
   pending:  { color: '#92400e', bg: '#fffbeb', label: 'Pending' },
   failed:   { color: '#991b1b', bg: '#fef2f2', label: 'Failed'  },
   refunded: { color: '#5b21b6', bg: '#f5f3ff', label: 'Refunded'},
@@ -93,7 +93,7 @@ const BookingManagement = () => {
       {toast && (
         <div style={{
           position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 1000,
-          background: toast.type === 'error' ? '#fef2f2' : '#f0fdf4',
+          background: toast.type === 'error' ? '#fef2f2' : '#ebf9f3',
           border: `1px solid ${toast.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
           color: toast.type === 'error' ? '#991b1b' : '#166534',
           borderRadius: '12px', padding: '0.875rem 1.25rem',
@@ -190,7 +190,7 @@ const BookingManagement = () => {
                       <div style={{ color: '#0f172a', fontWeight: 700 }}>{b.date ? new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
                       <div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>{b.start_time} – {b.end_time}</div>
                     </td>
-                    <td style={{ ...td, color: '#16a34a', fontWeight: 800 }}>₹{b.total_amount?.toLocaleString('en-IN')}</td>
+                    <td style={{ ...td, color: '#00844d', fontWeight: 800 }}>₹{b.total_amount?.toLocaleString('en-IN')}</td>
                     <td style={td}><StatusBadge status={b.payment?.status} map={payStyle} /></td>
                     <td style={td}><StatusBadge status={b.booking_status} map={statusStyle} /></td>
                     <td style={td}>

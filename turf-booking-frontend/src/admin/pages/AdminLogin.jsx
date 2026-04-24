@@ -32,7 +32,7 @@ const AdminLogin = () => {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: 'radial-gradient(ellipse at top, #f0fdf4 0%, #ffffff 70%)' }}
+      style={{ background: 'radial-gradient(ellipse at top, #ebf9f3 0%, #ffffff 70%)' }}
     >
       <div className="w-full" style={{ maxWidth: '420px' }}>
 
@@ -41,7 +41,7 @@ const AdminLogin = () => {
           <div style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
             width: '52px', height: '52px', borderRadius: '14px',
-            background: 'linear-gradient(135deg, #16a34a, #15803d)',
+            background: 'linear-gradient(135deg, #00844d, #006b3e)',
             marginBottom: '1rem',
             boxShadow: '0 8px 24px rgba(22,163,74,0.25)',
           }}>
@@ -51,7 +51,7 @@ const AdminLogin = () => {
             fontWeight: 800, fontSize: '1.5rem', color: '#1a1d1e',
             letterSpacing: '-0.03em', margin: 0,
           }}>
-            Infinity Sports Turf <span style={{ color: '#16a34a' }}>Admin</span>
+            Infinity Sports Turf <span style={{ color: '#00844d' }}>Admin</span>
           </h1>
           <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.4rem' }}>
             Restricted access. Authorised personnel only.
@@ -69,12 +69,12 @@ const AdminLogin = () => {
           {/* Admin badge */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
-            background: '#f0fdf4', border: '1px solid #bbf7d0',
+            background: '#ebf9f3', border: '1px solid #bbf7d0',
             borderRadius: '9999px', padding: '0.35rem 1rem',
             marginBottom: '1.5rem', width: 'fit-content', margin: '0 auto 1.5rem',
           }}>
-            <ShieldCheck size={13} color="#16a34a" />
-            <span style={{ color: '#16a34a', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>
+            <ShieldCheck size={13} color="#00844d" />
+            <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>
               ADMIN PORTAL
             </span>
           </div>
@@ -108,7 +108,7 @@ const AdminLogin = () => {
                   transition: 'border-color 0.2s, box-shadow 0.2s',
                 }}
                 onFocus={e => {
-                  e.target.style.borderColor = '#16a34a'
+                  e.target.style.borderColor = '#00844d'
                   e.target.style.boxShadow = '0 0 0 4px rgba(22,163,74,0.08)'
                 }}
                 onBlur={e => {
@@ -139,7 +139,7 @@ const AdminLogin = () => {
                     transition: 'border-color 0.2s, box-shadow 0.2s',
                   }}
                   onFocus={e => {
-                    e.target.style.borderColor = '#16a34a'
+                    e.target.style.borderColor = '#00844d'
                     e.target.style.boxShadow = '0 0 0 4px rgba(22,163,74,0.08)'
                   }}
                   onBlur={e => {
@@ -181,15 +181,15 @@ const AdminLogin = () => {
               disabled={loading}
               style={{
                 width: '100%', padding: '0.875rem', borderRadius: '12px',
-                background: '#16a34a',
+                background: '#00844d',
                 color: '#fff', fontWeight: 700, fontSize: '0.9rem',
                 border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'all 0.2s', opacity: loading ? 0.65 : 1,
                 boxShadow: '0 4px 20px rgba(22,163,74,0.25)',
                 marginTop: '0.25rem',
               }}
-              onMouseEnter={e => { if (!loading) e.target.style.background = '#15803d' }}
-              onMouseLeave={e => { e.target.style.background = '#16a34a' }}
+              onMouseEnter={e => { if (!loading) e.target.style.background = '#006b3e' }}
+              onMouseLeave={e => { e.target.style.background = '#00844d' }}
             >
               {loading ? 'Signing in...' : 'Sign in as Admin'}
             </button>
@@ -213,9 +213,9 @@ const AdminLogin = () => {
               textDecoration: 'none', transition: 'all 0.2s',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#16a34a'
-              e.currentTarget.style.color = '#16a34a'
-              e.currentTarget.style.background = '#f0fdf4'
+              e.currentTarget.style.borderColor = '#00844d'
+              e.currentTarget.style.color = '#00844d'
+              e.currentTarget.style.background = '#ebf9f3'
             }}
             onMouseLeave={e => {
               e.currentTarget.style.borderColor = '#d1d5db'

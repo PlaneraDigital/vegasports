@@ -34,9 +34,9 @@ const Navbar = () => {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-2xl font-bold cursor-pointer group"
-          style={{ color: '#16a34a' }}>
+          style={{ color: '#00844d' }}>
           <IoFootballSharp className="transition duration-700 group-hover:rotate-180" />
-          <span className="brand-wordmark text-gray-900">Infinity <span style={{ color: '#16a34a' }}>Sports Turf</span></span>
+          <span className="brand-wordmark text-gray-900">Infinity <span style={{ color: '#00844d' }}>Sports Turf</span></span>
         </Link>
 
         {/* Desktop Links */}
@@ -57,9 +57,9 @@ const Navbar = () => {
               <button
                 onClick={handleLogout}
                 className="px-6 py-2 text-sm font-bold text-white rounded-full transition cursor-pointer uppercase tracking-tighter"
-                style={{ backgroundColor: '#16a34a' }}
-                onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
-                onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
+                style={{ backgroundColor: '#00844d' }}
+                onMouseEnter={e => e.target.style.backgroundColor = '#006b3e'}
+                onMouseLeave={e => e.target.style.backgroundColor = '#00844d'}
               >
                 Logout
               </button>
@@ -67,9 +67,9 @@ const Navbar = () => {
           ) : (
             <Link to="/login"
               className="ml-2 px-6 py-2 text-sm font-bold text-white rounded-full transition uppercase tracking-tighter"
-              style={{ backgroundColor: '#16a34a' }}
-              onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
-              onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}>
+              style={{ backgroundColor: '#00844d' }}
+              onMouseEnter={e => e.target.style.backgroundColor = '#006b3e'}
+              onMouseLeave={e => e.target.style.backgroundColor = '#00844d'}>
               Book Now
             </Link>
           )}
@@ -104,7 +104,7 @@ const Navbar = () => {
               <button
                 onClick={handleLogout}
                 className="mt-1 px-8 py-2 text-sm font-bold text-white rounded-full transition uppercase"
-                style={{ backgroundColor: '#16a34a' }}
+                style={{ backgroundColor: '#00844d' }}
               >
                 Logout
               </button>
@@ -112,7 +112,7 @@ const Navbar = () => {
           ) : (
             <Link to="/login" onClick={() => setOpen(false)}
               className="mt-1 px-8 py-2 text-sm font-bold text-white rounded-full transition uppercase"
-              style={{ backgroundColor: '#16a34a' }}>
+              style={{ backgroundColor: '#00844d' }}>
               Login
             </Link>
           )}

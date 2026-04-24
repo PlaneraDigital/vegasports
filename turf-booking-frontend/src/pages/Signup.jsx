@@ -79,13 +79,13 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12"
-      style={{ background: 'radial-gradient(ellipse at top, #f0fdf4 0%, #ffffff 70%)' }}>
+      style={{ background: 'radial-gradient(ellipse at top, #ebf9f3 0%, #ffffff 70%)' }}>
 
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl font-black" style={{ color: '#16a34a' }}>
+          <Link to="/" className="text-2xl font-black" style={{ color: '#00844d' }}>
             <span style={{ color: '#1a1d1e' }}>Infinity</span> Sports Turf
           </Link>
           <p className="text-gray-500 text-sm mt-2">
@@ -223,7 +223,7 @@ const Signup = () => {
                 </div>
               )}
               {form.confirm.length > 0 && form.confirm === form.password && (
-                <span className="text-xs font-bold" style={{ color: '#16a34a' }}>✓ Passwords match</span>
+                <span className="text-xs font-bold" style={{ color: '#00844d' }}>✓ Passwords match</span>
               )}
             </div>
 
@@ -237,16 +237,16 @@ const Signup = () => {
               type="submit"
               disabled={isLoading}
               className="w-full cursor-pointer py-3.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-60 shadow-lg shadow-green-200"
-              style={{ backgroundColor: '#16a34a' }}
-              onMouseEnter={e => e.target.style.backgroundColor = '#15803d'}
-              onMouseLeave={e => e.target.style.backgroundColor = '#16a34a'}
+              style={{ backgroundColor: '#00844d' }}
+              onMouseEnter={e => e.target.style.backgroundColor = '#006b3e'}
+              onMouseLeave={e => e.target.style.backgroundColor = '#00844d'}
             >
               {isLoading ? 'Creating account...' : 'Create Account'}
             </button>
 
             <p className="text-center text-gray-500 text-sm mt-2">
               Already have an account?{' '}
-              <Link to="/login" style={{ color: '#16a34a' }} className="font-bold hover:underline">
+              <Link to="/login" style={{ color: '#00844d' }} className="font-bold hover:underline">
                 Login
               </Link>
             </p>

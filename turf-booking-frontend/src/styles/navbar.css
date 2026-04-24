@@ -37,11 +37,11 @@
 .navbar-links a:hover { color: white; }
 
 .navbar-login {
-  background: #16a34a;
+  background: #00844d;
   color: white !important;
   padding: 8px 20px;
   border-radius: 8px;
   font-weight: 600 !important;
 }
 
-.navbar-login:hover { background: #15803d; }
+.navbar-login:hover { background: #006b3e; }

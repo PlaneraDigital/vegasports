@@ -49,7 +49,7 @@ const AdminTopbar = ({ onMenuClick }) => {
         }}>
           <div style={{
             width: '26px', height: '26px', borderRadius: '50%',
-            background: 'linear-gradient(135deg, #16a34a, #15803d)',
+            background: 'linear-gradient(135deg, #00844d, #006b3e)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: '0.7rem', fontWeight: 800, color: '#fff', flexShrink: 0,
           }}>
@@ -59,7 +59,7 @@ const AdminTopbar = ({ onMenuClick }) => {
             <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0f172a' }}>
               {adminUser?.name || 'Admin'}
             </div>
-            <div style={{ fontSize: '0.6rem', color: '#16a34a', fontWeight: 600, letterSpacing: '0.05em' }}>
+            <div style={{ fontSize: '0.6rem', color: '#00844d', fontWeight: 600, letterSpacing: '0.05em' }}>
               ADMIN
             </div>
           </div>
