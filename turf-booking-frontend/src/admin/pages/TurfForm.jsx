@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react'
 import { adminApi } from '../utils/adminApi'
 import { X, ChevronRight } from 'lucide-react'
 
-const SPORTS_OPTIONS   = ['football', 'cricket', 'badminton', 'tennis', 'basketball']
-const SURFACE_OPTIONS  = ['artificial_grass', 'natural_grass', 'concrete', 'clay']
-const TYPE_OPTIONS     = ['multi-purpose', 'football-only', 'cricket-only', 'badminton-only']
+const SPORTS_OPTIONS = ['football', 'cricket', 'badminton', 'tennis', 'basketball']
+const SURFACE_OPTIONS = ['artificial_grass', 'natural_grass', 'concrete', 'clay']
+const TYPE_OPTIONS = ['multi-purpose', 'football-only', 'cricket-only', 'badminton-only']
 const DURATION_OPTIONS = [30, 60, 90, 120]
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 const AMENITY_KEYS = ['floodlights', 'parking', 'washroom', 'changing_room', 'drinking_water', 'professional_surface', 'safe_premises', 'equipment_rental', 'cafeteria']
@@ -16,7 +16,7 @@ const defaultForm = () => ({
   slot_duration_minutes: 60, price_per_hour: '', sports: [],
   location: { address: '', city: '', state: '', pincode: '' },
   amenities: Object.fromEntries(AMENITY_KEYS.map(k => [k, false])),
-  operating_hours: Object.fromEntries(DAYS.map(d => [d, { open: '06:00', close: '22:00', is_closed: false }])),
+  operating_hours: Object.fromEntries(DAYS.map(d => [d, { open: '', close: '', is_closed: false }])),
   pricing_overrides: { weekend_price: '', peak_hour_price: '', peak_hours: { start: '', end: '' } },
   rules: [],
 })
@@ -65,7 +65,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
         sports: turf.sports || [],
         location: { address: turf.location?.address || '', city: turf.location?.city || '', state: turf.location?.state || '', pincode: turf.location?.pincode || '' },
         amenities: { ...Object.fromEntries(AMENITY_KEYS.map(k => [k, false])), ...(turf.amenities || {}) },
-        operating_hours: turf.operating_hours || Object.fromEntries(DAYS.map(d => [d, { open: '06:00', close: '22:00', is_closed: false }])),
+        operating_hours: turf.operating_hours || Object.fromEntries(DAYS.map(d => [d, { open: '', close: '', is_closed: false }])),
         pricing_overrides: {
           weekend_price: turf.pricing_overrides?.weekend_price || '',
           peak_hour_price: turf.pricing_overrides?.peak_hour_price || '',
@@ -215,8 +215,8 @@ const TurfForm = ({ turf, onClose, onSave }) => {
             {DAYS.map(day => {
               // Ensure we merge existing day data with defaults
               const h = {
-                open: '06:00',
-                close: '22:00',
+                open: '',
+                close: '',
                 is_closed: false,
                 ...(form.operating_hours?.[day] || {})
               }
@@ -225,6 +225,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                   <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 700, textTransform: 'capitalize' }}>{day}</span>
                   <input type="time" value={h.open} disabled={h.is_closed}
                     onChange={e => set(`operating_hours.${day}.open`, e.target.value)}
+                    placeholder="--:--"
                     style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.45rem 0.6rem', color: h.is_closed ? '#94a3b8' : '#0f172a', fontSize: '0.8rem', outline: 'none' }} />
                   <input type="time" value={h.close} disabled={h.is_closed}
                     onChange={e => set(`operating_hours.${day}.close`, e.target.value)}
@@ -232,6 +233,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
                     <input type="checkbox" checked={!!h.is_closed}
                       onChange={e => set(`operating_hours.${day}.is_closed`, e.target.checked)}
+                      placeholder="--:--"
                       style={{ accentColor: '#ef4444', width: '14px', height: '14px' }} />
                     <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600 }}>Closed</span>
                   </label>

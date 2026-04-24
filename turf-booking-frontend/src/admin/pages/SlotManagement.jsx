@@ -4,10 +4,10 @@ import { Clock, Lock, CheckCircle, AlertCircle, Zap, RefreshCw } from 'lucide-re
 
 const slotColors = {
   available: { bg: '#f0fdf4', border: '#bbf7d0', color: '#166534', label: 'Available' },
-  booked:    { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', label: 'Booked'    },
-  on_hold:   { bg: '#fffbeb', border: '#fef3c7', color: '#92400e', label: 'On Hold'   },
-  blocked:   { bg: '#f8fafc', border: '#e2e8f0', color: '#475569', label: 'Blocked'   },
-  expired:   { bg: '#f1f5f9', border: '#e2e8f0', color: '#94a3b8', label: 'Expired'   },
+  booked: { bg: '#fef2f2', border: '#fecaca', color: '#991b1b', label: 'Booked' },
+  on_hold: { bg: '#fffbeb', border: '#fef3c7', color: '#92400e', label: 'On Hold' },
+  blocked: { bg: '#f8fafc', border: '#e2e8f0', color: '#475569', label: 'Blocked' },
+  expired: { bg: '#f1f5f9', border: '#e2e8f0', color: '#94a3b8', label: 'Expired' },
 }
 
 const today = () => new Date().toISOString().split('T')[0]
@@ -35,14 +35,14 @@ const SlotManagement = () => {
   const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000) }
 
   useEffect(() => {
-    api.get('/api/turfs').then(r => setTurfs(r.data.turfs)).catch(() => {})
+    api.get('/api/turfs').then(r => setTurfs(r.data.turfs)).catch(() => { })
   }, [])
 
   const fetchSlots = async () => {
     if (!selectedTurf || !selectedDate) return
     setLoading(true); setFetched(false)
     try {
-      const { data } = await adminApi.get(`/slots?turf_id=${selectedTurf}&date=${selectedDate}`)
+      const { data } = await api.get(`/api/slots?turf_id=${selectedTurf}&date=${selectedDate}`)
       setSlots(data.slots)
       setSummary(data.summary)
       setFetched(true)
@@ -135,11 +135,11 @@ const SlotManagement = () => {
       {summary && (
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {[
-            { label: 'Total',     value: summary.total,     color: '#64748b' },
-            { label: 'Available', value: summary.available,  color: '#16a34a' },
-            { label: 'Booked',    value: summary.booked,     color: '#dc2626' },
-            { label: 'On Hold',   value: summary.on_hold,    color: '#d97706' },
-            { label: 'Blocked',   value: summary.blocked,    color: '#475569' },
+            { label: 'Total', value: summary.total, color: '#64748b' },
+            { label: 'Available', value: summary.available, color: '#16a34a' },
+            { label: 'Booked', value: summary.booked, color: '#dc2626' },
+            { label: 'On Hold', value: summary.on_hold, color: '#d97706' },
+            { label: 'Blocked', value: summary.blocked, color: '#475569' },
           ].map(s => (
             <div key={s.label} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '0.75rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.1rem', flex: 1, minWidth: '90px', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
               <span style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>{s.value}</span>
@@ -164,9 +164,9 @@ const SlotManagement = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
             {[
               { label: 'Base Price (₹)*', key: 'price', type: 'number', ph: '1200' },
-              { label: 'Peak Price (₹)',  key: 'peak_hour_price', type: 'number', ph: '1800' },
-              { label: 'Peak Start',      key: 'peak_start', type: 'time', ph: '' },
-              { label: 'Peak End',        key: 'peak_end', type: 'time', ph: '' },
+              { label: 'Peak Price (₹)', key: 'peak_hour_price', type: 'number', ph: '1800' },
+              { label: 'Peak Start', key: 'peak_start', type: 'time', ph: '' },
+              { label: 'Peak End', key: 'peak_end', type: 'time', ph: '' },
             ].map(({ label, key, type, ph }) => (
               <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
                 <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>{label}</label>

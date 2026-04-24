@@ -1,38 +1,51 @@
 const Slot = require("../models/Slot");
 const Turf = require("../models/Turf");
 
+// ─── Helper: validate HH:MM format ───────────────────────────────────────────
+const isValidTime = (t) =>
+  typeof t === "string" && /^\d{2}:\d{2}$/.test(t.trim());
+
+// ─── Helper: format minutes to HH:MM ─────────────────────────────────────────
+const formatTime = (mins) => {
+  const normalized = mins % (24 * 60);
+  const h = Math.floor(normalized / 60);
+  const m = normalized % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
 // ─── Get Slots by Turf ID and Date ────────────────────────────────────────────
 const getSlotsByTurfAndDate = async (req, res) => {
   try {
     const { turf_id, date } = req.query;
 
-    // Validate required params
+    // ── Validate required params ──────────────────────────────────────────────
     if (!turf_id || !date) {
       return res.status(400).json({
         message: "turf_id and date are required",
       });
     }
 
-    // Validate date format (YYYY-MM-DD)
     const parsedDate = new Date(date);
     if (isNaN(parsedDate.getTime())) {
-      return res.status(400).json({ message: "Invalid date format. Use YYYY-MM-DD" });
+      return res.status(400).json({
+        message: "Invalid date format. Use YYYY-MM-DD",
+      });
     }
 
-    // Check turf exists
+    // ── Find turf ─────────────────────────────────────────────────────────────
     const turf = await Turf.findById(turf_id);
     if (!turf) {
       return res.status(404).json({ message: "Turf not found" });
     }
 
-    // Set date range for the full day (00:00 to 23:59)
+    // ── Day range ─────────────────────────────────────────────────────────────
     const startOfDay = new Date(date);
     startOfDay.setUTCHours(0, 0, 0, 0);
 
     const endOfDay = new Date(date);
     endOfDay.setUTCHours(23, 59, 59, 999);
 
-    // Auto-expire on_hold slots whose held_until has passed
+    // ── Auto-expire stale on_hold slots ───────────────────────────────────────
     await Slot.updateMany(
       {
         turf_id,
@@ -41,133 +54,195 @@ const getSlotsByTurfAndDate = async (req, res) => {
       },
       {
         $set: {
-          status:     "available",
+          status: "available",
           held_until: null,
-          booked_by:  null,
+          booked_by: null,
           booking_id: null,
         },
       }
     );
 
-    // Fetch slots
+    // ── Fetch existing slots ──────────────────────────────────────────────────
     let slots = await Slot.find({
       turf_id,
       date: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    // Auto-generate if empty
+    // ── Auto-generate slots if none exist ─────────────────────────────────────
     if (slots.length === 0 && turf.operating_hours) {
       const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
       const dayName = days[startOfDay.getUTCDay()];
-      const daySchedule = turf.operating_hours[dayName];
-      const slotDuration = turf.slot_duration_minutes;
+      const schedule = turf.operating_hours[dayName];
+      const duration = turf.slot_duration_minutes;
 
-      if (daySchedule && !daySchedule.is_closed && daySchedule.open && daySchedule.close && slotDuration) {
-        const [openH, openM]   = daySchedule.open.split(":").map(Number);
-        const [closeH, closeM] = daySchedule.close.split(":").map(Number);
-        
-        let startMinutes = openH * 60 + openM;
-        let endMinutes   = closeH * 60 + closeM;
-        if (endMinutes <= startMinutes) endMinutes += 24 * 60; // Next morning overlap
+      if (schedule && !schedule.is_closed && duration) {
+        const openStr = (schedule.open || "").trim();
+        const closeStr = (schedule.close || "").trim();
 
+        // ── 24 hour detection ─────────────────────────────────────────────────
+        const is24Hours = openStr === "00:00" && closeStr === "00:00";
+
+        // ── Guard: if not 24h and times are invalid — return empty ────────────
+        if (!is24Hours && (!isValidTime(openStr) || !isValidTime(closeStr))) {
+          return res.status(200).json({
+            message: "Slots fetched successfully",
+            turf: {
+              id: turf._id,
+              name: turf.name,
+              price_per_hour: turf.price_per_hour,
+              slot_duration_minutes: turf.slot_duration_minutes,
+            },
+            date,
+            summary: {
+              total: 0,
+              available: 0,
+              booked: 0,
+              on_hold: 0,
+              blocked: 0,
+            },
+            slots: [],
+          });
+        }
+
+        // ── Calculate start and end minutes ───────────────────────────────────
+        let startMin;
+        let endMin;
+
+        if (is24Hours) {
+          startMin = 0;
+          endMin = 24 * 60; // 1440 = full day
+        } else {
+          const [openH, openM] = openStr.split(":").map(Number);
+          const [closeH, closeM] = closeStr.split(":").map(Number);
+
+          startMin = openH * 60 + openM;
+          endMin = closeH * 60 + closeM;
+
+          // Overnight turf e.g. 22:00 → 02:00
+          if (endMin <= startMin) endMin += 24 * 60;
+        }
+
+        // ── Pricing setup ─────────────────────────────────────────────────────
+        const overrides = turf.pricing_overrides || {};
+        const weekendPrice = overrides.weekend_price || null;
+        const peakPrice = overrides.peak_hour_price || null;
+        const peakHours = overrides.peak_hours || {};
+
+        let peakStartMin = -1;
+        let peakEndMin = -1;
+
+        if (
+          peakHours.start && peakHours.end &&
+          isValidTime(peakHours.start) && isValidTime(peakHours.end)
+        ) {
+          const [psH, psM] = peakHours.start.split(":").map(Number);
+          const [peH, peM] = peakHours.end.split(":").map(Number);
+          peakStartMin = psH * 60 + psM;
+          peakEndMin = peH * 60 + peM;
+          if (peakEndMin <= peakStartMin) peakEndMin += 24 * 60;
+        }
+
+        const isWeekend = dayName === "saturday" || dayName === "sunday";
+
+        // ── Check if slot falls in peak hours ─────────────────────────────────
+        const isPeakSlot = (slotStartMin) => {
+          if (peakStartMin === -1 || !peakPrice) return false;
+          const normalized = slotStartMin % (24 * 60);
+          if (peakEndMin > 24 * 60) {
+            return (
+              normalized >= peakStartMin ||
+              normalized < (peakEndMin - 24 * 60)
+            );
+          }
+          return normalized >= peakStartMin && normalized < peakEndMin;
+        };
+
+        // ── Generate all slots ────────────────────────────────────────────────
         const newSlots = [];
-        const { weekend_price, peak_hour_price, peak_hours } = turf.pricing_overrides || {};
-        
-        let peakStartMin = -1, peakEndMin = -1;
-        if (peak_hours && peak_hours.start && peak_hours.end) {
-            const [psH, psM] = peak_hours.start.split(":").map(Number);
-            peakStartMin = psH * 60 + psM;
-            const [peH, peM] = peak_hours.end.split(":").map(Number);
-            peakEndMin = peH * 60 + peM;
-            if (peakEndMin <= peakStartMin) peakEndMin += 24 * 60;
+
+        for (let m = startMin; m + duration <= endMin; m += duration) {
+          let price = turf.price_per_hour;
+
+          if (isWeekend && weekendPrice) price = weekendPrice;
+          if (isPeakSlot(m)) price = peakPrice;
+
+          newSlots.push({
+            turf_id: turf._id,
+            date: startOfDay,
+            start_time: formatTime(m),
+            end_time: formatTime(m + duration),
+            price,
+            status: "available",
+          });
         }
 
-        for (let m = startMinutes; m + slotDuration <= endMinutes; m += slotDuration) {
-           const formatM = (mins) => {
-               const hm = mins % (24 * 60);
-               return `${String(Math.floor(hm/60)).padStart(2, "0")}:${String(hm%60).padStart(2, "0")}`;
-           };
-
-           let price = turf.price_per_hour;
-           const isWeekend = dayName === "saturday" || dayName === "sunday";
-           if (isWeekend && weekend_price) price = weekend_price;
-
-           if (peak_hour_price && peakStartMin !== -1) {
-              const currentSm = m % (24 * 60);
-              let isPeak = false;
-              if (peakEndMin > 24 * 60) {
-                  // Wraps around midnight
-                  isPeak = currentSm >= peakStartMin || currentSm < (peakEndMin - 24 * 60);
-              } else {
-                  // Does not wrap around
-                  isPeak = currentSm >= peakStartMin && currentSm < peakEndMin;
-              }
-              
-              if (isPeak) {
-                 price = peak_hour_price;
-              }
-           }
-
-           newSlots.push({
-               turf_id: turf._id,
-               date: startOfDay,
-               start_time: formatM(m),
-               end_time: formatM(m + slotDuration),
-               price: price,
-               status: "available"
-           });
-        }
-
+        // ── Insert, safely skip duplicates ────────────────────────────────────
         if (newSlots.length > 0) {
-            await Slot.insertMany(newSlots);
-            // Refresh slots after insertion
-            slots = await Slot.find({
-              turf_id,
-              date: { $gte: startOfDay, $lte: endOfDay },
-            });
+          try {
+            await Slot.insertMany(newSlots, { ordered: false });
+          } catch (err) {
+            // 11000 = duplicate key — safe to ignore
+            if (err.code !== 11000) {
+              const nonDupErrors = (err.writeErrors || []).filter(
+                (e) => e.code !== 11000
+              );
+              if (nonDupErrors.length > 0) throw err;
+            }
+          }
+
+          // Refresh slots after insert
+          slots = await Slot.find({
+            turf_id,
+            date: { $gte: startOfDay, $lte: endOfDay },
+          });
         }
       }
     }
 
-    // ─── Custom Sort ──────────────────────────────────────────────────────────
-    // Sort slots based on turf opening time (e.g. 7 AM) to wrap around correctly
+    // ── Sort slots by opening time ────────────────────────────────────────────
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    // Get the local day name from the startOfDay (which is midnight UTC)
-    const dayName = days[new Date(date).getUTCDay()]; 
-    const daySchedule = turf.operating_hours?.[dayName];
-    const dayStartStr = daySchedule?.open || "00:00";
-    
-    const [openH, openM] = dayStartStr.split(":").map(Number);
-    const openTotal = openH * 60 + openM;
+    const dayName = days[new Date(date).getUTCDay()];
+    const sched = turf.operating_hours?.[dayName];
+
+    const openStr = (sched?.open || "").trim();
+    const closeStr = (sched?.close || "").trim();
+
+    const is24Hours = openStr === "00:00" && closeStr === "00:00";
+
+    // For 24h or invalid times — sort from 00:00 (openTotal = 0)
+    let openTotal = 0;
+
+    if (!is24Hours && isValidTime(openStr)) {
+      const [openH, openM] = openStr.split(":").map(Number);
+      openTotal = openH * 60 + openM;
+    }
 
     slots.sort((a, b) => {
-      const [ah, am] = a.start_time.split(":").map(Number);
-      let at = ah * 60 + am;
-      // If the slot time is earlier than the opening time, it belongs to the "next morning" part of this business day
-      if (at < openTotal) at += 24 * 60; 
-      
-      const [bh, bm] = b.start_time.split(":").map(Number);
-      let bt = bh * 60 + bm;
-      if (bt < openTotal) bt += 24 * 60;
-      
-      return at - bt;
+      const toMins = (timeStr) => {
+        if (!isValidTime(timeStr)) return 0;
+        const [h, m] = timeStr.split(":").map(Number);
+        let total = h * 60 + m;
+        if (total < openTotal) total += 24 * 60;
+        return total;
+      };
+      return toMins(a.start_time) - toMins(b.start_time);
     });
 
-    // Summary count
+    // ── Summary ───────────────────────────────────────────────────────────────
     const summary = {
-      total:     slots.length,
+      total: slots.length,
       available: slots.filter((s) => s.status === "available").length,
-      booked:    slots.filter((s) => s.status === "booked").length,
-      on_hold:   slots.filter((s) => s.status === "on_hold").length,
-      blocked:   slots.filter((s) => s.status === "blocked").length,
+      booked: slots.filter((s) => s.status === "booked").length,
+      on_hold: slots.filter((s) => s.status === "on_hold").length,
+      blocked: slots.filter((s) => s.status === "blocked").length,
     };
 
     res.status(200).json({
       message: "Slots fetched successfully",
       turf: {
-        id:                   turf._id,
-        name:                 turf.name,
-        price_per_hour:       turf.price_per_hour,
+        id: turf._id,
+        name: turf.name,
+        price_per_hour: turf.price_per_hour,
         slot_duration_minutes: turf.slot_duration_minutes,
       },
       date,
