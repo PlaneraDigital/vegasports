@@ -109,7 +109,7 @@ function Home() {
       </section>
 
       {/* CTA */}
-      <section className="cta-section">
+      {/* <section className="cta-section">
         <div className="cta-glow" />
         <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           Own a Turf?
@@ -121,7 +121,7 @@ function Home() {
           <button className="btn-glow">List Your Turf</button>
           <button className="btn-ghost">Talk to Us</button>
         </div>
-      </section>
+      </section> */}
 
       {/* <Footer /> */}
     </div>
