@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi, saveAuthSession } from '../utils/auth'
+import { ShieldCheck } from 'lucide-react'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -144,6 +145,31 @@ const Login = () => {
               Sign up
             </Link>
           </p>
+
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1rem 0 0' }}>
+            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+            <span style={{ color: '#9ca3af', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>or</span>
+            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+          </div>
+
+          {/* Admin Login button */}
+          <Link
+            to="/admin/login"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+              width: '100%', padding: '0.75rem', marginTop: '0.75rem', borderRadius: '12px',
+              border: '1.5px solid #d1d5db', background: '#f9fafb',
+              color: '#374151', fontWeight: 600, fontSize: '0.85rem',
+              textDecoration: 'none', transition: 'all 0.2s',
+              boxSizing: 'border-box',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#16a34a'; e.currentTarget.style.color = '#16a34a'; e.currentTarget.style.background = '#f0fdf4'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.background = '#f9fafb'; }}
+          >
+            <ShieldCheck size={16} />
+            Login as Admin
+          </Link>
 
         </div>
       </div>

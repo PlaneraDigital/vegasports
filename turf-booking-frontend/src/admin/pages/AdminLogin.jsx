@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { adminApi } from '../utils/adminApi'
 import { useAdminAuth } from '../context/AdminAuthContext'
 import { ShieldCheck, Eye, EyeOff, AlertCircle } from 'lucide-react'
@@ -30,61 +30,67 @@ const AdminLogin = () => {
   }
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'radial-gradient(ellipse at 20% 50%, #051a0f 0%, #0a0a0a 60%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: "'Plus Jakarta Sans', sans-serif",
-      padding: '1rem',
-    }}>
-      {/* Decorative background grid */}
-      <div style={{
-        position: 'fixed', inset: 0, pointerEvents: 'none',
-        backgroundImage: 'linear-gradient(rgba(74,222,128,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(74,222,128,0.03) 1px, transparent 1px)',
-        backgroundSize: '60px 60px',
-      }} />
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ background: 'radial-gradient(ellipse at top, #f0fdf4 0%, #ffffff 70%)' }}
+    >
+      <div className="w-full" style={{ maxWidth: '420px' }}>
 
-      <div style={{ width: '100%', maxWidth: '420px', position: 'relative' }}>
-        {/* Logo area */}
+        {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            width: '56px', height: '56px', borderRadius: '16px',
+            width: '52px', height: '52px', borderRadius: '14px',
             background: 'linear-gradient(135deg, #16a34a, #15803d)',
             marginBottom: '1rem',
-            boxShadow: '0 0 40px rgba(22,163,74,0.3)',
+            boxShadow: '0 8px 24px rgba(22,163,74,0.25)',
           }}>
-            <ShieldCheck size={28} color="white" />
+            <ShieldCheck size={26} color="white" />
           </div>
           <h1 style={{
-            fontWeight: 800, fontSize: '1.5rem', color: '#ffffff',
+            fontWeight: 800, fontSize: '1.5rem', color: '#1a1d1e',
             letterSpacing: '-0.03em', margin: 0,
           }}>
-            Infinity Sports Turf<span style={{ color: '#4ade80' }}> Admin</span>
+            Infinity Sports Turf <span style={{ color: '#16a34a' }}>Admin</span>
           </h1>
-          <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+          <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.4rem' }}>
             Restricted access. Authorised personnel only.
           </p>
         </div>
 
         {/* Card */}
         <div style={{
-          background: '#111111',
-          border: '1px solid #1f1f1f',
+          background: '#f4f4f5',
+          border: '1px solid #e5e7eb',
           borderRadius: '20px',
           padding: '2rem',
-          boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
         }}>
-          <h2 style={{ color: '#ffffff', fontWeight: 700, fontSize: '1.1rem', marginBottom: '1.5rem', textAlign: 'center' }}>
+          {/* Admin badge */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
+            background: '#f0fdf4', border: '1px solid #bbf7d0',
+            borderRadius: '9999px', padding: '0.35rem 1rem',
+            marginBottom: '1.5rem', width: 'fit-content', margin: '0 auto 1.5rem',
+          }}>
+            <ShieldCheck size={13} color="#16a34a" />
+            <span style={{ color: '#16a34a', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>
+              ADMIN PORTAL
+            </span>
+          </div>
+
+          <h2 style={{
+            color: '#111827', fontWeight: 700, fontSize: '1.25rem',
+            marginBottom: '1.5rem', textAlign: 'center',
+          }}>
             Sign in to Admin Portal
           </h2>
 
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+
             {/* Email */}
-            <div>
-              <label style={{ color: '#9ca3af', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ color: '#374151', fontSize: '0.8rem', fontWeight: 700 }}>
                 Admin Email
               </label>
               <input
@@ -94,19 +100,27 @@ const AdminLogin = () => {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="admin@infinityturf.com"
                 style={{
-                  width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a',
-                  borderRadius: '12px', padding: '0.75rem 1rem', color: '#fff',
-                  fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box',
-                  transition: 'border-color 0.2s',
+                  width: '100%', background: '#f9fafb',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '12px', padding: '0.75rem 1rem',
+                  color: '#111827', fontSize: '0.875rem',
+                  outline: 'none', boxSizing: 'border-box',
+                  transition: 'border-color 0.2s, box-shadow 0.2s',
                 }}
-                onFocus={e => e.target.style.borderColor = '#4ade80'}
-                onBlur={e => e.target.style.borderColor = '#2a2a2a'}
+                onFocus={e => {
+                  e.target.style.borderColor = '#16a34a'
+                  e.target.style.boxShadow = '0 0 0 4px rgba(22,163,74,0.08)'
+                }}
+                onBlur={e => {
+                  e.target.style.borderColor = '#e5e7eb'
+                  e.target.style.boxShadow = 'none'
+                }}
               />
             </div>
 
             {/* Password */}
-            <div>
-              <label style={{ color: '#9ca3af', fontSize: '0.8rem', fontWeight: 600, display: 'block', marginBottom: '0.4rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ color: '#374151', fontSize: '0.8rem', fontWeight: 700 }}>
                 Password
               </label>
               <div style={{ position: 'relative' }}>
@@ -117,20 +131,30 @@ const AdminLogin = () => {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   style={{
-                    width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a',
-                    borderRadius: '12px', padding: '0.75rem 3rem 0.75rem 1rem', color: '#fff',
-                    fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box',
-                    transition: 'border-color 0.2s',
+                    width: '100%', background: '#f9fafb',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '12px', padding: '0.75rem 3rem 0.75rem 1rem',
+                    color: '#111827', fontSize: '0.875rem',
+                    outline: 'none', boxSizing: 'border-box',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
                   }}
-                  onFocus={e => e.target.style.borderColor = '#4ade80'}
-                  onBlur={e => e.target.style.borderColor = '#2a2a2a'}
+                  onFocus={e => {
+                    e.target.style.borderColor = '#16a34a'
+                    e.target.style.boxShadow = '0 0 0 4px rgba(22,163,74,0.08)'
+                  }}
+                  onBlur={e => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.boxShadow = 'none'
+                  }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(p => !p)}
                   style={{
-                    position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', padding: '0.2rem',
+                    position: 'absolute', right: '0.75rem', top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none', border: 'none',
+                    cursor: 'pointer', color: '#9ca3af', padding: '0.2rem',
                   }}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -142,11 +166,11 @@ const AdminLogin = () => {
             {error && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '0.5rem',
-                background: '#1a0a0a', border: '1px solid #7f1d1d',
+                background: '#fef2f2', border: '1px solid #fecaca',
                 borderRadius: '10px', padding: '0.6rem 0.875rem',
               }}>
-                <AlertCircle size={14} color="#f87171" />
-                <span style={{ color: '#f87171', fontSize: '0.8rem' }}>{error}</span>
+                <AlertCircle size={14} color="#dc2626" />
+                <span style={{ color: '#dc2626', fontSize: '0.8rem' }}>{error}</span>
               </div>
             )}
 
@@ -156,26 +180,56 @@ const AdminLogin = () => {
               type="submit"
               disabled={loading}
               style={{
-                width: '100%', padding: '0.85rem', borderRadius: '12px',
-                background: loading ? '#166534' : 'linear-gradient(135deg, #16a34a, #15803d)',
-                color: '#fff', fontWeight: 700, fontSize: '0.9rem', border: 'none',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s', opacity: loading ? 0.7 : 1,
-                boxShadow: '0 4px 20px rgba(22,163,74,0.3)',
+                width: '100%', padding: '0.875rem', borderRadius: '12px',
+                background: '#16a34a',
+                color: '#fff', fontWeight: 700, fontSize: '0.9rem',
+                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s', opacity: loading ? 0.65 : 1,
+                boxShadow: '0 4px 20px rgba(22,163,74,0.25)',
                 marginTop: '0.25rem',
               }}
-              onMouseEnter={e => { if (!loading) e.target.style.transform = 'translateY(-1px)' }}
-              onMouseLeave={e => { e.target.style.transform = 'translateY(0)' }}
+              onMouseEnter={e => { if (!loading) e.target.style.background = '#15803d' }}
+              onMouseLeave={e => { e.target.style.background = '#16a34a' }}
             >
               {loading ? 'Signing in...' : 'Sign in as Admin'}
             </button>
           </form>
+
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.25rem 0 0' }}>
+            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+            <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>or</span>
+            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+          </div>
+
+          {/* Back to user login */}
+          <Link
+            to="/login"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginTop: '0.75rem', padding: '0.7rem', borderRadius: '12px',
+              border: '1.5px solid #d1d5db', background: '#f9fafb',
+              color: '#374151', fontWeight: 600, fontSize: '0.85rem',
+              textDecoration: 'none', transition: 'all 0.2s',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = '#16a34a'
+              e.currentTarget.style.color = '#16a34a'
+              e.currentTarget.style.background = '#f0fdf4'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#d1d5db'
+              e.currentTarget.style.color = '#374151'
+              e.currentTarget.style.background = '#f9fafb'
+            }}
+          >
+            ← Back to User Login
+          </Link>
         </div>
 
-        {/* Footer note */}
-        <p style={{ textAlign: 'center', color: '#374151', fontSize: '0.75rem', marginTop: '1.5rem' }}>
-          Not an admin?{' '}
-          <a href="/" style={{ color: '#4ade80', textDecoration: 'none' }}>Go to user site →</a>
+        {/* Footer */}
+        <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: '0.75rem', marginTop: '1.5rem' }}>
+          Infinity Sports Turf &mdash; Admin Portal
         </p>
       </div>
     </div>
