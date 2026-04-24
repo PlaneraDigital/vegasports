@@ -200,12 +200,6 @@ export default function ProfilePage() {
     if (!authUser) navigate("/login");
   }, [authUser, navigate]);
 
-<<<<<<< HEAD
-  useEffect(() => {
-    if (authUser) fetchBookings();
-  }, []);
-
-=======
   // Fetch bookings and profile on mount
   useEffect(() => {
     if (authUser) {
@@ -228,14 +222,11 @@ export default function ProfilePage() {
   };
 
 
->>>>>>> eba48369e6f00792c4f07d24155c18a24b730bd6
   const handleLogout = () => {
     clearAuthSession();
     navigate("/");
   };
 
-<<<<<<< HEAD
-=======
   const handleEditClick = () => {
     setEditFormData({
       dob: profile?.dob ? new Date(profile.dob).toISOString().split('T')[0] : "",
@@ -274,7 +265,6 @@ export default function ProfilePage() {
   };
 
   // ── Shared fetch helper so we can call it from multiple places ───────────────
->>>>>>> eba48369e6f00792c4f07d24155c18a24b730bd6
   const fetchBookings = async () => {
     setLoading(true);
     setError(null);

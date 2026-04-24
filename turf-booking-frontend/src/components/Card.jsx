@@ -49,13 +49,8 @@ const TurfCard = ({ turf }) => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-5">
           <span className="text-green-600 font-extrabold text-lg sm:text-xl">
             ₹{turf.price_per_hour}
-<<<<<<< HEAD
-            <span className="text-gray-400 font-normal text-xs sm:text-sm ml-1">
-              /hour
-=======
             <span className="text-gray-400 font-normal text-xs sm:text-sm">
               /{turf.slot_duration_minutes} mins
->>>>>>> eba48369e6f00792c4f07d24155c18a24b730bd6
             </span>
           </span>
 
