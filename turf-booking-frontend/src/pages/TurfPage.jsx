@@ -14,32 +14,32 @@ import {
 ────────────────────────── */
 const SURFACE_LABEL = {
   artificial_grass: "Artificial Grass",
-  natural_grass:    "Natural Grass",
-  concrete:         "Concrete",
-  clay:             "Clay",
+  natural_grass: "Natural Grass",
+  concrete: "Concrete",
+  clay: "Clay",
 };
 
 const TURF_TYPE_LABEL = {
-  "multi-purpose":  "Multi-Purpose",
-  "football-only":  "Football Only",
-  "cricket-only":   "Cricket Only",
+  "multi-purpose": "Multi-Purpose",
+  "football-only": "Football Only",
+  "cricket-only": "Cricket Only",
   "badminton-only": "Badminton Only",
 };
 
 const DAY_ORDER = [
-  "monday","tuesday","wednesday","thursday","friday","saturday","sunday",
+  "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
 ];
 
 const AMENITY_META = {
-  floodlights:          { icon: Zap,         label: "Floodlights"      },
-  parking:              { icon: Car,          label: "Parking"           },
-  washroom:             { icon: Droplets,    label: "Washroom"          },
-  changing_room:        { icon: Shirt,       label: "Changing Room"    },
-  drinking_water:       { icon: Droplets,    label: "Drinking Water"   },
-  professional_surface: { icon: Layers,      label: "Pro Surface"      },
-  safe_premises:        { icon: ShieldCheck, label: "Safe Premises"    },
-  equipment_rental:     { icon: Dumbbell,    label: "Equipment Rental" },
-  cafeteria:            { icon: Utensils,    label: "Cafeteria"        },
+  floodlights: { icon: Zap, label: "Floodlights" },
+  parking: { icon: Car, label: "Parking" },
+  washroom: { icon: Droplets, label: "Washroom" },
+  changing_room: { icon: Shirt, label: "Changing Room" },
+  drinking_water: { icon: Droplets, label: "Drinking Water" },
+  professional_surface: { icon: Layers, label: "Pro Surface" },
+  safe_premises: { icon: ShieldCheck, label: "Safe Premises" },
+  equipment_rental: { icon: Dumbbell, label: "Equipment Rental" },
+  cafeteria: { icon: Utensils, label: "Cafeteria" },
 };
 
 const SPORT_EMOJI = {
@@ -47,10 +47,10 @@ const SPORT_EMOJI = {
 };
 
 const STATUS_STYLE = {
-  active:           "bg-emerald-50 border-emerald-200 text-emerald-700",
-  inactive:         "bg-zinc-100 border-zinc-200 text-zinc-500",
+  active: "bg-emerald-50 border-emerald-200 text-emerald-700",
+  inactive: "bg-zinc-100 border-zinc-200 text-zinc-500",
   pending_approval: "bg-amber-50 border-amber-200 text-amber-700",
-  suspended:        "bg-red-50 border-red-200 text-red-700",
+  suspended: "bg-red-50 border-red-200 text-red-700",
 };
 
 /* ─────────────────────────
@@ -75,7 +75,7 @@ function SkeletonLoader() {
             <div className="w-3/4 h-10 bg-zinc-200 rounded-xl" />
             <div className="w-1/2 h-4 bg-zinc-200 rounded-full" />
             <div className="flex gap-3 mt-2">
-              {[1,2,3,4].map(i => <div key={i} className="w-28 h-10 bg-zinc-200 rounded-xl" />)}
+              {[1, 2, 3, 4].map(i => <div key={i} className="w-28 h-10 bg-zinc-200 rounded-xl" />)}
             </div>
           </div>
           <div className="hidden md:block">
@@ -155,9 +155,8 @@ function ImageGallery({ images }) {
         <div className="flex gap-2 mt-2.5 overflow-x-auto pb-0.5">
           {images.map((img, i) => (
             <button key={i} onClick={() => setActive(i)}
-              className={`flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all duration-150 ${
-                i === active ? "border-green-600 opacity-100 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
-              }`}>
+              className={`flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all duration-150 ${i === active ? "border-green-600 opacity-100 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
+                }`}>
               <img src={img.url} alt="" className="w-full h-full object-cover"
                 onError={e => { e.target.src = "/images/turf1.jpg"; }} />
             </button>
@@ -206,16 +205,15 @@ function AmenitiesGrid({ amenities }) {
           const Icon = meta.icon;
           return (
             <div key={key}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-colors ${
-                val
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-colors ${val
                   ? "bg-white border-green-200 text-zinc-700 shadow-sm"
                   : "bg-zinc-50 border-zinc-200 text-zinc-400"
-              }`}>
+                }`}>
               <Icon size={14} className={`flex-shrink-0 ${val ? "text-green-600" : "text-zinc-400"}`} />
               <span className="flex-1 font-medium">{meta.label}</span>
               {val
                 ? <CheckCircle2 size={14} className="text-green-500 flex-shrink-0" />
-                : <XCircle     size={14} className="text-zinc-300 flex-shrink-0" />}
+                : <XCircle size={14} className="text-zinc-300 flex-shrink-0" />}
             </div>
           );
         })}
@@ -277,8 +275,8 @@ function groupDays(hours) {
     let j = i;
     while (
       j + 1 < DAY_ORDER.length &&
-      hours[DAY_ORDER[j + 1]]?.open      === cur?.open &&
-      hours[DAY_ORDER[j + 1]]?.close     === cur?.close &&
+      hours[DAY_ORDER[j + 1]]?.open === cur?.open &&
+      hours[DAY_ORDER[j + 1]]?.close === cur?.close &&
       hours[DAY_ORDER[j + 1]]?.is_closed === cur?.is_closed
     ) j++;
     groups.push({
@@ -298,49 +296,70 @@ function OperatingHours({ hours, pricing_overrides }) {
   return (
     <section>
       <SectionHeading icon={CalendarDays} label="Operating Hours" />
-      <div className="grid sm:grid-cols-2 gap-6">
-        <div>
-          <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Regular Hours</p>
-          <div className="space-y-3">
+      <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
+        
+        {/* LEFT: REGULAR SCHEDULE */}
+        <div className="flex-1">
+          <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-6">Regular Schedule</p>
+          <div className="space-y-6">
             {groups.map(({ label, slot }) => (
-              <div key={label} className="flex items-center justify-between border-b border-zinc-100 pb-2 last:border-0">
-                <span className="text-sm text-zinc-600">{label}</span>
-                {slot?.is_closed
-                  ? <span className="text-red-500 text-sm font-semibold">Closed</span>
-                  : (slot?.open && slot?.close)
-                    ? <span className="text-zinc-900 text-sm font-bold tabular-nums">
-                        {fmt(slot.open)} – {fmt(slot.close)}
-                      </span>
-                    : <span className="text-zinc-400 text-sm">—</span>}
+              <div key={label} className="group flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-bold text-zinc-900">{label}</span>
+                  <span className="text-[11px] text-zinc-400 font-medium">Standard timing</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {slot?.is_closed ? (
+                    <span className="text-red-500 text-[13px] font-bold bg-red-50 px-3 py-1 rounded-lg">Closed</span>
+                  ) : (
+                    <span className="text-zinc-900 font-black tabular-nums text-lg tracking-tight">
+                      {fmt(slot.open)} – {fmt(slot.close)}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* VERTICAL DIVIDER (Desktop) */}
+        <div className="hidden lg:block w-px bg-zinc-200 self-stretch" />
+
+        {/* RIGHT: SPECIAL HOURS & POLICY */}
+        <div className="flex-1 space-y-8">
           {peak?.start && peak?.end && (
             <div>
-              <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">Peak Hours</p>
-              <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock size={14} className="text-amber-600" />
-                  <span className="text-amber-800 text-sm font-bold">
-                    Evening Slots ({fmt(peak.start)} – {fmt(peak.end)})
-                  </span>
+              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Peak Hours Demand</p>
+              <div className="bg-white border-2 border-emerald-500/10 rounded-2xl p-5 shadow-sm">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-500 flex items-center justify-center">
+                    <Zap size={12} className="text-white" />
+                  </div>
+                  <span className="text-zinc-900 font-black text-[13px]">Evening Rush ({fmt(peak.start)} – {fmt(peak.end)})</span>
                 </div>
-                <p className="text-amber-700/80 text-xs leading-relaxed">
-                  Higher demand during these hours. We recommend booking in advance for evening slots.
+                <p className="text-zinc-500 text-xs font-medium leading-relaxed">
+                  Slots during this window are highly popular. We recommend booking in advance to secure your preferred time.
                 </p>
               </div>
             </div>
           )}
+          
           <div>
-            <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-2">Holiday Schedule</p>
-            <p className="text-zinc-500 text-sm leading-relaxed">
-              Open on all public holidays. Special rates may apply.
-            </p>
+            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Holiday Policy</p>
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center flex-shrink-0">
+                <ShieldCheck size={18} className="text-zinc-400" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-zinc-900 font-bold text-sm">Open 365 Days a Year</span>
+                <p className="text-zinc-500 text-xs font-medium mt-1 leading-relaxed">
+                  Games don't stop for holidays! Our staff is available every day, though special rates may apply.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
     </section>
   );
@@ -366,17 +385,17 @@ function Rules({ rules }) {
 }
 
 export default function TurfPage() {
-  const { id }    = useParams();
-  const navigate  = useNavigate();
-  const [turf,    setTurf]    = useState(null);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [turf, setTurf] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTurf = async () => {
       try {
         const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
-        const res  = await axios.get(`${base}/api/turfs/${id}`);
+        const res = await axios.get(`${base}/api/turfs/${id}`);
         setTurf(res.data.turf);
       } catch (err) {
         setError(err.response?.data?.message || "Could not load turf details.");
@@ -390,13 +409,13 @@ export default function TurfPage() {
   if (loading) return <SkeletonLoader />;
   if (error || !turf) return <ErrorScreen message={error} onBack={() => navigate(-1)} />;
 
-  const sym             = turf.currency === "INR" ? "₹" : (turf.currency || "₹");
+  const sym = turf.currency === "INR" ? "₹" : (turf.currency || "₹");
   const activeAmenities = turf.amenities ? Object.values(turf.amenities).filter(Boolean).length : 0;
-  const fullAddress     = [turf.location?.address, turf.location?.city, turf.location?.state].filter(Boolean).join(", ");
+  const fullAddress = [turf.location?.address, turf.location?.city, turf.location?.state].filter(Boolean).join(", ");
 
   return (
     <div className="bg-zinc-50 text-zinc-900 min-h-screen pb-20">
-      
+
       {/* ── BACK NAV ── */}
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-6">
         <button onClick={() => navigate(-1)}
@@ -486,13 +505,13 @@ export default function TurfPage() {
               <div className="bg-white border border-zinc-200 rounded-[32px] shadow-xl shadow-zinc-200/50 p-7 relative">
                 <h3 className="text-zinc-900 font-black text-xl mb-2">Ready to play?</h3>
                 <p className="text-zinc-500 text-sm font-medium mb-6">Secure your slot in seconds. Instant confirmation.</p>
-                
+
                 <div className="flex items-baseline gap-1.5 mb-6">
                   <span className="text-4xl font-extrabold text-black tracking-tight">{sym}{turf.price_per_hour}</span>
                   <span className="text-zinc-500 text-sm font-medium">/ {turf.slot_duration_minutes} mins</span>
                 </div>
 
-                <button 
+                <button
                   onClick={() => navigate(`/turf/${turf._id}/book`)}
                   className="w-full py-4 bg-zinc-900 text-white text-[15px] font-bold rounded-2xl hover:bg-black transition-all active:scale-[0.98] flex items-center justify-center gap-2"
                 >
@@ -521,7 +540,7 @@ export default function TurfPage() {
             <span className="text-zinc-500 font-normal text-sm"> / {turf.slot_duration_minutes} mins</span>
           </p>
         </div>
-        <button 
+        <button
           onClick={() => navigate(`/turf/${turf._id}/book`)}
           className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-200 active:scale-95 transition-all text-sm">
           Book Now
