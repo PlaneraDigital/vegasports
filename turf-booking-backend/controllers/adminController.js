@@ -186,6 +186,9 @@ const editTurf = async (req, res) => {
 
     await turf.save();
 
+    // Clear available slots so they are regenerated with new settings (price/hours)
+    await Slot.deleteMany({ turf_id: turf._id, status: "available" });
+
     res.status(200).json({
       message: "Turf updated successfully",
       turf,

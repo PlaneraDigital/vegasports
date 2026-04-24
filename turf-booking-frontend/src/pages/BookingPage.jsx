@@ -230,8 +230,8 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, sym, onBook
 
           {/* Pricing breakdown */}
           <div className="flex justify-between items-center px-1">
-            <span className="text-[12px] text-zinc-400 font-medium">Price / Slot</span>
-            <span className="text-[13px] font-bold text-zinc-300">{sym}{turf.price_per_hour}</span>
+            <span className="text-[12px] text-zinc-400 font-medium">{selectedSlots.length === 1 ? "Price / Slot" : "Average Price / Slot"}</span>
+            <span className="text-[13px] font-bold text-zinc-300">{sym}{Math.round(totalAmount / selectedSlots.length)}</span>
           </div>
           <div className="flex justify-between items-center pb-4 border-b border-zinc-800/60 px-1">
             <span className="text-[12px] text-zinc-400 font-medium">Total Slots</span>
@@ -335,7 +335,7 @@ function BookingCard({ turf, onConfirmBooking }) {
         <h3 className="text-green-400/80 font-semibold text-[10px] tracking-[0.2em] uppercase mb-3">Book your slot</h3>
         <div className="flex items-baseline gap-1.5">
           <span className="text-5xl font-extrabold text-white tracking-tight">{sym}{turf.price_per_hour}</span>
-          <span className="text-zinc-500 text-sm font-medium">/ hour</span>
+          <span className="text-zinc-500 text-sm font-medium">/ {turf.slot_duration_minutes} mins</span>
         </div>
         {turf.slot_duration_minutes && (
           <p className="text-emerald-300 text-xs mt-3 flex items-center gap-1.5 font-medium bg-emerald-950/40 w-fit px-3 py-1.5 rounded-lg border border-emerald-900/60">

@@ -418,10 +418,17 @@ export default function TurfPage() {
 
             {/* Quick stats pills */}
             <div className="mt-6 flex flex-wrap gap-3">
+<<<<<<< HEAD
               <div className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2.5 rounded-2xl shadow-sm text-sm">
                 <IndianRupee size={14} className="text-green-600" />
                 <span className="text-zinc-900 font-bold">{sym}{turf.price_per_hour}</span>
                 <span className="text-zinc-500">/hr</span>
+=======
+              <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
+                <IndianRupee size={14} className="text-green-400" />
+                <span className="text-zinc-200 font-semibold">{sym}{turf.price_per_hour}</span>
+                <span className="text-zinc-500">/ {turf.slot_duration_minutes} mins</span>
+>>>>>>> eba48369e6f00792c4f07d24155c18a24b730bd6
               </div>
               <div className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2.5 rounded-2xl shadow-sm text-sm">
                 <ShieldCheck size={14} className="text-green-600" />
@@ -461,8 +468,13 @@ export default function TurfPage() {
                 <p className="text-zinc-500 text-sm font-medium mb-6">Secure your slot in seconds. Instant confirmation.</p>
                 
                 <div className="flex items-baseline gap-1.5 mb-6">
+<<<<<<< HEAD
                   <span className="text-4xl font-black text-zinc-900 tracking-tight">{sym}{turf.price_per_hour}</span>
                   <span className="text-zinc-400 text-sm font-bold uppercase tracking-widest">/ hour</span>
+=======
+                  <span className="text-4xl font-extrabold text-white tracking-tight">{sym}{turf.price_per_hour}</span>
+                  <span className="text-zinc-500 text-sm font-medium">/ {turf.slot_duration_minutes} mins</span>
+>>>>>>> eba48369e6f00792c4f07d24155c18a24b730bd6
                 </div>
 
                 <button 
@@ -499,7 +511,11 @@ export default function TurfPage() {
         <div>
           <p className="text-zinc-900 font-black text-xl leading-none">
             {sym}{turf.price_per_hour}
+<<<<<<< HEAD
             <span className="text-zinc-400 font-bold text-xs uppercase ml-1">/hr</span>
+=======
+            <span className="text-zinc-500 font-normal text-sm"> / {turf.slot_duration_minutes} mins</span>
+>>>>>>> eba48369e6f00792c4f07d24155c18a24b730bd6
           </p>
         </div>
         <button 
