@@ -44,18 +44,12 @@ const TurfCard = ({ turf }) => {
           {turf.location?.address}, {turf.location?.city}
         </p>
 
-<<<<<<< Updated upstream
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-4">
           <span className="text-green-400 font-bold text-lg sm:text-xl">
             ₹{turf.price_per_hour}
             <span className="text-gray-400 font-normal text-xs sm:text-sm">
-              /hour
+              /{turf.slot_duration_minutes} mins
             </span>
-=======
-        <div className="flex justify-between items-center mt-4">
-          <span className="text-green-400 font-bold">
-            ₹{turf.price_per_hour}<span className="text-gray-400 font-normal text-xs">/{turf.slot_duration_minutes} mins</span>
->>>>>>> Stashed changes
           </span>
 
           <button
