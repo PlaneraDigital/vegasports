@@ -8,6 +8,7 @@ const TYPE_OPTIONS = ['multi-purpose', 'football-only', 'cricket-only', 'badmint
 const DURATION_OPTIONS = [30, 60, 90, 120]
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 const AMENITY_KEYS = ['floodlights', 'parking', 'washroom', 'changing_room', 'drinking_water', 'professional_surface', 'safe_premises', 'equipment_rental', 'cafeteria']
+const IMAGE_LABELS = ['main', 'exterior', 'night-view', 'aerial', 'changing-room']
 
 const labelOf = (k) => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
 
@@ -20,6 +21,7 @@ const defaultForm = () => ({
   pricing_overrides: { weekend_price: '', peak_hour_price: '', peak_hours: { start: '', end: '' } },
   rules: [],
   highlights: [],
+  images: [],
 })
 
 const Input = ({ label, ...props }) => (
@@ -54,6 +56,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
   const [error, setError] = useState('')
   const [newRule, setNewRule] = useState('')
   const [newHighlight, setNewHighlight] = useState({ title: '', description: '' })
+  const [newImage, setNewImage] = useState({ url: '', label: 'main', is_primary: false })
 
   useEffect(() => {
     if (turf) {
@@ -75,6 +78,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
         },
         rules: turf.rules || [],
         highlights: turf.highlights || [],
+        images: turf.images || [],
       })
     }
   }, [turf])
@@ -305,6 +309,127 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                 </div>
                 <button type="button" onClick={() => setForm(p => ({ ...p, highlights: p.highlights.filter((_, j) => j !== i) }))}
                   style={{ background: '#fee2e2', border: 'none', color: '#ef4444', borderRadius: '8px', width: '28px', height: '28px', display: 'flex', itemsCenter: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.9rem' }}>×</button>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Images ── */}
+          <SectionTitle>Images</SectionTitle>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+              <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Upload Image</label>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    
+                    const formData = new FormData();
+                    formData.append('image', file);
+                    
+                    try {
+                      setSaving(true);
+                      const res = await adminApi.post('/upload', formData, {
+                        headers: { 'Content-Type': 'multipart/form-data' }
+                      });
+                      
+                      const uploadedUrl = res.data.url;
+                      
+                      // Auto-add to the gallery so the user doesn't have to click "Add"
+                      setForm(prev => {
+                        const isFirst = (prev.images || []).length === 0;
+                        return {
+                          ...prev,
+                          images: [...(prev.images || []), { 
+                            url: uploadedUrl, 
+                            label: newImage.label || 'main', 
+                            is_primary: isFirst 
+                          }]
+                        };
+                      });
+                      
+                      setNewImage(p => ({ ...p, url: '' })); // Reset staging state
+                    } catch (err) {
+                      setError('Image upload failed.');
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.5rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} 
+                />
+                {newImage.url && (
+                  <div style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #16a34a' }}>
+                    <img src={newImage.url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: '150px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Label</label>
+                <select value={newImage.label} onChange={e => setNewImage(p => ({ ...p, label: e.target.value }))}
+                  style={{ width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }}>
+                  {IMAGE_LABELS.map(l => <option key={l} value={l}>{labelOf(l)}</option>)}
+                </select>
+              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', paddingBottom: '0.75rem' }}>
+                <input type="checkbox" checked={newImage.is_primary} onChange={e => setNewImage(p => ({ ...p, is_primary: e.target.checked }))} style={{ accentColor: '#16a34a', width: '14px', height: '14px' }} />
+                <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>Primary</span>
+              </label>
+              <button type="button" onClick={() => {
+                if (newImage.url.trim()) {
+                  let updatedImages = [...form.images];
+                  if (newImage.is_primary) {
+                    updatedImages = updatedImages.map(img => ({ ...img, is_primary: false }));
+                  }
+                  setForm(p => ({ ...p, images: [...updatedImages, { ...newImage, url: newImage.url.trim() }] }));
+                  setNewImage({ url: '', label: 'main', is_primary: false });
+                }
+              }}
+              style={{ background: '#16a34a', border: 'none', borderRadius: '10px', padding: '0.6rem 1.5rem', color: '#fff', fontWeight: 800, cursor: 'pointer', height: '42px' }}>
+                Add
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+            {form.images.map((img, i) => (
+              <div key={i} style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: `2px solid ${img.is_primary ? '#16a34a' : '#e2e8f0'}`, background: '#fff' }}>
+                <img src={img.url} alt="" style={{ width: '100%', height: '80px', objectFit: 'cover', display: 'block' }} 
+                  onError={e => { e.target.src = 'https://placehold.co/100x80?text=Invalid+URL' }} />
+                <div style={{ padding: '0.4rem', borderTop: '1px solid #f1f5f9' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.25rem' }}>
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        const updated = form.images.map((img, j) => ({
+                          ...img,
+                          is_primary: i === j
+                        }));
+                        setForm(p => ({ ...p, images: updated }));
+                      }}
+                      style={{ 
+                        flex: 1,
+                        fontSize: '9px', 
+                        fontWeight: 800, 
+                        textTransform: 'uppercase', 
+                        background: img.is_primary ? '#16a34a' : '#f8fafc',
+                        color: img.is_primary ? '#fff' : '#64748b',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '4px',
+                        padding: '2px 4px',
+                        cursor: 'pointer'
+                      }}>
+                      {img.is_primary ? 'Primary' : 'Set Pri'}
+                    </button>
+                    <button type="button" onClick={() => setForm(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
+                      style={{ background: '#fee2e2', border: 'none', color: '#ef4444', borderRadius: '6px', width: '20px', height: '20px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                  </div>
+                  <div style={{ fontSize: '8px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>
+                    {img.label}
+                  </div>
+                </div>
               </div>
             ))}
           </div>

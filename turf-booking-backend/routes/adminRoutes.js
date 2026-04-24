@@ -1,5 +1,6 @@
 const express = require("express");
 const router  = express.Router();
+const multer  = require("multer");
 const {
   adminRegister,
   adminLogin,
@@ -21,6 +22,26 @@ const {
   getUserAnalytics,
 } = require("../controllers/adminController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+// ─── Cloudinary Config ────────────────────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "vegasports_turfs",
+    allowed_formats: ["jpg", "png", "jpeg", "webp"],
+    transformation: [{ width: 1200, height: 800, crop: "limit" }], // Quality optimization
+  },
+});
+
+const upload = multer({ storage });
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 router.post("/register", adminRegister);
@@ -31,6 +52,19 @@ router.post("/turfs",            protect, adminOnly, addTurf);
 router.put("/turfs/:id",         protect, adminOnly, editTurf);
 router.delete("/turfs/:id",      protect, adminOnly, deleteTurf);
 router.put("/turfs/:id/pricing", protect, adminOnly, updatePricing);
+
+router.post("/upload", protect, adminOnly, upload.single("image"), (req, res) => {
+  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+  
+  // Use path or secure_url (depending on multer-storage-cloudinary version)
+  const imageUrl = req.file.path || req.file.secure_url || req.file.url;
+
+  res.status(200).json({
+    message: "Image uploaded to Cloudinary successfully",
+    url: imageUrl,
+    filename: req.file.filename
+  });
+});
 
 // ─── Slot Management ──────────────────────────────────────────────────────────
 router.post("/slots/generate",   protect, adminOnly, generateSlots);
