@@ -6,7 +6,7 @@ import {
   MapPin, Star, Clock, IndianRupee, ChevronLeft, ChevronRight,
   Zap, Car, Droplets, ShieldCheck, Utensils, Dumbbell,
   Layers, Tag, CalendarDays, Info, CheckCircle2, XCircle,
-  Shirt, ArrowLeft,
+  Shirt, ArrowLeft, Sun, Camera, Plug, Sofa, Leaf, Sparkles,
 } from "lucide-react";
 
 /* ─────────────────────────
@@ -31,15 +31,16 @@ const DAY_ORDER = [
 ];
 
 const AMENITY_META = {
-  floodlights: { icon: Zap, label: "Floodlights" },
   parking: { icon: Car, label: "Parking" },
-  washroom: { icon: Droplets, label: "Washroom" },
-  changing_room: { icon: Shirt, label: "Changing Room" },
+  floodlights: { icon: Zap, label: "Floodlights" },
+  shade_for_day_matches: { icon: Sun, label: "Shade for Day Matches" },
   drinking_water: { icon: Droplets, label: "Drinking Water" },
-  professional_surface: { icon: Layers, label: "Pro Surface" },
-  safe_premises: { icon: ShieldCheck, label: "Safe Premises" },
-  equipment_rental: { icon: Dumbbell, label: "Equipment Rental" },
-  cafeteria: { icon: Utensils, label: "Cafeteria" },
+  cctv_surveillance: { icon: Camera, label: "CCTV Surveillance" },
+  electricity_24_7: { icon: Plug, label: "24/7 Electricity" },
+  open_24_7: { icon: Clock, label: "24/7 Open" },
+  sitting_area: { icon: Sofa, label: "Sitting Area" },
+  turf_grass: { icon: Leaf, label: "Pro Grade Turf Grass" },
+  clean_environment: { icon: Sparkles, label: "Clean Quality Environment" },
 };
 
 const SPORT_EMOJI = {
@@ -365,6 +366,118 @@ function OperatingHours({ hours, pricing_overrides }) {
   );
 }
 
+/* ─────────────────────────
+   BOOKING STEPS & LINKS SECTION
+────────────────────────── */
+function BookingStepsLinksSection({ turf }) {
+  const mapLink = "https://www.google.com/maps/place/Infinity+Sports+Turf/@19.4358472,72.7924501,17z/data=!3m1!4b1!4m6!3m5!1s0x3be7ab610f52c693:0x122bc1c9d6a719a5!8m2!3d19.4358472!4d72.7924501!16s%2Fg%2F11z2x6zk3g?entry=ttu&g_ep=EgoyMDI2MDQyMi4wIKXMDSoASAFQAw%3D%3D";
+  
+  return (
+    <section className="mt-10">
+      {/* Booking Steps */}
+      
+      
+      
+      
+      {/* Map Section at Bottom */}
+      <div className="mt-6">
+        <SectionHeading icon={MapPin} label="Location" />
+        <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-200 shadow-sm bg-white">
+          <div className="absolute top-4 right-4 z-10">
+            <a 
+              href={mapLink}
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-zinc-200 rounded-xl text-zinc-900 text-xs font-bold shadow-sm hover:bg-white transition-all"
+            >
+              Open in Maps <ArrowLeft size={14} className="rotate-135" />
+            </a>
+          </div>
+          
+          {/* Map Container */}
+          <div className="w-full h-48 md:h-64 bg-zinc-100">
+            <iframe
+              title="Turf Location"
+              width="100%"
+              height="100%"
+              frameBorder="0"
+              style={{ border: 0 }}
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3765.456789012345!2d72.7924501!3d19.4358472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ab610f52c693%3A0x122bc1c9d6a719a5!2sInfinity%20Sports%20Turf!5e0!3m2!1sen!2sin!4v1234567890"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+
+        {/* Instagram Link */}
+      <div className="mb-6">
+        <a href="https://www.instagram.com/_infinity_turf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-600 hover:text-zinc-900 transition-colors">
+          <div className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center">
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/></svg>
+          </div>
+          <span className="text-sm font-bold">Follow us on Instagram</span>
+        </a>
+      </div>
+        
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────
+   LOCATION & MAP SECTION
+────────────────────────── */
+function LocationSection({ turf }) {
+  // Using the resolved address: Stephen Menezes Marg, Virar West
+  const encodedAddress = encodeURIComponent("Infinity Sports Turf, Virar West, Maharashtra");
+  const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodedAddress}`;
+
+  return (
+    <section className="mt-12">
+      <SectionHeading icon={MapPin} label="Location" />
+      <p className="text-zinc-500 text-sm font-medium mb-5">
+        Exact location will be shared after booking confirmation.
+      </p>
+      
+      <div className="relative w-full rounded-4xl overflow-hidden border border-zinc-200 shadow-sm bg-white p-2">
+        <div className="absolute top-6 left-6 z-10">
+          <a 
+            href="https://maps.app.goo.gl/..." 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-zinc-200 rounded-xl text-zinc-900 text-xs font-bold shadow-sm hover:bg-white transition-all"
+          >
+            Open in Maps <ArrowLeft size={14} className="rotate-135" />
+          </a>
+        </div>
+        
+        {/* Map Container */}
+        <div className="w-full h-[280 px] md:h-87.5px rounded-3xl overflow-hidden bg-zinc-100">
+          <iframe
+            title="Turf Location"
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            style={{ border: 0 }}
+            src={mapEmbedUrl}
+            allowFullScreen
+          ></iframe>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-col gap-3">
+         <a href="https://www.instagram.com/_infinity_turf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-600 hover:text-zinc-900 transition-colors">
+            <div className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center">
+              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/></svg>
+            </div>
+            <span className="text-sm font-bold">
+              Follow us on Instagram 
+              </span>
+         </a>
+      </div>
+    </section>
+  );
+}
+
 function Rules({ rules }) {
   if (!rules || rules.length === 0) return null;
   return (
@@ -396,6 +509,12 @@ export default function TurfPage() {
       try {
         const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
         const res = await axios.get(`${base}/api/turfs/${id}`);
+        // Ensure all amenities are set to true for highlighting
+        const updatedAmenities = Object.keys(AMENITY_META).reduce((acc, key) => {
+          acc[key] = true; // Set all amenities to true
+          return acc;
+        }, {});
+        res.data.turf.amenities = updatedAmenities;
         setTurf(res.data.turf);
       } catch (err) {
         setError(err.response?.data?.message || "Could not load turf details.");
@@ -529,6 +648,7 @@ export default function TurfPage() {
         <Divider />
         <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} />
         <Divider />
+        <BookingStepsLinksSection turf={turf} />
         <Rules rules={turf.rules} />
       </div>
 

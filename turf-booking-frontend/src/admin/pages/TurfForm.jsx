@@ -7,7 +7,12 @@ const SURFACE_OPTIONS = ['artificial_grass', 'natural_grass', 'concrete', 'clay'
 const TYPE_OPTIONS = ['multi-purpose', 'football-only', 'cricket-only', 'badminton-only']
 const DURATION_OPTIONS = [30, 60, 90, 120]
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-const AMENITY_KEYS = ['floodlights', 'parking', 'washroom', 'changing_room', 'drinking_water', 'professional_surface', 'safe_premises', 'equipment_rental', 'cafeteria']
+const AMENITY_KEYS = [
+  'floodlights', 'parking', 'washroom', 'changing_room', 'drinking_water',
+  'professional_surface', 'safe_premises', 'equipment_rental', 'cafeteria',
+  'shade_for_day_matches', 'cctv_surveillance', 'electricity_24_7',
+  'open_24_7', 'sitting_area', 'turf_grass', 'clean_environment'
+]
 const IMAGE_LABELS = ['main', 'exterior', 'night-view', 'aerial', 'changing-room']
 
 const labelOf = (k) => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())

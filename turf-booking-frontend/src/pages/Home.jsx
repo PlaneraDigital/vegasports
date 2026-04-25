@@ -31,11 +31,11 @@ function Home() {
           </motion.div>
 
           <motion.h1 initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.1 }}>
-            Book Your <span>Perfect</span><br />Slot Instantly
+            Premium Multi-Sport Experience in <br /> <span>Virar West </span>
           </motion.h1>
 
           <motion.p className="hero-sub" initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.2 }}>
-            Browse top-rated sports grounds near you. Check live availability, book in seconds, and pay securely online.
+            Welcome! Whether it’s a high-stakes cricket match or a fast-paced football face-off, your slot starts here.
           </motion.p>
         </div>
       </section>
