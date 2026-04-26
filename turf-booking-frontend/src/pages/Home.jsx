@@ -19,6 +19,7 @@ const fade = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } }
 function Home() {
   const navigate = useNavigate()
   const [amenities, setAmenities] = useState([])
+  const [offers, setOffers] = useState([])
   
   useEffect(() => {
     const fetchTurfs = async () => {
@@ -29,6 +30,7 @@ function Home() {
           const firstTurf = res.data.turfs[0];
           const active = Array.isArray(firstTurf.amenities) ? firstTurf.amenities : [];
           setAmenities(active);
+          setOffers(Array.isArray(firstTurf.offers) ? firstTurf.offers : []);
         }
       } catch (err) {
         console.error("Error fetching amenities:", err);
@@ -82,6 +84,22 @@ function Home() {
             </div>
          </div>
       </section>
+
+      {/* Offers Section */}
+      {offers.length > 0 && (
+        <section className="offers-modern">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className={`offers-container ${offers.length > 3 ? 'has-many' : 'has-few'}`}>
+              {offers.map((offer, i) => (
+                <div key={i} className="offer-pill">
+                  <span className="offer-crown">🎁 20% OFF</span>
+                  <span className="offer-msg">{offer}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* All Turfs */}
       <section className="turfs-section" id="allturfs">

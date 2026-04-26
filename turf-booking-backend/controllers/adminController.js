@@ -131,7 +131,7 @@ const addTurf = async (req, res) => {
     const {
       name, slug, turf_type, surface, slot_duration_minutes,
       price_per_hour, sports, location, amenities, images,
-      operating_hours, pricing_overrides, rules, highlights,
+      operating_hours, pricing_overrides, rules, highlights, offers,
     } = req.body;
 
     if (!name || !slug || !surface || !slot_duration_minutes || !price_per_hour) {
@@ -159,6 +159,7 @@ const addTurf = async (req, res) => {
       pricing_overrides: pricing_overrides || {},
       rules:            rules            || [],
       highlights:       highlights       || [],
+      offers:           offers           || [],
       owner_id:         req.user._id,
       status:           "active",
     });
@@ -184,7 +185,7 @@ const editTurf = async (req, res) => {
     const allowedFields = [
       "name", "turf_type", "surface", "slot_duration_minutes",
       "price_per_hour", "sports", "location", "amenities",
-      "images", "operating_hours", "pricing_overrides", "rules", "highlights", "status",
+      "images", "operating_hours", "pricing_overrides", "rules", "highlights", "offers", "status",
     ];
 
     allowedFields.forEach((field) => {

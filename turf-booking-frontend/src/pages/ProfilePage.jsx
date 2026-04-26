@@ -312,39 +312,38 @@ export default function ProfilePage() {
         <div className="bg-white border border-gray-100 rounded-3xl p-7 mb-6 relative overflow-hidden shadow-sm">
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-green-500/5 blur-[80px] pointer-events-none" />
 
-          <div className="flex items-start justify-between gap-4 relative z-10">
-            <div className="flex items-center gap-5">
-              <div className="w-16 h-16 rounded-2xl bg-green-50 border-2 border-green-100 flex items-center justify-center flex-shrink-0">
-                <span className="text-2xl font-black text-green-600">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
+            <div className="flex items-center gap-4 sm:gap-5">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-green-50 border-2 border-green-100 flex items-center justify-center flex-shrink-0">
+                <span className="text-xl sm:text-2xl font-black text-green-600">
                   {authUser.name?.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <div>
-                <h1 className="text-xl font-extrabold text-gray-900 tracking-tight">{authUser.name}</h1>
-                <p className="text-gray-500 text-sm mt-0.5 flex items-center gap-1.5">
-                  <Mail size={12} className="text-gray-400" /> {authUser.email}
+              <div className="min-w-0">
+                <h1 className="text-lg sm:text-xl font-extrabold text-gray-900 tracking-tight truncate">{authUser.name}</h1>
+                <p className="text-gray-500 text-sm mt-0.5 flex items-center gap-1.5 truncate">
+                  <Mail size={12} className="text-gray-400 flex-shrink-0" /> {authUser.email}
                 </p>
                 {authUser.phone && (
                   <p className="text-gray-400 text-xs mt-0.5 flex items-center gap-1.5">
-                    <Phone size={11} /> {authUser.phone}
+                    <Phone size={11} className="flex-shrink-0" /> {authUser.phone}
                   </p>
                 )}
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-red-500 hover:text-red-600 border border-red-100 hover:border-red-200 bg-red-50 rounded-xl transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-red-500 hover:text-red-600 border border-red-100 hover:border-red-200 bg-red-50 rounded-xl transition-colors w-full sm:w-auto justify-center sm:justify-start mt-2 sm:mt-0"
             >
               <LogOut size={13} /> Logout
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 relative z-10">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-6 relative z-10">
             {[
               { label: "Bookings", value: stats.total, color: "text-gray-900" },
               { label: "Confirmed", value: stats.confirmed, color: "text-green-600" },
               { label: "Cancelled", value: bookings.filter(b => b.booking_status === 'cancelled').length, color: "text-red-500" },
-              { label: "Spent", value: `₹${stats.spent}`, color: "text-blue-600" },
             ].map((s) => (
               <div key={s.label} className="bg-gray-50/50 border border-gray-100 rounded-2xl p-4 text-center">
                 <p className={`text-xl font-black ${s.color}`}>{s.value}</p>

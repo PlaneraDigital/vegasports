@@ -81,6 +81,7 @@ const turfSchema = new mongoose.Schema(
         description: { type: String, required: true },
       }
     ],
+    offers: [{ type: String }],
 
     rating: {
       average: { type: Number, default: 0 },

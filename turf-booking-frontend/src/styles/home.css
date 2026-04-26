@@ -96,6 +96,56 @@
   background: linear-gradient(to bottom, #ffffff, #f9fafb);
 }
 
+/* ── OFFERS MODERN ───────────────────────── */
+.offers-modern {
+  padding: 10px 0 25px;
+  background: linear-gradient(to bottom, #ffffff, #ebf9f3);
+}
+
+.offers-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.offers-container.has-few {
+  justify-content: center;
+}
+
+.offer-pill {
+  background: #ffffff;
+  border: 1px solid #00844d;
+  border-radius: 14px;
+  padding: 6px 16px 6px 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(0, 132, 77, 0.08);
+  transition: transform 0.2s;
+}
+
+.offer-pill:hover {
+  transform: translateY(-2px);
+}
+
+.offer-crown {
+  background: #00844d;
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.offer-msg {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #1a1d1e;
+  letter-spacing: -0.2px;
+}
+
 /* ── TURFS SECTION ────────────────────────── */
 .turfs-section {
   padding: 80px 60px;
