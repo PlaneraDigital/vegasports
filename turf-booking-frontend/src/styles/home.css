@@ -262,11 +262,11 @@
 
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
-  .hero h1 { font-size: 4rem; }
+  .hero h1 { font-size: 3.2rem; }
 }
 
 @media (max-width: 768px) {
-  .hero h1 { font-size: 3rem; }
+  .hero h1 { font-size: 2.6rem; }
   .turfs-section, .how-section { padding: 60px 24px; }
   
   .how-grid {
