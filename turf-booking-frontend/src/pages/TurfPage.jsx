@@ -6,8 +6,9 @@ import {
   MapPin, Star, Clock, IndianRupee, ChevronLeft, ChevronRight,
   Zap, Car, Droplets, ShieldCheck, Utensils, Dumbbell,
   Layers, Tag, CalendarDays, Info, CheckCircle2, XCircle,
-  Shirt, ArrowLeft, Sun, Camera, Plug, Sofa, Leaf, Sparkles,
+  Shirt, ArrowLeft, Sun, Camera, Plug, Sofa, Leaf, Sparkles, Map,
 } from "lucide-react";
+import LocationMap from "../components/LocationMap";
 
 /* ─────────────────────────
    LOOKUP MAPS
@@ -314,7 +315,7 @@ function OperatingHours({ hours, pricing_overrides }) {
                   <span className="text-zinc-900 font-black text-[13px]">Evening Rush ({fmt(peak.start)} – {fmt(peak.end)})</span>
                 </div>
                 <p className="text-zinc-500 text-xs font-medium leading-relaxed">
-                  Slots during this window are highly popular. We recommend booking in advance to secure your preferred time.
+                  Slots during this window are highly popular. We recommend booking in advance to secure your preferred time. 
                 </p>
               </div>
             </div>
@@ -336,118 +337,6 @@ function OperatingHours({ hours, pricing_overrides }) {
           </div>
         </div>
 
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────
-   BOOKING STEPS & LINKS SECTION
-────────────────────────── */
-function BookingStepsLinksSection({ turf }) {
-  const mapLink = "https://www.google.com/maps/place/Infinity+Sports+Turf/@19.4358472,72.7924501,17z/data=!3m1!4b1!4m6!3m5!1s0x3be7ab610f52c693:0x122bc1c9d6a719a5!8m2!3d19.4358472!4d72.7924501!16s%2Fg%2F11z2x6zk3g?entry=ttu&g_ep=EgoyMDI2MDQyMi4wIKXMDSoASAFQAw%3D%3D";
-  
-  return (
-    <section className="mt-10">
-      {/* Booking Steps */}
-      
-      
-      
-      
-      {/* Map Section at Bottom */}
-      <div className="mt-6">
-        <SectionHeading icon={MapPin} label="Location" />
-        <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-200 shadow-sm bg-white">
-          <div className="absolute top-4 right-4 z-10">
-            <a 
-              href={mapLink}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-zinc-200 rounded-xl text-zinc-900 text-xs font-bold shadow-sm hover:bg-white transition-all"
-            >
-              Open in Maps <ArrowLeft size={14} className="rotate-135" />
-            </a>
-          </div>
-          
-          {/* Map Container */}
-          <div className="w-full h-48 md:h-64 bg-zinc-100">
-            <iframe
-              title="Turf Location"
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              style={{ border: 0 }}
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3765.456789012345!2d72.7924501!3d19.4358472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ab610f52c693%3A0x122bc1c9d6a719a5!2sInfinity%20Sports%20Turf!5e0!3m2!1sen!2sin!4v1234567890"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-
-        {/* Instagram Link */}
-      <div className="mb-6">
-        <a href="https://www.instagram.com/_infinity_turf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-600 hover:text-zinc-900 transition-colors">
-          <div className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center">
-            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/></svg>
-          </div>
-          <span className="text-sm font-bold">Follow us on Instagram</span>
-        </a>
-      </div>
-        
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────
-   LOCATION & MAP SECTION
-────────────────────────── */
-function LocationSection({ turf }) {
-  // Using the resolved address: Stephen Menezes Marg, Virar West
-  const encodedAddress = encodeURIComponent("Infinity Sports Turf, Virar West, Maharashtra");
-  const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodedAddress}`;
-
-  return (
-    <section className="mt-12">
-      <SectionHeading icon={MapPin} label="Location" />
-      <p className="text-zinc-500 text-sm font-medium mb-5">
-        Exact location will be shared after booking confirmation.
-      </p>
-      
-      <div className="relative w-full rounded-4xl overflow-hidden border border-zinc-200 shadow-sm bg-white p-2">
-        <div className="absolute top-6 left-6 z-10">
-          <a 
-            href="https://maps.app.goo.gl/..." 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-zinc-200 rounded-xl text-zinc-900 text-xs font-bold shadow-sm hover:bg-white transition-all"
-          >
-            Open in Maps <ArrowLeft size={14} className="rotate-135" />
-          </a>
-        </div>
-        
-        {/* Map Container */}
-        <div className="w-full h-[280 px] md:h-87.5px rounded-3xl overflow-hidden bg-zinc-100">
-          <iframe
-            title="Turf Location"
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            style={{ border: 0 }}
-            src={mapEmbedUrl}
-            allowFullScreen
-          ></iframe>
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-col gap-3">
-         <a href="https://www.instagram.com/_infinity_turf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-600 hover:text-zinc-900 transition-colors">
-            <div className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center">
-              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/></svg>
-            </div>
-            <span className="text-sm font-bold">
-              Follow us on Instagram 
-              </span>
-         </a>
       </div>
     </section>
   );
@@ -502,7 +391,7 @@ export default function TurfPage() {
   const fullAddress = [turf.location?.address, turf.location?.city, turf.location?.state].filter(Boolean).join(", ");
 
   return (
-    <div className="bg-zinc-50 text-zinc-900 min-h-screen pb-20">
+    <div className="bg-zinc-50 text-zinc-900 min-h-screen pb-0">
 
       {/* ── BACK NAV ── */}
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-6">
@@ -617,8 +506,8 @@ export default function TurfPage() {
         <Divider />
         <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} />
         <Divider />
-        <BookingStepsLinksSection turf={turf} />
         <Rules rules={turf.rules} />
+        <LocationMap />
       </div>
 
       {/* ── MOBILE STICKY FOOTER ── */}

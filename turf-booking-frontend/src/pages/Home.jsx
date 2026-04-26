@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { MapPin, Search, CheckCircle2 } from 'lucide-react'
 import Card from '../components/Card'
+import LocationMap from '../components/LocationMap'
 
 
 const steps = [
@@ -125,7 +126,7 @@ function Home() {
         </section>
       )}
 
-      {/* Facilities/Amenities Section */}
+      {/* Facilities Section */}
       <section className="facilities-section pt-10 pb-20 bg-zinc-50/50">
          <div className="max-w-7xl mx-auto px-6">
             <div className="section-header mb-8 text-center">
@@ -143,6 +144,9 @@ function Home() {
             </div>
          </div>
       </section>
+
+      {/* Location Section */}
+      <LocationMap />
     </div>
   )
 }

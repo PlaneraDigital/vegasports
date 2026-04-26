@@ -330,7 +330,7 @@ export default function BookingPage() {
   if (confirmedBooking) return <BookingSuccessScreen booking={confirmedBooking} turf={turf} sym={turf.currency === "INR" ? "₹" : "₹"} onGoHome={() => navigate("/")} onGoProfile={() => navigate("/profile")} />;
 
   return (
-    <div className="bg-zinc-50 min-h-screen pb-20 pt-10">
+    <div className="bg-zinc-50 min-h-screen pb-0 pt-10">
       <div className="max-w-5xl mx-auto px-6">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-zinc-900 transition-colors mb-8">
           <ArrowLeft size={16} /> Back
