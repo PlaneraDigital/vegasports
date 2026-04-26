@@ -30,19 +30,6 @@ const DAY_ORDER = [
   "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
 ];
 
-const AMENITY_META = {
-  parking: { icon: Car, label: "Parking" },
-  floodlights: { icon: Zap, label: "Floodlights" },
-  shade_for_day_matches: { icon: Sun, label: "Shade for Day Matches" },
-  drinking_water: { icon: Droplets, label: "Drinking Water" },
-  cctv_surveillance: { icon: Camera, label: "CCTV Surveillance" },
-  electricity_24_7: { icon: Plug, label: "24/7 Electricity" },
-  open_24_7: { icon: Clock, label: "24/7 Open" },
-  sitting_area: { icon: Sofa, label: "Sitting Area" },
-  turf_grass: { icon: Leaf, label: "Pro Grade Turf Grass" },
-  clean_environment: { icon: Sparkles, label: "Clean Quality Environment" },
-};
-
 const SPORT_EMOJI = {
   football: "⚽", cricket: "🏏", badminton: "🏸", tennis: "🎾", basketball: "🏀",
 };
@@ -193,31 +180,19 @@ function Divider() {
    AMENITIES GRID
 ────────────────────────── */
 function AmenitiesGrid({ amenities }) {
-  if (!amenities) return null;
-  const all = Object.entries(amenities);
+  if (!amenities || !Array.isArray(amenities) || amenities.length === 0) return null;
 
   return (
     <section>
       <SectionHeading icon={Zap} label="Amenities" />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        {all.map(([key, val]) => {
-          const meta = AMENITY_META[key];
-          if (!meta) return null;
-          const Icon = meta.icon;
-          return (
-            <div key={key}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-colors ${val
-                  ? "bg-white border-green-200 text-zinc-700 shadow-sm"
-                  : "bg-zinc-50 border-zinc-200 text-zinc-400"
-                }`}>
-              <Icon size={14} className={`flex-shrink-0 ${val ? "text-green-600" : "text-zinc-400"}`} />
-              <span className="flex-1 font-medium">{meta.label}</span>
-              {val
-                ? <CheckCircle2 size={14} className="text-green-500 flex-shrink-0" />
-                : <XCircle size={14} className="text-zinc-300 flex-shrink-0" />}
-            </div>
-          );
-        })}
+        {amenities.map((a, i) => (
+          <div key={i}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-green-200 text-sm bg-white text-zinc-700 shadow-sm transition-colors">
+            <CheckCircle2 size={14} className="flex-shrink-0 text-green-600" />
+            <span className="font-bold tracking-tight">{a}</span>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -509,12 +484,6 @@ export default function TurfPage() {
       try {
         const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
         const res = await axios.get(`${base}/api/turfs/${id}`);
-        // Ensure all amenities are set to true for highlighting
-        const updatedAmenities = Object.keys(AMENITY_META).reduce((acc, key) => {
-          acc[key] = true; // Set all amenities to true
-          return acc;
-        }, {});
-        res.data.turf.amenities = updatedAmenities;
         setTurf(res.data.turf);
       } catch (err) {
         setError(err.response?.data?.message || "Could not load turf details.");
@@ -529,7 +498,7 @@ export default function TurfPage() {
   if (error || !turf) return <ErrorScreen message={error} onBack={() => navigate(-1)} />;
 
   const sym = turf.currency === "INR" ? "₹" : (turf.currency || "₹");
-  const activeAmenities = turf.amenities ? Object.values(turf.amenities).filter(Boolean).length : 0;
+  const activeAmenities = turf.amenities ? turf.amenities.length : 0;
   const fullAddress = [turf.location?.address, turf.location?.city, turf.location?.state].filter(Boolean).join(", ");
 
   return (

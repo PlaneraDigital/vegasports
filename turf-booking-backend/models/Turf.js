@@ -40,17 +40,7 @@ const turfSchema = new mongoose.Schema(
       },
     },
 
-    amenities: {
-      floodlights: { type: Boolean, default: false },
-      parking: { type: Boolean, default: false },
-      washroom: { type: Boolean, default: false },
-      changing_room: { type: Boolean, default: false },
-      drinking_water: { type: Boolean, default: false },
-      professional_surface: { type: Boolean, default: false },
-      safe_premises: { type: Boolean, default: false },
-      equipment_rental: { type: Boolean, default: false },
-      cafeteria: { type: Boolean, default: false },
-    },
+    amenities: [{ type: String }],
 
     images: [
       {

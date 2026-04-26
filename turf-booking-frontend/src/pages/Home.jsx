@@ -1,7 +1,11 @@
+import { useState, useEffect } from "react";
+import axios from 'axios'
 import '../styles/home.css'
 import { motion } from 'framer-motion'
-import { MapPin, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { MapPin, Search, CheckCircle2 } from 'lucide-react'
 import Card from '../components/Card'
+
 
 const steps = [
   { icon: "🔍", title: "Find a Turf", desc: "Search by sport, city or area" },
@@ -13,11 +17,28 @@ const steps = [
 const fade = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } }
 
 function Home() {
-  const scrollToAllTurfs = () => {
-    const section = document.getElementById('allturfs')
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
+  const navigate = useNavigate()
+  const [amenities, setAmenities] = useState([])
+  
+  useEffect(() => {
+    const fetchTurfs = async () => {
+      try {
+        const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
+        const res = await axios.get(`${base}/api/turfs`);
+        if (res.data.turfs && res.data.turfs.length > 0) {
+          const firstTurf = res.data.turfs[0];
+          const active = Array.isArray(firstTurf.amenities) ? firstTurf.amenities : [];
+          setAmenities(active);
+        }
+      } catch (err) {
+        console.error("Error fetching amenities:", err);
+      }
+    };
+    fetchTurfs();
+  }, []);
+
+  const goToBooking = () => {
+    navigate('/turf/69c2a2dce69a34692fa78985/book')
   }
 
   return (
@@ -37,7 +58,29 @@ function Home() {
           <motion.p className="hero-sub" initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.2 }}>
             Welcome! Whether it’s a high-stakes cricket match or a fast-paced football face-off, your slot starts here.
           </motion.p>
+
+          <motion.div initial="hidden" animate="show" variants={fade} transition={{ duration: 0.5, delay: 0.25 }} className="hero-btn-container">
+            <button onClick={goToBooking} className="btn-glow flex items-center gap-2 mx-auto">
+              Book Your Slot Now <Search size={18} />
+            </button>
+          </motion.div>
         </div>
+      </section>
+
+      {/* Facilities/Amenities Section */}
+      <section className="facilities-section">
+         <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-wrap justify-center gap-3">
+               {amenities.length > 0 ? amenities.map((label, i) => (
+                 <div key={i} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-zinc-100 rounded-full shadow-sm">
+                    <CheckCircle2 size={14} className="text-emerald-500" />
+                    <span className="text-sm font-bold text-zinc-700 tracking-tight">{label}</span>
+                 </div>
+               )) : (
+                 <div className="text-zinc-400 text-sm italic">Loading amenities...</div>
+               )}
+            </div>
+         </div>
       </section>
 
       {/* All Turfs */}
