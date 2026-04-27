@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const razorpay = require("../config/razorpay");
 const Booking = require("../models/Booking");
 const Slot = require("../models/Slot");
 const Turf = require("../models/Turf");
@@ -236,6 +237,56 @@ const getBookingById = async (req, res) => {
 
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // ── FALLBACK: Create missing payment link for confirmed bookings ───────────
+    if (booking.payment.status === "advance_paid" && !booking.payment.balance_link_url) {
+      console.log(`[DEBUG] Attempting JIT link creation for booking: ${booking._id}`);
+      try {
+        const user = await User.findById(user_id);
+        const advanceAmount = booking.payment.advance_amount || 200;
+        const balanceDue = booking.total_amount - advanceAmount;
+        
+        console.log(`[DEBUG] Total: ${booking.total_amount}, Advance: ${advanceAmount}, Balance: ${balanceDue}`);
+
+        if (balanceDue > 0) {
+          const paymentLinkOptions = {
+            amount:      balanceDue * 100,
+            currency:    "INR",
+            accept_partial: false,
+            description: `Remaining balance for booking #${booking._id.toString().slice(-8).toUpperCase()} at ${booking.turf_name_snapshot || 'Vega Sports'}`,
+            customer: {
+              name:  user?.name  || "Customer",
+              email: user?.email || "",
+              contact: user?.phone || "",
+            },
+            notify: { sms: false, email: false },
+            reminder_enable: false,
+            notes: {
+              booking_id: booking._id.toString(),
+              type: "balance",
+            },
+            callback_url: `${process.env.BASE_URL}/api/payment/balance-webhook`,
+            callback_method: "get",
+          };
+
+          const link = await razorpay.paymentLink.create(paymentLinkOptions);
+          booking.payment.balance_link_id  = link.id;
+          booking.payment.balance_link_url = link.short_url;
+          await booking.save();
+          console.log("[DEBUG] Success! JIT Link created:", link.short_url);
+        } else {
+          console.log("[DEBUG] Skipping: Balance is 0 or negative.");
+        }
+      } catch (linkErr) {
+        console.error("[DEBUG] Failed to create JIT link:", linkErr.description || linkErr.message);
+      }
+    } else {
+      if (booking.payment.status === "advance_paid") {
+        console.log("[DEBUG] Skipping: Link already exists.");
+      } else {
+        console.log(`[DEBUG] Skipping: Payment status is ${booking.payment.status}`);
+      }
     }
 
     res.status(200).json({
