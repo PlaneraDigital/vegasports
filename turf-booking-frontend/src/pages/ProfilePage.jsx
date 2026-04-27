@@ -6,7 +6,7 @@ import {
   IndianRupee, CheckCircle2, XCircle, AlertCircle,
   Loader2, ChevronRight, LogOut, Ban, RotateCcw,
   Wallet, Calendar, UserCircle, Activity, Map,
-  Pencil, Save
+  Pencil, Save, Ticket
 } from "lucide-react";
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
@@ -147,12 +147,14 @@ function BookingCard({ booking, onCancelClick, navigate }) {
           #{booking._id?.toString().slice(-10).toUpperCase()}
         </p>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate(`/turf/${typeof booking.turf_id === "object" ? booking.turf_id._id : booking.turf_id}`)}
-            className="px-3 py-1.5 text-xs font-bold text-gray-600 hover:text-gray-900 border border-gray-200 hover:border-gray-400 rounded-xl transition-colors flex items-center gap-1 bg-white"
-          >
-            View Turf <ChevronRight size={12} />
-          </button>
+          {booking.booking_status !== 'cancelled' && (
+            <button
+              onClick={() => navigate(`/ticket/${booking._id}`)}
+              className="px-3 py-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 border border-blue-100 hover:border-blue-300 rounded-xl transition-colors flex items-center gap-1 bg-blue-50"
+            >
+              <Ticket size={12} /> View Ticket
+            </button>
+          )}
           {canCancel && (
             <button
               onClick={() => onCancelClick(booking)}

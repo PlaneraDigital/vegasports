@@ -11,6 +11,7 @@ import TurfDetails from './pages/TurfDetails'
 import TurfPage from './pages/TurfPage'
 import BookingPage from './pages/BookingPage'
 import ProfilePage from './pages/ProfilePage'
+import TicketPage from './pages/TicketPage'
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 import { AdminAuthProvider } from './admin/context/AdminAuthContext'
@@ -59,6 +60,7 @@ function App() {
                   <Route path="/signup"      element={<Signup />} />
                   <Route path="/turf/:id"    element={<TurfPage />} />
                   <Route path="/turf/:id/book" element={<BookingPage />} />
+                  <Route path="/ticket/:id"  element={<TicketPage />} />
                   <Route path="/profile"     element={<ProfilePage />} />
                 </Routes>
               </main>
