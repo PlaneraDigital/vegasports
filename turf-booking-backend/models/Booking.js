@@ -74,8 +74,9 @@ const bookingSchema = new mongoose.Schema(
       cancelled_at: { type: Date,   default: null },
       reason: {
         type: String,
-        enum: ["Changed plans", "Emergency", "Weather", "Other", null],
+        enum: ["Changed plans", "Emergency", "Weather", "Other"],
         default: null,
+        required: false,
       },
       cancelled_by: {
         type: String,

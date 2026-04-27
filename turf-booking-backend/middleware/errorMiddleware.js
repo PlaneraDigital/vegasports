@@ -10,6 +10,9 @@ const errorHandler = (err, req, res, next) => {
   // Sometimes Express gives 200 even on errors — force correct code
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
 
+  // Always log the error server-side for diagnostics
+  console.error("Unhandled error:", err && err.stack ? err.stack : err);
+
   // Handle Mongoose CastError (invalid ObjectId)
   if (err.name === "CastError") {
     return res.status(400).json({

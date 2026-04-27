@@ -16,6 +16,7 @@ const payStyle = {
   pending:      { color: '#92400e', bg: '#fffbeb', label: 'Pending'      },
   failed:       { color: '#991b1b', bg: '#fef2f2', label: 'Failed'       },
   refunded:     { color: '#5b21b6', bg: '#f5f3ff', label: 'Refunded'     },
+  cancelled:    { color: '#64748b', bg: '#f1f5f9', label: 'N/A'          },
 }
 
 const StatusBadge = ({ status, map }) => {
@@ -202,7 +203,12 @@ const BookingManagement = () => {
                       <div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>{b.start_time} – {b.end_time}</div>
                     </td>
                     <td style={{ ...td, color: '#00844d', fontWeight: 800 }}>₹{b.total_amount?.toLocaleString('en-IN')}</td>
-                    <td style={td}><StatusBadge status={b.payment?.status} map={payStyle} /></td>
+                    <td style={td}>
+                      <StatusBadge
+                        status={b.booking_status === 'cancelled' && b.payment?.status === 'pending' ? 'cancelled' : b.payment?.status}
+                        map={payStyle}
+                      />
+                    </td>
                     <td style={td}><StatusBadge status={b.booking_status} map={statusStyle} /></td>
                     <td style={td}>
                         <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>

@@ -60,7 +60,6 @@ function App() {
                   <Route path="/signup"      element={<Signup />} />
                   <Route path="/turf/:id"    element={<TurfPage />} />
                   <Route path="/turf/:id/book" element={<BookingPage />} />
-                  <Route path="/ticket/:id"  element={<TicketPage />} />
                   <Route path="/profile"     element={<ProfilePage />} />
                 </Routes>
               </main>
@@ -69,6 +68,9 @@ function App() {
             </div>
           }
         />
+
+        {/* ── Immersive standalone Ticket (No Navbar/Footer) ── */}
+        <Route path="/ticket/:id" element={<TicketPage />} />
       </Routes>
     </AdminAuthProvider>
   )

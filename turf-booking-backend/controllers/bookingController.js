@@ -33,18 +33,88 @@ const createBooking = async (req, res) => {
       { $set: { status: "available", held_until: null, booked_by: null } }
     );
 
-    // Convert string IDs to ObjectIds
-    // Convert string IDs to ObjectIds
-    const objectIds = slot_ids.map(id => new mongoose.Types.ObjectId(id));
+    // ── Handle "temp-" slots (Virtual slots not yet in DB) ───────────────────
+    const finalSlotIds = [];
+    const duration = turf.slot_duration_minutes;
 
-    // Fetch requested slots
+    // Helper to format minutes to HH:MM
+    const formatTime = (mins) => {
+      const normalized = mins % (24 * 60);
+      const h = Math.floor(normalized / 60);
+      const m = normalized % 60;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    };
+
+    for (let sid of slot_ids) {
+      if (typeof sid === "string" && sid.startsWith("temp-")) {
+        const startTimeStr = sid.replace("temp-", "");
+        const [h, m] = startTimeStr.split(":").map(Number);
+        const startMin = h * 60 + m;
+        const endTimeStr = formatTime(startMin + duration);
+
+        // Determine price for this specific slot (replica of controller logic)
+        let price = turf.price_per_hour;
+        const [y, mm, d_num] = date.split("-").map(Number);
+        const dayDate = new Date(Date.UTC(y, mm - 1, d_num));
+        const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+        const dayName = days[dayDate.getUTCDay()];
+        
+        const overrides = turf.pricing_overrides || {};
+        const isWeekend = dayName === "saturday" || dayName === "sunday";
+        if (isWeekend && overrides.weekend_price) price = overrides.weekend_price;
+        
+        const peakHours = overrides.peak_hours || {};
+        if (peakHours.start && peakHours.end && overrides.peak_hour_price) {
+          const [sH, sM] = peakHours.start.split(":").map(Number);
+          const [eH, eM] = peakHours.end.split(":").map(Number);
+          const psM = sH * 60 + sM; let peM = eH * 60 + eM;
+          if (peM <= psM) peM += 1440;
+          const norm = startMin % 1440;
+          const isPeak = peM > 1440 ? (norm >= psM || norm < (peM - 1440)) : (norm >= psM && norm < peM);
+          if (isPeak) price = overrides.peak_hour_price;
+        }
+
+        // Check if a real slot was created meanwhile
+        let realSlot = await Slot.findOne({
+          turf_id,
+          date: dayDate,
+          start_time: startTimeStr,
+        });
+
+        if (!realSlot) {
+          realSlot = await Slot.create({
+            turf_id,
+            date: dayDate,
+            start_time: startTimeStr,
+            end_time: endTimeStr,
+            price,
+            status: "available",
+          });
+        }
+        finalSlotIds.push(realSlot._id.toString());
+      } else {
+        finalSlotIds.push(sid);
+      }
+    }
+
+    // Now validate finalSlotIds
+    for (const sid of finalSlotIds) {
+      if (!mongoose.isValidObjectId(sid)) {
+        return res.status(400).json({ message: `Invalid slot id after resolution: ${sid}` });
+      }
+    }
+
+    // Convert string IDs to ObjectIds
+    const objectIds = finalSlotIds.map((id) => new mongoose.Types.ObjectId(id));
+
+    // Fetch requested slots using objectIds
     const slots = await Slot.find({
-      _id: { $in: slot_ids },
+      _id: { $in: objectIds },
       turf_id: turf_id,
     });
 
     // Check all slot_ids were found
-    if (slots.length !== slot_ids.length) {
+    if (slots.length !== finalSlotIds.length) {
       return res.status(400).json({
         message: "One or more slots not found for this turf",
       });
@@ -94,7 +164,7 @@ const createBooking = async (req, res) => {
     const booking = await Booking.create({
       user_id,
       turf_id,
-      slot_ids,
+      slot_ids: finalSlotIds,
       date: new Date(date),
       start_time,
       end_time,
@@ -123,9 +193,11 @@ const createBooking = async (req, res) => {
       start_time,
       end_time,
       held_until,
-      slots_held: slot_ids.length,
+      slots_held: finalSlotIds.length,
     });
   } catch (error) {
+    // Log full error for debugging (stack trace) before responding
+    console.error("createBooking error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -146,6 +218,8 @@ const getUserBookings = async (req, res) => {
       bookings,
     });
   } catch (error) {
+    // Log full error for debugging (stack trace) before responding
+    console.error("getBookingById error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -169,6 +243,7 @@ const getBookingById = async (req, res) => {
       booking,
     });
   } catch (error) {
+    console.error("getBookingById error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -247,6 +322,7 @@ const cancelBooking = async (req, res) => {
       refund_status,
     });
   } catch (error) {
+    console.error("cancelBooking error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -272,6 +348,7 @@ const getUpcomingBookings = async (req, res) => {
       bookings,
     });
   } catch (error) {
+    console.error("getUpcomingBookings error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -300,6 +377,7 @@ const getBookingHistory = async (req, res) => {
       bookings,
     });
   } catch (error) {
+    console.error("getBookingHistory error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -337,6 +415,7 @@ const downloadInvoice = async (req, res) => {
 
     res.send(pdfBuffer);
   } catch (error) {
+    console.error("downloadInvoice error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
