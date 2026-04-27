@@ -193,17 +193,17 @@ const verifyAdvancePayment = async (req, res) => {
     try {
       const user = await User.findById(user_id);
       const paymentLinkOptions = {
-        amount:      balanceDue * 100,
+        amount:      balanceDue * 100, // paise
         currency:    "INR",
         accept_partial: false,
-        description: `Balance payment for booking #${booking._id.toString().slice(-8).toUpperCase()} at ${booking.turf_name_snapshot}`,
+        description: `Balance payment for booking #${booking._id.toString().slice(-8).toUpperCase()} at ${booking.turf_name_snapshot || 'Vega Sports'}`,
         customer: {
           name:  user?.name  || "Customer",
           email: user?.email || "",
           contact: user?.phone || "",
         },
-        notify: { sms: true, email: true },
-        reminder_enable: true,
+        notify: { sms: false, email: false }, // Set to false to avoid failure if not configured
+        reminder_enable: false,
         notes: {
           booking_id: booking._id.toString(),
           type: "balance",
@@ -216,9 +216,10 @@ const verifyAdvancePayment = async (req, res) => {
       balanceLinkUrl = link.short_url;
       booking.payment.balance_link_id  = link.id;
       booking.payment.balance_link_url = link.short_url;
+      console.log("Razorpay Balance Payment Link created:", balanceLinkUrl);
     } catch (linkErr) {
-      console.error("Payment link creation failed:", linkErr.message);
-      // Continue without link — admin can still mark paid
+      console.error("CRITICAL: Payment link creation failed:", linkErr.description || linkErr.message || linkErr);
+      // Continue without link — admin can still mark paid if needed
     }
 
     // Hold/confirm slots

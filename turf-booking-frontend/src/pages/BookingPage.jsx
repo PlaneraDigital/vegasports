@@ -106,7 +106,7 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
           </div>
 
           {/* QR */}
-          {balance_link_url && (
+          {balance_link_url ? (
             <div style={{ background: "rgba(0,0,0,0.55)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: 16, marginBottom: 18, textAlign: "center" }}>
               <p style={{ color: "#ddd", fontSize: 12, fontWeight: 700, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.05em" }}>Scan to Pay Remaining ₹{balance_due}</p>
               <img
@@ -119,6 +119,15 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
                 Pay ₹{balance_due} Online ↗
               </a>
             </div>
+          ) : (
+             <div style={{ background: "rgba(180,20,0,0.1)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: 12, padding: 20, marginBottom: 18, textAlign: "center" }}>
+               <p style={{ color: "#ffcdd2", fontSize: 13, fontWeight: 700, margin: 0 }}>
+                 QR Generation Pending
+               </p>
+               <p style={{ color: "#aaa", fontSize: 11, marginTop: 4 }}>
+                 Please refresh the page in a moment or show your booking confirmation at the turf to pay the remaining ₹{balance_due} manually.
+               </p>
+             </div>
           )}
 
           {/* Notice */}
