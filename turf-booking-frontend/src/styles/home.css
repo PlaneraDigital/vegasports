@@ -96,7 +96,13 @@
 
 .hero-btn-container .btn-glow {
   width: auto;
-  min-width: 200px;
+  min-width: 280px;
+  padding: 14px 36px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hero-follow-btn {
@@ -105,12 +111,13 @@
   justify-content: center;
   gap: 12px;
   width: auto;
-  min-width: 220px;
-  padding: 12px 28px;
+  min-width: 280px;
+  padding: 14px 36px;
+  height: 52px;
   background: #18181b;
   color: white;
   border-radius: 16px;
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
   text-decoration: none;
   transition: all 0.3s;
@@ -132,8 +139,9 @@
   justify-content: center;
   gap: 8px;
   width: auto;
-  min-width: 220px;
-  padding: 12px 40px;
+  min-width: 280px;
+  padding: 14px 36px;
+  height: 52px;
   background: transparent;
   background-color: #009e5d;
   color: white;
