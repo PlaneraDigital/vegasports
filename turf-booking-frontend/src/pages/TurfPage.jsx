@@ -321,7 +321,8 @@ function OperatingHours({ hours, pricing_overrides }) {
             </div>
           )}
           
-          <div>
+          {/* Holiday Policy - Hidden as per request */}
+          {/* <div>
             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Holiday Policy</p>
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center flex-shrink-0">
@@ -334,7 +335,7 @@ function OperatingHours({ hours, pricing_overrides }) {
                 </p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
       </div>
@@ -414,23 +415,23 @@ export default function TurfPage() {
           {/* ════ LEFT COLUMN ════ */}
           <div>
             <div className="flex flex-wrap gap-2">
-              {turf.turf_type && (
+              {/* {turf.turf_type && (
                 <span className="bg-green-100 border border-green-200 text-green-700 text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">
                   {TURF_TYPE_LABEL[turf.turf_type] || turf.turf_type}
                 </span>
-              )}
-              {turf.status && (
+              )} */}
+              {/* {turf.status && (
                 <span className={`text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${STATUS_STYLE[turf.status] || STATUS_STYLE.inactive}`}>
                   {turf.status.replace(/_/g, " ")}
                 </span>
-              )}
+              )} */}
             </div>
 
-            <h1 className="mt-4 text-3xl md:text-4xl font-black tracking-tight text-zinc-900">
+            {/* <h1 className="mt-4 text-3xl md:text-4xl font-black tracking-tight text-zinc-900">
               {turf.name}
-            </h1>
+            </h1> */}
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            {/* <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
               {fullAddress && (
                 <p className="flex items-center gap-1.5 text-sm font-medium text-zinc-500">
                   <MapPin size={14} className="text-green-600" />
@@ -444,10 +445,10 @@ export default function TurfPage() {
                   <span className="text-zinc-500 text-xs font-bold">({turf.rating.total_reviews})</span>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Quick stats pills */}
-            <div className="mt-6 flex flex-wrap gap-3">
+            {/* <div className="mt-6 flex flex-wrap gap-3">
               <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
                 <IndianRupee size={14} className="text-green-400" />
                 <span className="text-zinc-200 font-semibold">{sym}{turf.price_per_hour}</span>
@@ -463,9 +464,9 @@ export default function TurfPage() {
                 <span className="text-zinc-900 font-bold">{turf.slot_duration_minutes} min</span>
                 <span className="text-zinc-500">Slots</span>
               </div>
-            </div>
+            </div> */}
 
-            {turf.sports?.length > 0 && (
+            {/* {turf.sports?.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-2">
                 {turf.sports.map(sport => (
                   <span key={sport} className="flex items-center gap-1.5 bg-white border border-zinc-200 text-zinc-700 text-[11px] font-bold uppercase py-1.5 px-3 rounded-lg shadow-sm">
@@ -473,11 +474,11 @@ export default function TurfPage() {
                   </span>
                 ))}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* ════ RIGHT COLUMN ════ */}
-          <div className="w-full">
+          {/* <div className="w-full">
             <div className="sticky top-24">
               <div className="bg-white border border-zinc-200 rounded-[32px] shadow-xl shadow-zinc-200/50 p-7 relative">
                 <h3 className="text-zinc-900 font-black text-xl mb-2">Ready to play?</h3>
@@ -496,15 +497,15 @@ export default function TurfPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* ── FULL WIDTH SECTIONS ── */}
-        <Divider />
+        {/* <Divider />
         <Highlights highlights={turf.highlights} />
         <AmenitiesGrid amenities={turf.amenities} />
         <Divider />
-        <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} />
+        <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} /> */}
         <Divider />
         <Rules rules={turf.rules} />
         <LocationMap />

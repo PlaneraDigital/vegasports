@@ -72,6 +72,9 @@ function Home() {
               </svg>
               <span>Follow @infinity_turf</span>
             </a>
+            <button onClick={() => navigate('/turf/69c2a2dce69a34692fa78985')} className="hero-view-photos-btn">
+              View Photos
+            </button>
           </motion.div>
         </div>
       </section>
@@ -79,7 +82,7 @@ function Home() {
 
       {/* All Turfs */}
       <section className="turfs-section" id="allturfs">
-        <Card />
+        {/* <Card /> */}
       </section>
 
       {/* Offers Section */}
