@@ -41,20 +41,32 @@ const sendRedCardEmail = async ({ to, name, booking }) => {
       <!-- Red Card -->
       <div style="margin:24px 28px;border:2px solid #ef4444;border-radius:14px;background:#1a0a0a;overflow:hidden;">
         <div style="background:#ef4444;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
-          <div>
-            <div style="font-size:11px;color:#fecaca;font-weight:700;letter-spacing:1px;text-transform:uppercase;">🔴 RED CARD: ACTION REQUIRED</div>
-          </div>
+          <div style="font-size:11px;color:#fecaca;font-weight:700;letter-spacing:1px;text-transform:uppercase;">🔴 RED CARD: ACTION REQUIRED</div>
           <div style="font-size:18px;">⚠️</div>
         </div>
-        <div style="padding:18px;">
-          <div style="color:#f87171;font-size:14px;font-weight:700;margin-bottom:4px;">Balance Due: ₹${balanceDue} <span style="color:#94a3b8;font-weight:500;">(Payable via QR at the turf)</span></div>
-          <div style="color:#94a3b8;font-size:13px;font-weight:600;">Status: Pending Entry Clearance</div>
+        <div style="padding:18px;text-align:center;">
+          <div style="color:#ffffff;font-size:16px;font-weight:700;margin-bottom:4px;">Balance Due: ₹${balanceDue}</div>
+          <div style="color:#94a3b8;font-size:13px;font-weight:600;margin-bottom:20px;">Status: Pending Entry Clearance</div>
+
+          ${booking.payment?.balance_link_url ? `
+            <!-- QR Section -->
+            <div style="background:#000000;padding:20px;border-radius:12px;margin-bottom:20px;display:inline-block;border:1px solid #333;">
+              <p style="color:#cbd5e1;font-size:11px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;">Scan to Pay Balance</p>
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(booking.payment.balance_link_url)}&bgcolor=000000&color=ffffff" 
+                   width="150" height="150" alt="Payment QR" style="display:block;margin:0 auto;border-radius:8px;" />
+              <div style="margin-top:15px;">
+                <a href="${booking.payment.balance_link_url}" style="background:#2563eb;color:#ffffff;padding:10px 20px;border-radius:8px;text-decoration:none;font-size:13px;font-weight:700;display:inline-block;">Pay ₹${balanceDue} Online ↗</a>
+              </div>
+            </div>
+          ` : `
+            <div style="color:#f87171;font-size:13px;margin-bottom:20px;">Please pay the balance at the turf to clear entry.</div>
+          `}
 
           <!-- Booking Summary Box -->
-          <div style="background:#2a0a0a;border:1px solid #7f1d1d;border-radius:10px;padding:14px;margin-top:16px;">
+          <div style="background:#2a0a0a;border:1px solid #7f1d1d;border-radius:10px;padding:14px;text-align:left;">
             <div style="color:#fca5a5;font-size:12px;font-weight:800;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.5px;">Booking Summary:</div>
             <div style="color:#e2e8f0;font-size:13px;line-height:2;">
-              • <strong>Total Rate:</strong> ₹${booking.total_amount}/hr<br>
+              • <strong>Total Rate:</strong> ₹${booking.total_amount}<br>
               • <strong>Advance Paid:</strong> ₹${booking.payment?.advance_amount || 200} ✅<br>
               • <strong>Balance Due:</strong> ₹${balanceDue}<br>
               • <strong>Date:</strong> ${fmtDate(booking.date)}<br>

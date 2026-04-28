@@ -250,8 +250,13 @@ const getBookingById = async (req, res) => {
         console.log(`[DEBUG] Total: ${booking.total_amount}, Advance: ${advanceAmount}, Balance: ${balanceDue}`);
 
         if (balanceDue > 0) {
+          const backendBase = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
+          
+          // Ensure amount is integer (paise)
+          const amountPaise = Math.round(balanceDue * 100);
+
           const paymentLinkOptions = {
-            amount:      balanceDue * 100,
+            amount:      amountPaise,
             currency:    "INR",
             accept_partial: false,
             description: `Remaining balance for booking #${booking._id.toString().slice(-8).toUpperCase()} at ${booking.turf_name_snapshot || 'Vega Sports'}`,
@@ -266,11 +271,23 @@ const getBookingById = async (req, res) => {
               booking_id: booking._id.toString(),
               type: "balance",
             },
-            callback_url: `${process.env.BASE_URL}/api/payment/balance-webhook`,
+            callback_url: `${backendBase}/api/payment/balance-webhook`,
             callback_method: "get",
           };
 
+          // Razorpay requires contact if present, but can fail if empty string in some cases
+          // or if it doesn't match a phone regex or has repetitive digits.
+          const contact = (paymentLinkOptions.customer.contact || "").replace(/\s/g, '');
+          const isInvalid = !/^\+?\d{10,15}$/.test(contact) || /^(.)\1{9,}$/.test(contact);
+
+          if (contact && isInvalid) {
+            console.log(`[DEBUG] Stripping invalid contact for Razorpay: ${paymentLinkOptions.customer.contact}`);
+            delete paymentLinkOptions.customer.contact;
+          }
+
+          console.log(`[DEBUG] Creating Razorpay Payment Link: ₹${balanceDue} (${amountPaise} paise)`);
           const link = await razorpay.paymentLink.create(paymentLinkOptions);
+          
           booking.payment.balance_link_id  = link.id;
           booking.payment.balance_link_url = link.short_url;
           await booking.save();
@@ -279,7 +296,7 @@ const getBookingById = async (req, res) => {
           console.log("[DEBUG] Skipping: Balance is 0 or negative.");
         }
       } catch (linkErr) {
-        console.error("[DEBUG] Failed to create JIT link:", linkErr.description || linkErr.message);
+          console.error("[DEBUG] Failed to create JIT link:", linkErr && linkErr.response ? JSON.stringify(linkErr.response) : (linkErr && linkErr.stack ? linkErr.stack : linkErr));
       }
     } else {
       if (booking.payment.status === "advance_paid") {

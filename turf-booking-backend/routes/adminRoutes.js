@@ -21,6 +21,7 @@ const {
   getTurfRevenueBreakdown,
   getUserAnalytics,
 } = require("../controllers/adminController");
+const { markFullyPaid } = require("../controllers/paymentController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -76,6 +77,7 @@ router.get("/slots",             protect, adminOnly, getAdminSlots);
 router.get("/bookings",            protect, adminOnly, getAllBookings);
 router.get("/bookings/:id",        protect, adminOnly, getBookingByIdAdmin);
 router.put("/bookings/:id/cancel", protect, adminOnly, cancelBookingAdmin);
+router.post("/payment/mark-fully-paid/:booking_id", protect, adminOnly, markFullyPaid);
 
 // ─── Dashboard + Reports ──────────────────────────────────────────────────────
 router.get("/dashboard",              protect, adminOnly, getDashboardStats);

@@ -82,7 +82,7 @@ const BookingManagement = () => {
   const handleMarkFullyPaid = async (booking) => {
     if (!window.confirm(`Mark booking #${booking._id?.toString().slice(-6).toUpperCase()} as fully paid? This will send the Blue Card email to the customer.`)) return
     try {
-      await api.post(`/api/payment/mark-fully-paid/${booking._id}`)
+      await adminApi.post(`/payment/mark-fully-paid/${booking._id}`)
       showToast('Marked as fully paid. Blue Card email sent! ✅')
       setDetailBooking(null)
       fetchBookings(page)

@@ -117,18 +117,21 @@ function RedCardView({ booking, onBack }) {
             <div style={{
               background: "rgba(0,0,0,0.6)",
               border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 12, padding: 16, marginBottom: 18, textAlign: "center",
+              borderRadius: 12, padding: 20, marginBottom: 18, 
+              display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center"
             }}>
-              <p style={{ color: "#ddd", fontSize: 12, fontWeight: 700, marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <p style={{ color: "#ddd", fontSize: 12, fontWeight: 700, marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Scan to Pay Balance ₹{balanceDue}
               </p>
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(balanceLinkUrl)}&bgcolor=111111&color=ffffff&format=png`}
-                alt="Pay Balance QR"
-                style={{ borderRadius: 10, border: "3px solid rgba(255,255,255,0.15)", width: 180, height: 180 }}
-              />
+              <div style={{ position: "relative", marginBottom: 16 }}>
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(balanceLinkUrl)}&bgcolor=111111&color=ffffff&format=png`}
+                  alt="Pay Balance QR"
+                  style={{ borderRadius: 10, border: "3px solid rgba(255,255,255,0.15)", width: 180, height: 180, display: "block" }}
+                />
+              </div>
               <a href={balanceLinkUrl} target="_blank" rel="noopener noreferrer"
-                style={{ display: "inline-block", marginTop: 12, padding: "8px 20px", background: "#2563eb", color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>
+                style={{ display: "inline-block", padding: "10px 24px", background: "#2563eb", color: "#fff", borderRadius: 10, fontSize: 13, fontWeight: 800, textDecoration: "none", boxShadow: "0 4px 12px rgba(37,99,235,0.3)" }}>
                 Pay ₹{balanceDue} Online ↗
               </a>
             </div>

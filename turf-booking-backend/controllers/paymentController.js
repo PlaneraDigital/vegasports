@@ -46,6 +46,7 @@ const createOrder = async (req, res) => {
       razorpay_key_id: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
+    console.error("createOrder error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -103,6 +104,7 @@ const verifyPayment = async (req, res) => {
       total_amount:   booking.total_amount,
     });
   } catch (error) {
+    console.error("verifyPayment error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -135,7 +137,7 @@ const createAdvanceOrder = async (req, res) => {
       },
     };
 
-    const order = await razorpay.orders.create(options);
+  const order = await razorpay.orders.create(options);
     booking.payment.razorpay_order_id = order.id;
     booking.payment.payment_type = "advance";
     await booking.save();
@@ -150,6 +152,7 @@ const createAdvanceOrder = async (req, res) => {
       razorpay_key_id: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
+    console.error("createAdvanceOrder error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -192,6 +195,7 @@ const verifyAdvancePayment = async (req, res) => {
     let balanceLinkUrl = null;
     try {
       const user = await User.findById(user_id);
+      const backendBase = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
       const paymentLinkOptions = {
         amount:      balanceDue * 100, // paise
         currency:    "INR",
@@ -208,9 +212,18 @@ const verifyAdvancePayment = async (req, res) => {
           booking_id: booking._id.toString(),
           type: "balance",
         },
-        callback_url: `${process.env.BASE_URL}/api/payment/balance-webhook`,
+        callback_url: `${backendBase}/api/payment/balance-webhook`,
         callback_method: "get",
       };
+
+      // Razorpay requires contact if present, but can fail if empty string or repetitive digits.
+      const contact = (paymentLinkOptions.customer.contact || "").replace(/\s/g, '');
+      const isInvalid = !/^\+?\d{10,15}$/.test(contact) || /^(.)\1{9,}$/.test(contact);
+
+      if (contact && isInvalid) {
+        console.log(`[DEBUG] Stripping invalid contact for Razorpay: ${paymentLinkOptions.customer.contact}`);
+        delete paymentLinkOptions.customer.contact;
+      }
 
       const link = await razorpay.paymentLink.create(paymentLinkOptions);
       balanceLinkUrl = link.short_url;
@@ -218,7 +231,7 @@ const verifyAdvancePayment = async (req, res) => {
       booking.payment.balance_link_url = link.short_url;
       console.log("Razorpay Balance Payment Link created:", balanceLinkUrl);
     } catch (linkErr) {
-      console.error("CRITICAL: Payment link creation failed:", linkErr.description || linkErr.message || linkErr);
+      console.error("CRITICAL: Payment link creation failed:", linkErr && linkErr.stack ? linkErr.stack : linkErr);
       // Continue without link — admin can still mark paid if needed
     }
 
@@ -247,6 +260,7 @@ const verifyAdvancePayment = async (req, res) => {
       total_amount:      booking.total_amount,
     });
   } catch (error) {
+    console.error("verifyAdvancePayment error:", error && error.stack ? error.stack : error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -306,32 +320,74 @@ const balanceWebhook = async (req, res) => {
 const markFullyPaid = async (req, res) => {
   try {
     const { booking_id } = req.params;
-    const { note } = req.body;
+    
+    console.log(`[ADMIN] markFullyPaid called for booking: ${booking_id}`);
 
     const booking = await Booking.findById(booking_id);
-    if (!booking) return res.status(404).json({ message: "Booking not found" });
+    if (!booking) {
+      console.error(`[ADMIN] markFullyPaid: Booking not found: ${booking_id}`);
+      return res.status(404).json({ message: "Booking not found" });
+    }
 
-    if (booking.payment.status === "paid")
+    // Ensure payment object exists
+    if (!booking.payment) {
+      booking.payment = { status: "pending", gateway: "razorpay" };
+    }
+
+    if (booking.payment.status === "paid") {
       return res.status(400).json({ message: "Booking is already fully paid" });
+    }
 
+    // Update payment status
     booking.payment.status  = "paid";
     booking.payment.paid_at = new Date();
-    if (!booking.payment.balance_paid_at) booking.payment.balance_paid_at = new Date();
+    if (!booking.payment.balance_paid_at) {
+      booking.payment.balance_paid_at = new Date();
+    }
+    
+    // CRITICAL: Update booking status to confirmed if it was pending
+    if (booking.booking_status === "pending" || !booking.booking_status) {
+      booking.booking_status = "confirmed";
+    }
+
     await booking.save();
+
+    // CRITICAL: Ensure all associated slots are marked as booked
+    try {
+      const slotResult = await Slot.updateMany(
+        { _id: { $in: booking.slot_ids } },
+        { $set: { status: "booked", booking_id: booking._id, held_until: null } }
+      );
+      console.log(`[ADMIN] Updated ${slotResult.modifiedCount} slots to 'booked' for booking ${booking._id}`);
+    } catch (slotErr) {
+      console.error(`[ADMIN] Failed to update slots for booking ${booking._id}:`, slotErr.message);
+      // We don't return 500 here as the payment itself was recorded
+    }
 
     // Send Blue Card email
     try {
       const user = await User.findById(booking.user_id);
-      if (user?.email) await sendBlueCardEmail({ to: user.email, name: user.name, booking });
-    } catch (emailErr) { console.error("Blue card email failed:", emailErr.message); }
+      if (user?.email) {
+        await sendBlueCardEmail({ to: user.email, name: user.name, booking });
+        console.log(`[ADMIN] Blue Card email sent to ${user.email} for booking ${booking._id}`);
+      }
+    } catch (emailErr) {
+      console.error(`[ADMIN] Blue card email failed for booking ${booking._id}:`, emailErr.message);
+    }
 
     res.status(200).json({
       message:        "Booking marked as fully paid. Blue Card email sent.",
       booking_id:     booking._id,
       payment_status: booking.payment.status,
+      booking_status: booking.booking_status,
     });
   } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    console.error("markFullyPaid error:", error && error.stack ? error.stack : error);
+    res.status(500).json({ 
+      message: "Server error", 
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 
