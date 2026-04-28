@@ -5,7 +5,7 @@ import { api } from "../utils/auth";
 import {
   ShieldCheck, ArrowLeft,
   CheckCircle2, AlertCircle, Loader2, CalendarDays,
-  ChevronUp, ChevronDown,
+  ChevronUp, ChevronDown, Sun, Moon, Clock
 } from "lucide-react";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -19,163 +19,122 @@ function fmt(t) {
   return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${ap}`;
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-    BOOKING SUCCESS SCREEN (Light)
-───────────────────────────────────────────────────────────────────────────── */
-function BookingSuccessScreen({ booking, turf, sym, onGoHome, onGoProfile }) {
+function isMorningSlot(start_time) {
+  if (!start_time) return true;
+  const [h] = start_time.split(":").map(Number);
+  return h >= 7 && h < 19;
+}
+
+// Fixed Overlap Check: Handles midnight (00:00) wrapping
+const isOverlapping = (s1, e1, s2, e2) => {
+  const toMins = (t) => {
+    const [h, m] = t.split(":").map(Number);
+    let total = h * 60 + m;
+    return total;
+  };
+
+  let start1 = toMins(s1);
+  let end1   = toMins(e1);
+  let start2 = toMins(s2);
+  let end2   = toMins(e2);
+
+  // If end time is midnight (00:00) and start is late (e.g. 11 PM), treat end as 1440
+  if (end1 <= start1 && end1 === 0) end1 = 1440;
+  if (end2 <= start2 && end2 === 0) end2 = 1440;
+
+  return start1 < end2 && start2 < end1;
+};
+
+/* ─── Success Screen ─────────────────────────────────────────────────────── */
+function BookingSuccessScreen({ booking, turf, onGoHome, onGoProfile }) {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-zinc-100/80 backdrop-blur-md p-4">
-      <div className="bg-white border border-zinc-200 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl relative">
-        <div className="px-8 pt-12 pb-10 text-center relative z-10">
-          {/* Success Icon */}
-          <div className="w-24 h-24 rounded-full bg-emerald-50 border-4 border-white flex items-center justify-center mx-auto mb-8 shadow-xl shadow-emerald-100">
-            <CheckCircle2 size={48} className="text-emerald-500" />
+      <div className="bg-white border border-zinc-200 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10 text-center">
+        <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 size={40} className="text-emerald-500" />
+        </div>
+        <h2 className="text-2xl font-black text-zinc-900 mb-2">Booking Confirmed!</h2>
+        <p className="text-zinc-500 text-sm mb-8">Game on at <span className="text-zinc-900 font-bold">{turf.name}</span></p>
+        <div className="bg-zinc-50 rounded-2xl p-5 text-left mb-8 space-y-3 border border-zinc-100">
+          <div className="flex justify-between text-xs">
+            <span className="text-zinc-400 font-bold uppercase tracking-widest">Time</span>
+            <span className="text-zinc-900 font-bold">{fmt(booking.start_time)} – {fmt(booking.end_time)}</span>
           </div>
-
-          <h2 className="text-3xl font-black text-zinc-900 tracking-tight mb-3">
-            Booking Confirmed!
-          </h2>
-          <p className="text-zinc-500 text-sm leading-relaxed mb-8 px-4">
-            Your slot at <span className="text-zinc-900 font-bold">{turf.name}</span> is successfully reserved.
-          </p>
-
-          {/* Details Card */}
-          <div className="bg-zinc-50 border border-zinc-100 rounded-[2rem] p-6 text-left space-y-4 mb-8">
-            <div className="flex justify-between items-center">
-              <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Booking ID</span>
-              <span className="text-zinc-900 text-xs font-mono font-bold px-2 py-1 bg-white rounded-md border border-zinc-200">
-                #{booking.booking_id?.toString().slice(-8).toUpperCase()}
-              </span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Time Slot</span>
-              <span className="text-zinc-900 text-sm font-bold">
-                {fmt(booking.start_time)} – {fmt(booking.end_time)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center border-t border-zinc-200 pt-4">
-              <span className="text-zinc-400 text-[10px] font-bold uppercase tracking-widest">Total Paid</span>
-              <span className="text-emerald-600 text-2xl font-black">{sym}{booking.total_amount}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <button
-              onClick={onGoProfile}
-              className="w-full py-4 bg-zinc-900 text-white text-sm font-bold rounded-2xl hover:bg-black transition-all active:scale-[0.98] shadow-lg shadow-zinc-200"
-            >
-              View in My Bookings
-            </button>
-            <button
-              onClick={onGoHome}
-              className="w-full py-3 text-zinc-500 text-sm font-bold rounded-2xl hover:text-zinc-900 transition-colors"
-            >
-              Return Home
-            </button>
+          <div className="flex justify-between text-xs border-t border-zinc-200 pt-3">
+            <span className="text-zinc-400 font-bold uppercase tracking-widest">Paid</span>
+            <span className="text-emerald-600 font-bold">₹{booking.total_amount}</span>
           </div>
         </div>
+        <button onClick={onGoProfile} className="w-full py-4 bg-zinc-900 text-white text-sm font-bold rounded-2xl mb-3 hover:bg-black transition-all">View Bookings</button>
+        <button onClick={onGoHome} className="w-full py-3 text-zinc-400 text-sm font-bold hover:text-zinc-900 transition-colors">Return Home</button>
       </div>
     </div>
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-    BOOKING SUMMARY MODAL (Light)
-───────────────────────────────────────────────────────────────────────────── */
-function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, sym, onBookingSuccess }) {
+/* ─── Summary Modal ──────────────────────────────────────────────────────── */
+function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onBookingSuccess }) {
   const [booking, setBooking] = useState(false);
-  const [bookingErr, setBookingErr] = useState(null);
-
-  const handleConfirm = async () => {
-    setBooking(true);
-    setBookingErr(null);
-    try {
-      const slot_ids = selectedSlots.map((s) => s._id);
-      const rawDate = new Date(selectedSlots[0].date);
-      const date = `${rawDate.getUTCFullYear()}-${String(rawDate.getUTCMonth() + 1).padStart(2, "0")}-${String(rawDate.getUTCDate()).padStart(2, "0")}`;
-
-      const bookingRes = await api.post("/api/bookings", { turf_id: turf._id, date, slot_ids });
-      const { booking_id } = bookingRes.data;
-      const orderRes = await api.post("/api/payment/create-order", { booking_id });
-      const orderData = orderRes.data;
-
-      const options = {
-        key: orderData.razorpay_key_id,
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: turf.name,
-        order_id: orderData.order_id,
-        handler: async function (response) {
-          try {
-            setBooking(true);
-            const verifyRes = await api.post("/api/payment/verify", {
-              booking_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            onBookingSuccess(verifyRes.data);
-          } catch (err) {
-            setBookingErr("Payment verification failed.");
-          } finally { setBooking(false); }
-        },
-        theme: { color: "#10b981" },
-      };
-      new window.Razorpay(options).open();
-    } catch (err) {
-      setBookingErr(err.response?.data?.message || "Booking failed.");
-    } finally { setBooking(false); }
-  };
+  const [err, setErr] = useState(null);
 
   if (!isOpen) return null;
-  const totalAmount = selectedSlots.reduce((acc, s) => acc + s.price, 0);
+  const total = selectedSlots.reduce((acc, s) => acc + s.price, 0);
+
+  const handlePay = async () => {
+    setBooking(true); setErr(null);
+    try {
+      const slot_ids = selectedSlots.map(s => s._id);
+      const d = new Date(selectedSlots[0].date);
+      const date = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+      const bRes = await api.post("/api/bookings", { turf_id: turf._id, date, slot_ids });
+      const oRes = await api.post("/api/payment/create-order", { booking_id: bRes.data.booking_id });
+      const options = {
+        key: oRes.data.razorpay_key_id,
+        amount: oRes.data.amount,
+        order_id: oRes.data.order_id,
+        name: turf.name,
+        handler: async (res) => {
+          const vRes = await api.post("/api/payment/verify", {
+            booking_id: bRes.data.booking_id,
+            razorpay_order_id: res.razorpay_order_id,
+            razorpay_payment_id: res.razorpay_payment_id,
+            razorpay_signature: res.razorpay_signature
+          });
+          onBookingSuccess(vRes.data);
+        },
+        theme: { color: "#10b981" }
+      };
+      new window.Razorpay(options).open();
+    } catch (e) { setErr(e.response?.data?.message || "Payment failed"); }
+    finally { setBooking(false); }
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4">
-      <div className="bg-white border border-zinc-200 rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl relative">
-        <div className="px-7 pt-8 pb-5 border-b border-zinc-100 bg-zinc-50/50">
+      <div className="bg-white border border-zinc-200 rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl">
+        <div className="p-8 pb-4">
           <h2 className="text-xl font-black text-zinc-900">Summary</h2>
-          <p className="text-zinc-500 text-xs mt-1 flex items-center gap-1.5 font-medium">
-            <ShieldCheck size={14} className="text-emerald-500" /> Review and pay
-          </p>
-        </div>
-
-        <div className="px-7 py-6 space-y-5 max-h-[60vh] overflow-y-auto">
-          <div className="flex justify-between items-center pb-4 border-b border-zinc-100">
-            <span className="text-[13px] text-zinc-400 font-bold uppercase tracking-tight">Venue</span>
-            <span className="text-[14px] font-black text-zinc-900">{turf.name}</span>
-          </div>
-
-          <div className="space-y-3">
-            <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">Slots</span>
-            <div className="flex flex-wrap gap-2">
-              {selectedSlots.map(s => (
-                <div key={s._id} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-2 rounded-xl text-xs font-bold">
-                  {fmt(s.start_time)}
-                </div>
-              ))}
+          <div className="mt-6 space-y-4">
+            <div className="flex justify-between items-center text-sm"><span className="text-zinc-400">Venue</span><span className="text-zinc-900 font-bold">{turf.name}</span></div>
+            <div className="space-y-2">
+              <span className="text-zinc-400 text-[10px] uppercase font-bold tracking-widest">Slots</span>
+              <div className="flex flex-wrap gap-2">
+                {selectedSlots.map(s => (
+                  <div key={s._id} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1.5 rounded-xl text-xs font-bold">{fmt(s.start_time)}</div>
+                ))}
+              </div>
             </div>
           </div>
-
-          <div className="pt-4 border-t border-zinc-100 flex justify-between items-end">
-            <span className="text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-1">Total Payable</span>
-            <span className="text-4xl font-black text-zinc-900 tracking-tight">{sym}{totalAmount}</span>
+          <div className="mt-8 pt-6 border-t border-zinc-100 flex justify-between items-end">
+            <span className="text-zinc-400 text-sm font-bold mb-1">Payable</span>
+            <span className="text-3xl font-black text-zinc-900">₹{total}</span>
           </div>
-
-          {bookingErr && (
-            <div className="bg-red-50 border border-red-100 rounded-xl p-4 flex gap-3 items-center">
-              <AlertCircle size={16} className="text-red-500" />
-              <p className="text-red-600 text-xs font-bold">{bookingErr}</p>
-            </div>
-          )}
+          {err && <p className="mt-4 text-red-500 text-xs font-bold bg-red-50 p-3 rounded-lg border border-red-100">{err}</p>}
         </div>
-
-        <div className="px-7 py-6 bg-zinc-50 border-t border-zinc-100 flex gap-3">
-          <button onClick={onClose} disabled={booking} className="flex-1 py-4 bg-white border border-zinc-200 text-zinc-500 text-sm font-bold rounded-2xl hover:bg-zinc-100">
-            Cancel
-          </button>
-          <button onClick={handleConfirm} disabled={booking} className="flex-[2] py-4 bg-emerald-600 text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-100 flex items-center justify-center gap-2">
-            {booking ? <Loader2 size={18} className="animate-spin" /> : "Pay Now"}
+        <div className="p-8 bg-zinc-50 border-t border-zinc-100 flex gap-3">
+          <button onClick={onClose} className="flex-1 py-4 text-zinc-400 font-bold hover:text-zinc-900 transition-colors">Cancel</button>
+          <button onClick={handlePay} disabled={booking} className="flex-[2] py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-lg shadow-emerald-100 flex items-center justify-center gap-2 hover:bg-emerald-700 transition-all">
+            {booking ? <Loader2 size={18} className="animate-spin" /> : "Confirm & Pay"}
           </button>
         </div>
       </div>
@@ -183,222 +142,46 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, sym, onBook
   );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-    BOOKING CARD (Light)
-───────────────────────────────────────────────────────────────────────────── */
-function BookingCard({ turf, onConfirmBooking }) {
-  const sym = turf.currency === "INR" ? "₹" : (turf.currency || "₹");
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedSlots, setSelectedSlots] = useState([]);
-  const [slots, setSlots] = useState([]);
-  const [loadingSlots, setLoadingSlots] = useState(false);
-
-  const calRef = useRef(null);
-  const [calOpen, setCalOpen] = useState(false);
-  const [viewYear,  setViewYear]  = useState(new Date().getFullYear());
-  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
-
-  // Close calendar on outside click
-  useEffect(() => {
-    const handler = (e) => { if (calRef.current && !calRef.current.contains(e.target)) setCalOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); }
-    else setViewMonth(m => m - 1);
-  };
-  const nextMonth = () => {
-    if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); }
-    else setViewMonth(m => m + 1);
-  };
-
-  const today = new Date(); today.setHours(0,0,0,0);
-  const isPrevDisabled = viewYear === today.getFullYear() && viewMonth === today.getMonth();
-
-  const firstDay    = new Date(viewYear, viewMonth, 1).getDay();
-  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
-  const calCells    = [];
-  for (let i = 0; i < firstDay; i++) calCells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) calCells.push(d);
-
-  const fmtDateDisplay = (d) => {
-    const dd = String(d.getDate()).padStart(2,'0');
-    const mm = String(d.getMonth()+1).padStart(2,'0');
-    return `${dd}-${mm}-${d.getFullYear()}`;
-  };
-
-  const pickDay = (day) => {
-    const d = new Date(viewYear, viewMonth, day);
-    setSelectedDate(d);
-    setSelectedSlots([]);
-    setCalOpen(false);
-  };
-
-
-  useEffect(() => {
-    const fetchSlots = async () => {
-      try {
-        setLoadingSlots(true);
-        const d = selectedDate;
-        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-        const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dateStr}`);
-        setSlots(res.data.slots || []);
-      } catch (err) { console.error(err); }
-      finally { setLoadingSlots(false); }
-    };
-    fetchSlots();
-  }, [selectedDate, turf._id]);
-
-  return (
-    <div className="bg-white border border-zinc-200 rounded-[2rem] overflow-hidden shadow-xl flex flex-col">
-      {/* Price Header + Date picker */}
-      <div className="px-8 pt-8 pb-6 bg-zinc-50/50 border-b border-zinc-100" style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between' }}>
-        <div>
-          <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Select Timings</span>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-4xl font-black text-zinc-900">{sym}{turf.price_per_hour}</span>
-            <span className="text-zinc-400 text-sm font-bold">/ hour</span>
-          </div>
-        </div>
-
-        {/* Compact date picker — right side */}
-        <div ref={calRef} style={{ position: 'relative' }}>
-          <button
-            onClick={() => setCalOpen(o => !o)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem',
-              border: '1px solid #d4d4d8', borderRadius: '10px',
-              padding: '0.45rem 0.75rem', background: '#fff',
-              color: '#18181b', fontSize: '0.82rem', fontWeight: 600,
-              cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-            }}
-          >
-            <span>{fmtDateDisplay(selectedDate)}</span>
-            <CalendarDays size={14} color="#71717a" />
-          </button>
-
-          {calOpen && (
-            <div style={{
-              position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 100,
-              background: '#fff', border: '1px solid #e4e4e7', borderRadius: '14px',
-              padding: '1rem', width: '240px',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-            }}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem' }}>
-                <span style={{ fontWeight:800, fontSize:'0.8rem', color:'#18181b' }}>{MONTHS[viewMonth]}, {viewYear}</span>
-                <div style={{ display:'flex', flexDirection:'column', gap:'2px' }}>
-                  <button onClick={nextMonth} style={{ background:'none', border:'none', cursor:'pointer', color:'#52525b', padding:'1px' }}><ChevronUp size={13}/></button>
-                  <button onClick={prevMonth} disabled={isPrevDisabled} style={{ background:'none', border:'none', cursor: isPrevDisabled?'not-allowed':'pointer', color: isPrevDisabled?'#d4d4d8':'#52525b', padding:'1px' }}><ChevronDown size={13}/></button>
-                </div>
-              </div>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', marginBottom:'4px' }}>
-                {DAYS_SHORT.map(d => <div key={d} style={{ textAlign:'center', fontSize:'0.65rem', fontWeight:800, color:'#10b981', padding:'3px 0' }}>{d}</div>)}
-              </div>
-              <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:'2px' }}>
-                {calCells.map((day, idx) => {
-                  if (!day) return <div key={`e-${idx}`}/>;
-                  const cellDate = new Date(viewYear, viewMonth, day); cellDate.setHours(0,0,0,0);
-                  const isPast  = cellDate < today;
-                  const isToday = cellDate.getTime() === today.getTime();
-                  const isSel   = cellDate.getTime() === new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()).getTime();
-                  return (
-                    <button key={day} disabled={isPast} onClick={() => pickDay(day)} style={{
-                      height:'30px', borderRadius:'6px',
-                      border: isSel ? '2px solid #2563eb' : '1px solid transparent',
-                      background: isSel ? '#2563eb' : 'transparent',
-                      color: isPast ? '#d4d4d8' : isSel ? '#fff' : isToday ? '#10b981' : '#18181b',
-                      fontWeight: isSel || isToday ? 800 : 500, fontSize:'0.78rem',
-                      cursor: isPast ? 'not-allowed' : 'pointer',
-                    }}>{day}</button>
-                  );
-                })}
-              </div>
-              <div style={{ display:'flex', justifyContent:'space-between', marginTop:'0.75rem', borderTop:'1px solid #f4f4f5', paddingTop:'0.6rem' }}>
-                <button onClick={() => { setSelectedDate(today); setSelectedSlots([]); setCalOpen(false); setViewMonth(today.getMonth()); setViewYear(today.getFullYear()); }}
-                  style={{ background:'none', border:'none', color:'#10b981', fontWeight:700, fontSize:'0.75rem', cursor:'pointer' }}>Today</button>
-                <button onClick={() => setCalOpen(false)}
-                  style={{ background:'none', border:'none', color:'#10b981', fontWeight:700, fontSize:'0.75rem', cursor:'pointer' }}>Close</button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Slots */}
-      <div className="px-8 pt-4 pb-8 flex-1">
-        <h4 className="text-[11px] font-black text-zinc-400 uppercase tracking-widest mb-4">Available Timings</h4>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-          {loadingSlots ? (
-            <div className="col-span-full text-center py-10"><Loader2 className="animate-spin mx-auto text-emerald-500" /></div>
-          ) : (
-            slots.map((slot) => {
-              const isBooked = ["booked", "on_hold", "blocked"].includes(slot.status);
-              const isSelected = selectedSlots.some((s) => s._id === slot._id);
-              return (
-                <button
-                  key={slot._id}
-                  disabled={isBooked}
-                  onClick={() => {
-                    if (isSelected) setSelectedSlots(prev => prev.filter(s => s._id !== slot._id));
-                    else setSelectedSlots(prev => [...prev, slot]);
-                  }}
-                  className={`py-3 rounded-xl border text-sm font-bold transition-all ${isBooked ? "bg-zinc-50 border-zinc-50 text-zinc-300 cursor-not-allowed" :
-                      isSelected ? "bg-emerald-600 border-emerald-600 text-white shadow-md" :
-                        "bg-white border-zinc-200 text-zinc-900 hover:border-emerald-500"
-                    }`}
-                >
-                  {fmt(slot.start_time)}
-                </button>
-              );
-            })
-          )}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="p-8 border-t border-zinc-100 bg-zinc-50/50">
-        <div className="flex justify-between items-end mb-6">
-          <div>
-            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Subtotal</span>
-            <p className="text-3xl font-black text-zinc-900">
-              {sym}{selectedSlots.reduce((acc, s) => acc + s.price, 0)}
-            </p>
-          </div>
-          <span className="text-xs font-black bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg">
-            {selectedSlots.length} Selected
-          </span>
-        </div>
-        <button
-          disabled={selectedSlots.length === 0}
-          onClick={() => onConfirmBooking(selectedSlots)}
-          className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl shadow-xl shadow-emerald-100 disabled:bg-zinc-200 disabled:shadow-none hover:bg-emerald-700 transition-all active:scale-[0.98]"
-        >
-          Confirm & Pay
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-    MAIN PAGE (Light)
-───────────────────────────────────────────────────────────────────────────── */
+/* ─── Main Page ──────────────────────────────────────────────────────────── */
 export default function BookingPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [turf, setTurf] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [slots, setSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSlots, setSelectedSlots] = useState([]);
-  const [confirmedBooking, setConfirmedBooking] = useState(null);
+  const [activeTab, setActiveTab] = useState("morning");
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [confirmed, setConfirmed] = useState(null);
+
+  // Calendar state
+  const calRef = useRef(null);
+  const [calOpen, setCalOpen] = useState(false);
+  const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
+
+  useEffect(() => {
+    const handler = (e) => { if (calRef.current && !calRef.current.contains(e.target)) setCalOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const prevMonth = () => { if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1); } else setViewMonth(m => m - 1); };
+  const nextMonth = () => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); };
+  const isPrevDisabled = viewYear === today.getFullYear() && viewMonth === today.getMonth();
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const calCells = [];
+  for (let i = 0; i < firstDay; i++) calCells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) calCells.push(d);
 
   useEffect(() => {
     const fetchTurf = async () => {
       try {
-        const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
-        const res = await axios.get(`${base}/api/turfs/${id}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/turfs/${id}`);
         setTurf(res.data.turf);
       } catch (err) { console.error(err); }
       finally { setLoading(false); }
@@ -406,23 +189,159 @@ export default function BookingPage() {
     fetchTurf();
   }, [id]);
 
-  if (loading) return <div className="min-h-screen bg-zinc-50 flex items-center justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>;
+  useEffect(() => {
+    if (!turf) return;
+    const fetchSlots = async () => {
+      setLoadingSlots(true);
+      try {
+        const dStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth()+1).padStart(2,'0')}-${String(selectedDate.getDate()).padStart(2,'0')}`;
+        const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dStr}`);
+        setSlots(res.data.slots || []);
+      } catch (err) { console.error(err); }
+      finally { setLoadingSlots(false); }
+    };
+    fetchSlots();
+  }, [selectedDate, turf]);
 
-  if (confirmedBooking) return <BookingSuccessScreen booking={confirmedBooking} turf={turf} sym={turf.currency === "INR" ? "₹" : "₹"} onGoHome={() => navigate("/")} onGoProfile={() => navigate("/profile")} />;
+  if (loading) return <div className="min-h-screen bg-zinc-50 flex items-center justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>;
+  if (confirmed) return <BookingSuccessScreen booking={confirmed} turf={turf} onGoHome={() => navigate("/")} onGoProfile={() => navigate("/profile")} />;
+
+  const morningSlots = slots.filter(s => isMorningSlot(s.start_time));
+  const eveningSlots = slots.filter(s => !isMorningSlot(s.start_time));
+  const visibleSlots = activeTab === "morning" ? morningSlots : eveningSlots;
+
+  const toggleSlot = (slot) => {
+    setSelectedSlots(prev => prev.some(s => s._id === slot._id) ? prev.filter(s => s._id !== slot._id) : [...prev, slot]);
+  };
+
+  const morningPrice = turf.pricing?.morning?.price || turf.price_per_hour;
+  const eveningPrice = turf.pricing?.evening?.price || turf.price_per_hour;
 
   return (
-    <div className="bg-zinc-50 min-h-screen pb-20 pt-10">
-      <div className="max-w-5xl mx-auto px-6">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-zinc-900 transition-colors mb-8">
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 pb-20 pt-10">
+      <div className="max-w-4xl mx-auto px-6">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-zinc-900 transition-colors mb-10">
           <ArrowLeft size={16} /> Back
         </button>
-        <h1 className="text-3xl font-black text-zinc-900 mb-2 leading-tight">Reserve your slot</h1>
-        <p className="text-zinc-500 font-medium mb-10">{turf.name}</p>
+        
+        <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-3xl font-black mb-1">Reserve your slot</h1>
+            <p className="text-zinc-500 font-medium">{turf.name}</p>
+          </div>
 
-        <BookingCard turf={turf} onConfirmBooking={(slots) => { setSelectedSlots(slots); setIsSummaryOpen(true); }} />
+          {/* Date Picker Component */}
+          <div ref={calRef} className="relative">
+            <button onClick={() => setCalOpen(!calOpen)} className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:border-zinc-300 transition-all">
+              <CalendarDays size={16} className="text-zinc-400" />
+              {selectedDate.getDate()} {MONTHS[selectedDate.getMonth()]}
+            </button>
+            {calOpen && (
+              <div className="absolute top-full right-0 mt-2 bg-white border border-zinc-200 rounded-2xl p-4 shadow-2xl z-[150] w-[280px]">
+                <div className="flex justify-between items-center mb-4 px-1">
+                  <span className="font-black text-sm">{MONTHS[viewMonth]} {viewYear}</span>
+                  <div className="flex gap-1">
+                    <button onClick={prevMonth} disabled={isPrevDisabled} className="p-1 disabled:opacity-20"><ChevronUp size={16} /></button>
+                    <button onClick={nextMonth} className="p-1"><ChevronDown size={16} /></button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-7 gap-1 text-center">
+                  {DAYS_SHORT.map(d => <div key={d} className="text-[10px] font-black text-emerald-600 pb-2">{d}</div>)}
+                  {calCells.map((day, idx) => {
+                    if (!day) return <div key={`e-${idx}`} />;
+                    const cellD = new Date(viewYear, viewMonth, day); cellD.setHours(0,0,0,0);
+                    const isPast = cellD < today;
+                    const isSel = cellD.getTime() === new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate()).getTime();
+                    return (
+                      <button key={day} disabled={isPast} onClick={() => { setSelectedDate(cellD); setSelectedSlots([]); setCalOpen(false); }} className={`aspect-square rounded-lg text-xs font-bold transition-all ${isSel ? 'bg-zinc-900 text-white' : isPast ? 'text-zinc-200 cursor-not-allowed' : 'hover:bg-zinc-100 text-zinc-900'}`}>{day}</button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </header>
+
+        <div className="bg-white border border-zinc-200 rounded-[2.5rem] overflow-hidden shadow-xl">
+          <div className="p-8 border-b border-zinc-100 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-zinc-50/50">
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-black">₹{activeTab === "morning" ? morningPrice : eveningPrice}</span>
+              <span className="text-zinc-400 text-xs font-black uppercase tracking-widest">/ slot</span>
+            </div>
+            
+            <div className="flex bg-zinc-100 p-1 rounded-2xl w-fit border border-zinc-200">
+              <button onClick={() => { setActiveTab("morning"); setSelectedSlots([]); }} className={`px-6 py-2 rounded-xl text-sm font-black flex items-center gap-2 transition-all ${activeTab === 'morning' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-400'}`}>
+                <Sun size={15} /> Morning
+              </button>
+              <button onClick={() => { setActiveTab("evening"); setSelectedSlots([]); }} className={`px-6 py-2 rounded-xl text-sm font-black flex items-center gap-2 transition-all ${activeTab === 'evening' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-400'}`}>
+                <Moon size={15} /> Evening
+              </button>
+            </div>
+          </div>
+
+          <div className="p-8">
+            <div className="flex items-center gap-3 mb-8 text-[10px] font-black text-zinc-400 uppercase tracking-widest">
+              <Clock size={12} />
+              <span>Timings ({activeTab === 'morning' ? '7 AM - 7 PM' : '7 PM - 7 AM'})</span>
+            </div>
+
+            {loadingSlots ? (
+              <div className="py-20 flex justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {visibleSlots.map(slot => {
+                  const isSelected = selectedSlots.some(s => s._id === slot._id);
+                  const isTaken = slot.status !== "available" || slot.is_past;
+                  const overlaps = selectedSlots.some(s => s._id !== slot._id && isOverlapping(slot.start_time, slot.end_time, s.start_time, s.end_time));
+                  const disabled = isTaken || overlaps;
+
+                  return (
+                    <button
+                      key={slot._id}
+                      disabled={disabled}
+                      onClick={() => toggleSlot(slot)}
+                      className={`p-4 rounded-2xl border-2 transition-all text-left group ${
+                        isSelected 
+                          ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-100 scale-[0.98]" 
+                          : disabled
+                          ? "bg-zinc-50 border-zinc-50 text-zinc-200 cursor-not-allowed"
+                          : "bg-white border-zinc-100 text-zinc-900 hover:border-emerald-500 hover:bg-emerald-50/30"
+                      }`}
+                    >
+                      <span className="block text-sm font-black mb-0.5">{fmt(slot.start_time)}</span>
+                      <span className={`block text-[10px] font-black ${isSelected ? 'text-emerald-100' : 'text-zinc-400'}`}>
+                        {fmt(slot.end_time)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="p-8 bg-zinc-50 border-t border-zinc-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+              <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest block mb-1">Total Payable</span>
+              <span className="text-4xl font-black text-zinc-900">₹{selectedSlots.reduce((acc, s) => acc + s.price, 0)}</span>
+            </div>
+            <button 
+              disabled={selectedSlots.length === 0}
+              onClick={() => setIsSummaryOpen(true)}
+              className="px-12 py-4 bg-zinc-900 text-white font-black rounded-2xl shadow-xl shadow-zinc-200 disabled:bg-zinc-200 disabled:text-zinc-400 hover:bg-black transition-all active:scale-[0.95]"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
       </div>
 
-      <BookingSummaryModal isOpen={isSummaryOpen} onClose={() => setIsSummaryOpen(false)} selectedSlots={selectedSlots} turf={turf} sym={turf.currency === "INR" ? "₹" : "₹"} onBookingSuccess={(data) => { setIsSummaryOpen(false); setConfirmedBooking(data); }} />
+      <BookingSummaryModal
+        isOpen={isSummaryOpen}
+        onClose={() => setIsSummaryOpen(false)}
+        selectedSlots={selectedSlots}
+        turf={turf}
+        onBookingSuccess={(d) => { setIsSummaryOpen(false); setConfirmed(d); }}
+      />
     </div>
   );
 }

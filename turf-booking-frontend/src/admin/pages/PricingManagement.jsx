@@ -5,7 +5,10 @@ import { DollarSign, Save, CheckCircle, AlertCircle } from 'lucide-react'
 const PricingManagement = () => {
   const [turfs, setTurfs] = useState([])
   const [selectedTurf, setSelectedTurf] = useState(null)
-  const [form, setForm] = useState({ price_per_hour: '', weekend_price: '', peak_hour_price: '', peak_start: '', peak_end: '' })
+  const [form, setForm] = useState({
+    price_per_hour: '', weekend_price: '', peak_hour_price: '', peak_start: '', peak_end: '',
+    morning_price: '', evening_price: '', slot_interval_minutes: '',
+  })
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState(null)
 
@@ -23,6 +26,9 @@ const PricingManagement = () => {
       peak_hour_price:  turf.pricing_overrides?.peak_hour_price || '',
       peak_start:       turf.pricing_overrides?.peak_hours?.start || '',
       peak_end:         turf.pricing_overrides?.peak_hours?.end || '',
+      morning_price:    turf.pricing?.morning?.price || '',
+      evening_price:    turf.pricing?.evening?.price || '',
+      slot_interval_minutes: turf.slot_interval_minutes || '',
     })
   }
 
@@ -35,6 +41,9 @@ const PricingManagement = () => {
         peak_hour_price:  form.peak_hour_price   ? Number(form.peak_hour_price) : undefined,
         peak_start:       form.peak_start || undefined,
         peak_end:         form.peak_end   || undefined,
+        morning_price:    form.morning_price ? Number(form.morning_price) : undefined,
+        evening_price:    form.evening_price ? Number(form.evening_price) : undefined,
+        slot_interval_minutes: form.slot_interval_minutes ? Number(form.slot_interval_minutes) : undefined,
       })
       // Refresh turf list
       const { data } = await api.get('/api/turfs')
@@ -134,6 +143,46 @@ const PricingManagement = () => {
                 />
                 <p style={{ color: '#64748b', fontSize: '0.7rem', margin: '0.4rem 0 0', fontWeight: 600 }}>Applied to all weekday normal slots</p>
               </div>
+
+              <div style={{ marginTop: '1.25rem' }}>
+                <label style={labelStyle}>⏱️ Slot Interval (Minutes)</label>
+                <input type="number" value={form.slot_interval_minutes} onChange={e => setForm(p => ({ ...p, slot_interval_minutes: e.target.value }))}
+                  placeholder="e.g. 30"
+                  style={inputStyle}
+                  onFocus={e => e.target.style.borderColor = '#00844d'}
+                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                />
+                <p style={{ color: '#64748b', fontSize: '0.65rem', marginTop: '4px' }}>How often a new slot starts (e.g. 30 = slots start at 12:00, 12:30, etc.)</p>
+              </div>
+            </div>
+
+            {/* Morning / Evening Pricing */}
+            <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '1.25rem', border: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
+                <span style={{ color: '#d97706', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Morning / Evening Rates</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label style={labelStyle}>☀️ Morning Rate (₹) — 7 AM to 7 PM</label>
+                  <input type="number" value={form.morning_price} onChange={e => setForm(p => ({ ...p, morning_price: e.target.value }))}
+                    placeholder="e.g. 500"
+                    style={inputStyle}
+                    onFocus={e => e.target.style.borderColor = '#f59e0b'}
+                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  />
+                </div>
+                <div>
+                  <label style={labelStyle}>🌙 Evening Rate (₹) — 7 PM to 7 AM</label>
+                  <input type="number" value={form.evening_price} onChange={e => setForm(p => ({ ...p, evening_price: e.target.value }))}
+                    placeholder="e.g. 800"
+                    style={inputStyle}
+                    onFocus={e => e.target.style.borderColor = '#6366f1'}
+                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  />
+                </div>
+              </div>
+              <p style={{ color: '#64748b', fontSize: '0.7rem', margin: '0.75rem 0 0', fontWeight: 600 }}>These override base price based on time of day (shown as Morning / Evening tabs in booking UI)</p>
             </div>
 
             {/* Weekend Pricing */}
@@ -197,6 +246,8 @@ const PricingManagement = () => {
               </div>
               <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
                 <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Base</div><div style={{ color: '#00844d', fontWeight: 800, fontSize: '1rem' }}>₹{selectedTurf.price_per_hour}/slot</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Morning</div><div style={{ color: '#d97706', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing?.morning?.price ? `₹${selectedTurf.pricing.morning.price}/slot` : '—'}</div></div>
+                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Evening</div><div style={{ color: '#6366f1', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing?.evening?.price ? `₹${selectedTurf.pricing.evening.price}/slot` : '—'}</div></div>
                 <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Weekend</div><div style={{ color: '#2563eb', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.weekend_price ? `₹${selectedTurf.pricing_overrides.weekend_price}/slot` : '—'}</div></div>
                 <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Peak Hour</div><div style={{ color: '#d97706', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hour_price ? `₹${selectedTurf.pricing_overrides.peak_hour_price}/slot` : '—'}</div></div>
                 <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Peak Window</div><div style={{ color: '#475569', fontWeight: 700, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hours?.start ? `${selectedTurf.pricing_overrides.peak_hours.start} – ${selectedTurf.pricing_overrides.peak_hours.end}` : '—'}</div></div>

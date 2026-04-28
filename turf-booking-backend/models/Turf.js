@@ -21,8 +21,26 @@ const turfSchema = new mongoose.Schema(
       enum: [30, 60, 90, 120],
       required: true,
     },
+    slot_interval_minutes: {
+      type: Number,
+      default: 30, // Starts a new slot every 30 mins by default
+    },
     price_per_hour: { type: Number, required: true },
     currency: { type: String, default: "INR" },
+
+    // Morning / Evening rate tiers
+    pricing: {
+      morning: {
+        start: { type: String, default: "07:00" }, // HH:MM — start of morning window
+        end:   { type: String, default: "19:00" }, // HH:MM — end of morning window
+        price: { type: Number, default: 500  },
+      },
+      evening: {
+        start: { type: String, default: "19:00" }, // HH:MM — start of evening window
+        end:   { type: String, default: "07:00" }, // HH:MM — wraps midnight
+        price: { type: Number, default: 800  },
+      },
+    },
 
     sports: {
       type: [String],

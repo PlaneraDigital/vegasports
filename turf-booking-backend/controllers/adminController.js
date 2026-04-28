@@ -131,7 +131,7 @@ const addTurf = async (req, res) => {
     const {
       name, slug, turf_type, surface, slot_duration_minutes,
       price_per_hour, sports, location, amenities, images,
-      operating_hours, pricing_overrides, rules, highlights,
+      operating_hours, pricing_overrides, pricing, rules, highlights,
     } = req.body;
 
     if (!name || !slug || !surface || !slot_duration_minutes || !price_per_hour) {
@@ -151,6 +151,10 @@ const addTurf = async (req, res) => {
       surface,
       slot_duration_minutes,
       price_per_hour,
+      pricing: pricing || {
+        morning: { start: "07:00", end: "19:00", price: 500 },
+        evening: { start: "19:00", end: "07:00", price: 800 },
+      },
       sports:           sports           || [],
       location:         location         || {},
       amenities:        amenities        || {},
@@ -183,7 +187,7 @@ const editTurf = async (req, res) => {
     // Update only fields that are sent
     const allowedFields = [
       "name", "turf_type", "surface", "slot_duration_minutes",
-      "price_per_hour", "sports", "location", "amenities",
+      "price_per_hour", "pricing", "sports", "location", "amenities",
       "images", "operating_hours", "pricing_overrides", "rules", "highlights", "status",
     ];
 
@@ -402,40 +406,63 @@ const getAdminSlots = async (req, res) => {
     const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
     const dayName = dayNames[startOfDay.getUTCDay()];
     const schedule = turf.operating_hours ? turf.operating_hours[dayName] : null;
-    const duration = turf.slot_duration_minutes;
+    const duration = turf.slot_duration_minutes || 60;
+    const interval = turf.slot_interval_minutes || 30;
+
+    // Helper: overlap check
+    const isOverlapping = (s1, e1, s2, e2) => {
+      const toMins = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
+      return toMins(s1) < toMins(e2) && toMins(s2) < toMins(e1);
+    };
 
     let finalSlots = [];
 
-    if (schedule && !schedule.is_closed && duration > 0) {
+    if (schedule && !schedule.is_closed) {
       const openStr = (schedule.open || "").trim();
       const closeStr = (schedule.close || "").trim();
       const is24Hours = openStr === "00:00" && closeStr === "00:00";
 
       if (is24Hours || (isValidTime(openStr) && isValidTime(closeStr))) {
         let startMin, endMin;
-        if (is24Hours) {
-          startMin = 0; endMin = 1440;
-        } else {
+        if (is24Hours) { startMin = 0; endMin = 1440; }
+        else {
           const [oH, oM] = openStr.split(":").map(Number);
           const [cH, cM] = closeStr.split(":").map(Number);
           startMin = oH * 60 + oM; endMin = cH * 60 + cM;
           if (endMin <= startMin) endMin += 1440;
         }
 
-        for (let tM = startMin; tM + duration <= endMin; tM += duration) {
+        const ADMIN_MORNING_START = 7 * 60;
+        const ADMIN_MORNING_END   = 19 * 60;
+        const getAdminSlotPrice = (startMins) => {
+          const norm = startMins % 1440;
+          if (norm >= ADMIN_MORNING_START && norm < ADMIN_MORNING_END) {
+            return turf.pricing?.morning?.price ?? turf.price_per_hour;
+          }
+          return turf.pricing?.evening?.price ?? turf.price_per_hour;
+        };
+
+        for (let tM = startMin; tM + duration <= endMin; tM += interval) {
           const sT = formatTime(tM);
-          const existing = slotsFromDb.find(s => s.start_time === sT);
-          if (existing) {
-            finalSlots.push(existing);
+          const eT = formatTime(tM + duration);
+          
+          const exact = slotsFromDb.find(s => s.start_time === sT);
+          const overlap = slotsFromDb.find(booked => 
+            ["booked", "on_hold", "blocked"].includes(booked.status) &&
+            isOverlapping(sT, eT, booked.start_time, booked.end_time)
+          );
+
+          if (exact) {
+            finalSlots.push(exact);
           } else {
             finalSlots.push({
               _id: `temp-${sT}`,
               turf_id,
               date: startOfDay,
               start_time: sT,
-              end_time: formatTime(tM + duration),
-              price: turf.price_per_hour,
-              status: "available",
+              end_time: eT,
+              price: getAdminSlotPrice(tM),
+              status: overlap ? "booked" : "available",
               is_temp: true
             });
           }
@@ -602,6 +629,8 @@ const updatePricing = async (req, res) => {
       peak_hour_price,
       peak_start,
       peak_end,
+      morning_price,
+      evening_price,
     } = req.body;
 
     const turf = await Turf.findById(req.params.id);
@@ -613,6 +642,19 @@ const updatePricing = async (req, res) => {
     if (price_per_hour !== undefined) {
       turf.price_per_hour = price_per_hour;
     }
+
+    // Update morning/evening pricing tiers
+    if (!turf.pricing) turf.pricing = {};
+    if (!turf.pricing.morning) turf.pricing.morning = { start: "07:00", end: "19:00", price: 500 };
+    if (!turf.pricing.evening) turf.pricing.evening = { start: "19:00", end: "07:00", price: 800 };
+
+    if (morning_price !== undefined) {
+      turf.pricing.morning.price = Number(morning_price);
+    }
+    if (evening_price !== undefined) {
+      turf.pricing.evening.price = Number(evening_price);
+    }
+    turf.markModified("pricing"); // tell mongoose nested object changed
 
     // Update pricing overrides
     if (weekend_price !== undefined) {
@@ -634,6 +676,7 @@ const updatePricing = async (req, res) => {
       message: "Pricing updated successfully",
       pricing: {
         price_per_hour:    turf.price_per_hour,
+        pricing:           turf.pricing,
         pricing_overrides: turf.pricing_overrides,
       },
     });
