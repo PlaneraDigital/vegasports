@@ -226,26 +226,62 @@ const updatePricing = async (req, res) => {
 
 const getDashboardStats = async (req, res) => {
   try {
-    const totalBookings = await Booking.countDocuments();
-    const totalUsers = await User.countDocuments({ role: "user" });
-    const totalTurfs = await Turf.countDocuments({ status: "active" });
+    const total_bookings = await Booking.countDocuments();
+    const total_users = await User.countDocuments({ role: "user" });
+    const total_turfs = await Turf.countDocuments({ status: "active" });
+    
     const bookingsByStatus = await Booking.aggregate([ { $group: { _id: "$booking_status", count: { $sum: 1 } } } ]);
-    const revenueResult = await Booking.aggregate([ { $match: { "payment.status": "paid" } }, { $group: { _id: null, total_revenue: { $sum: "$total_amount" } } } ]);
+    const statusMap = { confirmed: 0, pending: 0, completed: 0, cancelled: 0, failed: 0 };
+    bookingsByStatus.forEach((item) => { if (statusMap.hasOwnProperty(item._id)) statusMap[item._id] = item.count; });
+
+    const revenueResult = await Booking.aggregate([ 
+      { $match: { "payment.status": { $in: ["paid", "advance_paid"] } } }, 
+      { $group: { _id: null, total_revenue: { $sum: "$total_amount" } } } 
+    ]);
     const total_revenue = revenueResult[0]?.total_revenue || 0;
+
     const todayStart = new Date(); todayStart.setUTCHours(0, 0, 0, 0);
     const todayEnd = new Date(); todayEnd.setUTCHours(23, 59, 59, 999);
-    const todayBookings = await Booking.countDocuments({ created_at: { $gte: todayStart, $lte: todayEnd } });
-    const todayRevenueResult = await Booking.aggregate([ { $match: { "payment.status": "paid", "payment.paid_at": { $gte: todayStart, $lte: todayEnd } } }, { $group: { _id: null, today_revenue: { $sum: "$total_amount" } } } ]);
+    
+    const today_bookings = await Booking.countDocuments({ created_at: { $gte: todayStart, $lte: todayEnd } });
+    const todayRevenueResult = await Booking.aggregate([ 
+      { $match: { "payment.status": { $in: ["paid", "advance_paid"] }, created_at: { $gte: todayStart, $lte: todayEnd } } }, 
+      { $group: { _id: null, today_revenue: { $sum: "$total_amount" } } } 
+    ]);
     const today_revenue = todayRevenueResult[0]?.today_revenue || 0;
-    const statusMap = {}; bookingsByStatus.forEach((item) => { statusMap[item._id] = item.count; });
-    res.status(200).json({ message: "Dashboard stats fetched successfully", stats: { totalBookings, totalUsers, totalTurfs, total_revenue, todayBookings, today_revenue, bookingsByStatus: statusMap } });
+
+    res.status(200).json({ 
+      message: "Dashboard stats fetched successfully", 
+      stats: { 
+        total_bookings, total_users, total_turfs, total_revenue, 
+        today: { bookings: today_bookings, revenue: today_revenue }, 
+        bookings_by_status: statusMap 
+      } 
+    });
   } catch (error) { res.status(500).json({ message: "Server error", error: error.message }); }
 };
 
-const getRevenueReport = async (req, res) => { res.status(200).json({ message: "Revenue report data" }); };
-const getPeakHoursAnalysis = async (req, res) => { res.status(200).json({ message: "Peak hours data" }); };
-const getTurfRevenueBreakdown = async (req, res) => { res.status(200).json({ message: "Turf breakdown data" }); };
-const getUserAnalytics = async (req, res) => { res.status(200).json({ message: "User analytics data" }); };
+const getRevenueReport = async (req, res) => {
+  try {
+    const revenueData = await Booking.aggregate([
+      { $match: { "payment.status": { $in: ["paid", "advance_paid"] } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$date" } },
+          total_revenue: { $sum: "$total_amount" },
+          total_bookings: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } },
+      { $project: { period: "$_id", total_revenue: 1, total_bookings: 1, _id: 0 } }
+    ]);
+    res.status(200).json({ data: revenueData });
+  } catch (error) { res.status(500).json({ message: "Error fetching report" }); }
+};
+
+const getPeakHoursAnalysis = async (req, res) => { res.status(200).json({ data: [] }); };
+const getTurfRevenueBreakdown = async (req, res) => { res.status(200).json({ data: [] }); };
+const getUserAnalytics = async (req, res) => { res.status(200).json({ data: [] }); };
 
 module.exports = { 
   adminRegister, adminLogin, addTurf, editTurf, deleteTurf, 
