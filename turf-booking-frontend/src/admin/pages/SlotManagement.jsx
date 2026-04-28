@@ -215,7 +215,7 @@ const SlotManagement = () => {
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)' }}
                 >
                   <div style={{ fontSize: '0.8rem', fontWeight: 800, color: s.color }}>{slot.start_time}</div>
-                  <div style={{ fontSize: '0.7rem', color: '#64748b', margin: '0.1rem 0' }}>→ {slot.end_time}</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: s.color, margin: '0.1rem 0' }}>→ {slot.end_time}</div>
                   <div style={{ fontSize: '0.75rem', color: '#0f172a', fontWeight: 800 }}>₹{slot.price}</div>
                   {slot.status === 'blocked' && <Lock size={10} color="#64748b" style={{ marginTop: '0.25rem', display: 'block', margin: '0.25rem auto 0' }} />}
                 </button>

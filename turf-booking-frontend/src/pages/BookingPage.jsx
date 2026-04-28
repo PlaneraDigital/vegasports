@@ -8,8 +8,8 @@ import {
   ChevronRight, XCircle
 } from "lucide-react";
 
-const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-const DAYS_SHORT = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const DAYS_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
 function fmt(t) {
@@ -31,9 +31,9 @@ const isOverlapping = (s1, e1, s2, e2) => {
     return h * 60 + m;
   };
   let start1 = toMins(s1);
-  let end1   = toMins(e1);
+  let end1 = toMins(e1);
   let start2 = toMins(s2);
-  let end2   = toMins(e2);
+  let end2 = toMins(e2);
   if (end1 <= start1 && end1 === 0) end1 = 1440;
   if (end2 <= start2 && end2 === 0) end2 = 1440;
   return start1 < end2 && start2 < end1;
@@ -50,7 +50,7 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
         </div>
         <h2 className="text-2xl font-black text-zinc-900 mb-2">Advance Paid!</h2>
         <p className="text-zinc-500 text-sm mb-6">Slot secured at {turf.name}</p>
-        
+
         <div className="bg-red-50 rounded-2xl p-6 text-left mb-6 border border-red-100">
           <p className="text-red-800 font-black text-sm mb-3">🔴 RED CARD: BALANCE DUE</p>
           <div className="space-y-2 text-xs">
@@ -83,7 +83,7 @@ function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
         </div>
         <h2 className="text-2xl font-black text-zinc-900 mb-2">You're Pitch Ready!</h2>
         <p className="text-zinc-500 text-sm mb-6">Full payment confirmed at {turf.name}</p>
-        
+
         <div className="bg-emerald-50 rounded-2xl p-6 text-left mb-8 border border-emerald-100">
           <p className="text-emerald-800 font-black text-sm mb-3">🔵 BLUE CARD: FULL ACCESS</p>
           <div className="space-y-2 text-xs">
@@ -114,8 +114,8 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
     try {
       const slot_ids = selectedSlots.map(s => s._id);
       const d = new Date(selectedSlots[0].date);
-      const date = `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
-      
+      const date = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+
       const bRes = await api.post("/api/bookings", { turf_id: turf._id, date, slot_ids });
       const booking_id = bRes.data.booking_id;
 
@@ -179,16 +179,16 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-3">
-             <button onClick={() => setPayType("advance")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'advance' ? 'border-red-500 bg-red-50' : 'border-zinc-100 bg-white hover:border-zinc-200'}`}>
-                <Wallet size={18} className={payType === 'advance' ? 'text-red-500' : 'text-zinc-400'} />
-                <span className="text-[11px] font-black uppercase">Advance</span>
-                <span className="text-xs font-bold text-zinc-900">₹200</span>
-             </button>
-             <button onClick={() => setPayType("full")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'full' ? 'border-emerald-500 bg-emerald-50' : 'border-zinc-100 bg-white hover:border-zinc-200'}`}>
-                <CreditCard size={18} className={payType === 'full' ? 'text-emerald-500' : 'text-zinc-400'} />
-                <span className="text-[11px] font-black uppercase">Full Pay</span>
-                <span className="text-xs font-bold text-zinc-900">₹{total}</span>
-             </button>
+            <button onClick={() => setPayType("advance")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'advance' ? 'border-red-500 bg-red-50' : 'border-zinc-100 bg-white hover:border-zinc-200'}`}>
+              <Wallet size={18} className={payType === 'advance' ? 'text-red-500' : 'text-zinc-400'} />
+              <span className="text-[11px] font-black uppercase">Advance</span>
+              <span className="text-xs font-bold text-zinc-900">₹200</span>
+            </button>
+            <button onClick={() => setPayType("full")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'full' ? 'border-emerald-500 bg-emerald-50' : 'border-zinc-100 bg-white hover:border-zinc-200'}`}>
+              <CreditCard size={18} className={payType === 'full' ? 'text-emerald-500' : 'text-zinc-400'} />
+              <span className="text-[11px] font-black uppercase">Full Pay</span>
+              <span className="text-xs font-bold text-zinc-900">₹{total}</span>
+            </button>
           </div>
         </div>
 
@@ -222,7 +222,7 @@ export default function BookingPage() {
   const [selectedSlots, setSelectedSlots] = useState([]);
   const [activeTab, setActiveTab] = useState("morning");
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
-  
+
   // Success states
   const [advanceResult, setAdvanceResult] = useState(null);
   const [fullResult, setFullResult] = useState(null);
@@ -256,7 +256,7 @@ export default function BookingPage() {
     const fetchSlots = async () => {
       setLoadingSlots(true);
       try {
-        const dStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth()+1).padStart(2,'0')}-${String(selectedDate.getDate()).padStart(2,'0')}`;
+        const dStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
         const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dStr}`);
         setSlots(res.data.slots || []);
       } catch (err) { console.error(err); }
@@ -267,7 +267,7 @@ export default function BookingPage() {
 
   if (loading) return <div className="min-h-screen bg-zinc-50 flex items-center justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>;
   if (advanceResult) return <RedCardScreen advanceResult={advanceResult} turf={turf} onGoTicket={() => navigate(`/ticket/${confirmedId}`)} onGoHome={() => navigate("/")} />;
-  if (fullResult) return <BlueCardScreen booking={{...fullResult, start_time: selectedSlots[0].start_time, end_time: selectedSlots[selectedSlots.length-1].end_time}} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
+  if (fullResult) return <BlueCardScreen booking={{ ...fullResult, start_time: selectedSlots[0].start_time, end_time: selectedSlots[selectedSlots.length - 1].end_time }} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
 
   const toggleSlot = (slot) => {
     if (selectedSlots.some(s => s._id === slot._id)) {
@@ -297,7 +297,7 @@ export default function BookingPage() {
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-zinc-900 transition-colors mb-10">
           <ArrowLeft size={16} /> Back
         </button>
-        
+
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="text-3xl font-black mb-1">Reserve your slot</h1>
@@ -359,7 +359,7 @@ export default function BookingPage() {
                   const isBooked = ["booked", "on_hold", "blocked"].includes(slot.status);
                   const isSel = selectedSlots.some(s => s._id === slot._id);
                   const isBlockedBySelection = selectedSlots.some(s => s._id !== slot._id && isOverlapping(s.start_time, s.end_time, slot.start_time, slot.end_time));
-                  
+
                   return (
                     <button key={slot._id} disabled={isBooked || (isBlockedBySelection && !isSel)} onClick={() => toggleSlot(slot)}
                       className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-zinc-900 border-zinc-900 text-white shadow-xl scale-[1.02]' : isBooked || (isBlockedBySelection && !isSel) ? 'bg-zinc-50 border-zinc-50 text-zinc-200 cursor-not-allowed grayscale' : 'bg-white border-zinc-100 text-zinc-900 hover:border-zinc-900 hover:shadow-lg'}`}>
