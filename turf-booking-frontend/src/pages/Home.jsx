@@ -8,12 +8,7 @@ import Card from '../components/Card'
 import LocationMap from '../components/LocationMap'
 
 
-const steps = [
-  { icon: "🔍", title: "Find a Turf", desc: "Search by sport, city or area" },
-  { icon: "📅", title: "Pick a Slot", desc: "Real-time availability, no guessing" },
-  { icon: "💳", title: "Pay Securely", desc: "Instant confirmation via Razorpay" },
-  { icon: "⚽", title: "Play & Enjoy", desc: "Show up and play, zero hassle" },
-]
+
 
 const fade = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } }
 
@@ -66,6 +61,17 @@ function Home() {
             <button onClick={goToBooking} className="btn-glow flex items-center gap-2 mx-auto">
               Book Your Slot Now <Search size={18} />
             </button>
+            <a 
+              href="https://www.instagram.com/_infinity_turf" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hero-follow-btn"
+            >
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/>
+              </svg>
+              <span>Follow @infinity_turf</span>
+            </a>
           </motion.div>
         </div>
       </section>
@@ -73,38 +79,7 @@ function Home() {
 
       {/* All Turfs */}
       <section className="turfs-section" id="allturfs">
-        <div className="section-header">
-          <div>
-            <div className="section-label">Available Now</div>
-            <h2>All Turfs</h2>
-          </div>
-          <a href="#">View all →</a>
-        </div>
         <Card />
-      </section>
-
-      {/* How It Works */}
-      <section className="how-section">
-        <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-          The easiest way to book turfs
-        </motion.h2>
-        <div className="how-grid">
-          {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              className="how-card"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              
-              <div className="how-icon">{step.icon}</div>
-              <h3>{step.title}</h3>
-              <p>{step.desc}</p>
-            </motion.div>
-          ))}
-        </div>
       </section>
 
       {/* Offers Section */}
@@ -113,14 +88,6 @@ function Home() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="section-header mb-8 text-center">
                <h2 className="text-xl font-black">Exclusive Offers</h2>
-            </div>
-            <div className={`offers-container ${offers.length > 3 ? 'has-many' : 'has-few'}`}>
-              {offers.map((offer, i) => (
-                <div key={i} className="offer-pill">
-                  <span className="offer-crown">🎁 20% OFF</span>
-                  <span className="offer-msg">{offer}</span>
-                </div>
-              ))}
             </div>
           </div>
         </section>

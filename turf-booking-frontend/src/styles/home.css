@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-  padding: 100px 24px 60px;
+  padding: 100px 24px 30px;
   overflow: hidden;
 }
 
@@ -39,7 +39,7 @@
 .hero-content {
   position: relative;
   z-index: 1;
-  max-width: 860px;
+  max-width: 1000px;
   margin-top: 0;
 }
 
@@ -88,6 +88,98 @@
 
 .hero-btn-container {
   margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-btn-container .btn-glow {
+  width: auto;
+  min-width: 200px;
+}
+
+.hero-follow-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: auto;
+  min-width: 220px;
+  padding: 12px 28px;
+  background: #18181b;
+  color: white;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.hero-follow-btn:hover {
+  background: #000;
+  transform: translateY(-2px);
+}
+
+.hero-follow-btn:active {
+  transform: scale(0.98);
+}
+
+/* ── RESPONSIVE ───────────────────────────── */
+@media (max-width: 768px) {
+  .hero {
+    padding: 80px 20px 30px;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+    letter-spacing: -1px;
+  }
+
+  .hero-sub {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  .hero-btn-container {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .hero-btn-container .btn-glow {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .hero-follow-btn {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 70px 16px 24px;
+  }
+
+  .hero h1 {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
+  .hero-sub {
+    font-size: 0.9rem;
+  }
+
+  .hero-btn-container {
+    padding: 0 16px;
+  }
+
+  .hero-follow-btn {
+    padding: 10px 20px;
+    font-size: 0.8rem;
+  }
 }
 
 /* ── FACILITIES ──────────────────────────── */
@@ -148,9 +240,21 @@
 
 /* ── TURFS SECTION ────────────────────────── */
 .turfs-section {
-  padding: 80px 60px;
+  padding: 0px 60px;
   max-width: 1300px;
   margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .turfs-section {
+    padding: 0px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .turfs-section {
+    padding: 0px 16px;
+  }
 }
 
 .section-header {

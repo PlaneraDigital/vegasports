@@ -51,17 +51,7 @@ const LocationMap = () => {
              </div>
           </div>
           
-          <a 
-            href="https://www.instagram.com/_infinity_turf" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="flex items-center gap-3 px-6 py-3 bg-zinc-900 text-white rounded-2xl hover:bg-black transition-all shadow-lg active:scale-95"
-          >
-            <div className="w-6 h-6 flex items-center justify-center">
-              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/></svg>
-            </div>
-            <span className="text-sm font-bold truncate">Follow @infinity_turf</span>
-          </a>
+          
         </div>
       </div>
     </section>
