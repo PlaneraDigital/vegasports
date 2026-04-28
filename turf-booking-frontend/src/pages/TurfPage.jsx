@@ -6,8 +6,9 @@ import {
   MapPin, Star, Clock, IndianRupee, ChevronLeft, ChevronRight,
   Zap, Car, Droplets, ShieldCheck, Utensils, Dumbbell,
   Layers, Tag, CalendarDays, Info, CheckCircle2, XCircle,
-  Shirt, ArrowLeft, Sun, Camera, Plug, Sofa, Leaf, Sparkles,
+  Shirt, ArrowLeft, Sun, Camera, Plug, Sofa, Leaf, Sparkles, Map,
 } from "lucide-react";
+import LocationMap from "../components/LocationMap";
 
 /* ─────────────────────────
    LOOKUP MAPS
@@ -29,19 +30,6 @@ const TURF_TYPE_LABEL = {
 const DAY_ORDER = [
   "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
 ];
-
-const AMENITY_META = {
-  parking: { icon: Car, label: "Parking" },
-  floodlights: { icon: Zap, label: "Floodlights" },
-  shade_for_day_matches: { icon: Sun, label: "Shade for Day Matches" },
-  drinking_water: { icon: Droplets, label: "Drinking Water" },
-  cctv_surveillance: { icon: Camera, label: "CCTV Surveillance" },
-  electricity_24_7: { icon: Plug, label: "24/7 Electricity" },
-  open_24_7: { icon: Clock, label: "24/7 Open" },
-  sitting_area: { icon: Sofa, label: "Sitting Area" },
-  turf_grass: { icon: Leaf, label: "Pro Grade Turf Grass" },
-  clean_environment: { icon: Sparkles, label: "Clean Quality Environment" },
-};
 
 const SPORT_EMOJI = {
   football: "⚽", cricket: "🏏", badminton: "🏸", tennis: "🎾", basketball: "🏀",
@@ -193,31 +181,19 @@ function Divider() {
    AMENITIES GRID
 ────────────────────────── */
 function AmenitiesGrid({ amenities }) {
-  if (!amenities) return null;
-  const all = Object.entries(amenities);
+  if (!amenities || !Array.isArray(amenities) || amenities.length === 0) return null;
 
   return (
     <section>
       <SectionHeading icon={Zap} label="Amenities" />
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-        {all.map(([key, val]) => {
-          const meta = AMENITY_META[key];
-          if (!meta) return null;
-          const Icon = meta.icon;
-          return (
-            <div key={key}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-sm transition-colors ${val
-                  ? "bg-white border-green-200 text-zinc-700 shadow-sm"
-                  : "bg-zinc-50 border-zinc-200 text-zinc-400"
-                }`}>
-              <Icon size={14} className={`flex-shrink-0 ${val ? "text-green-600" : "text-zinc-400"}`} />
-              <span className="flex-1 font-medium">{meta.label}</span>
-              {val
-                ? <CheckCircle2 size={14} className="text-green-500 flex-shrink-0" />
-                : <XCircle size={14} className="text-zinc-300 flex-shrink-0" />}
-            </div>
-          );
-        })}
+        {amenities.map((a, i) => (
+          <div key={i}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-green-200 text-sm bg-white text-zinc-700 shadow-sm transition-colors">
+            <CheckCircle2 size={14} className="flex-shrink-0 text-green-600" />
+            <span className="font-bold tracking-tight">{a}</span>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -339,13 +315,14 @@ function OperatingHours({ hours, pricing_overrides }) {
                   <span className="text-zinc-900 font-black text-[13px]">Evening Rush ({fmt(peak.start)} – {fmt(peak.end)})</span>
                 </div>
                 <p className="text-zinc-500 text-xs font-medium leading-relaxed">
-                  Slots during this window are highly popular. We recommend booking in advance to secure your preferred time.
+                  Slots during this window are highly popular. We recommend booking in advance to secure your preferred time. 
                 </p>
               </div>
             </div>
           )}
           
-          <div>
+          {/* Holiday Policy - Hidden as per request */}
+          {/* <div>
             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Holiday Policy</p>
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center flex-shrink-0">
@@ -358,121 +335,9 @@ function OperatingHours({ hours, pricing_overrides }) {
                 </p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────
-   BOOKING STEPS & LINKS SECTION
-────────────────────────── */
-function BookingStepsLinksSection({ turf }) {
-  const mapLink = "https://www.google.com/maps/place/Infinity+Sports+Turf/@19.4358472,72.7924501,17z/data=!3m1!4b1!4m6!3m5!1s0x3be7ab610f52c693:0x122bc1c9d6a719a5!8m2!3d19.4358472!4d72.7924501!16s%2Fg%2F11z2x6zk3g?entry=ttu&g_ep=EgoyMDI2MDQyMi4wIKXMDSoASAFQAw%3D%3D";
-  
-  return (
-    <section className="mt-10">
-      {/* Booking Steps */}
-      
-      
-      
-      
-      {/* Map Section at Bottom */}
-      <div className="mt-6">
-        <SectionHeading icon={MapPin} label="Location" />
-        <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-200 shadow-sm bg-white">
-          <div className="absolute top-4 right-4 z-10">
-            <a 
-              href={mapLink}
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-zinc-200 rounded-xl text-zinc-900 text-xs font-bold shadow-sm hover:bg-white transition-all"
-            >
-              Open in Maps <ArrowLeft size={14} className="rotate-135" />
-            </a>
-          </div>
-          
-          {/* Map Container */}
-          <div className="w-full h-48 md:h-64 bg-zinc-100">
-            <iframe
-              title="Turf Location"
-              width="100%"
-              height="100%"
-              frameBorder="0"
-              style={{ border: 0 }}
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3765.456789012345!2d72.7924501!3d19.4358472!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ab610f52c693%3A0x122bc1c9d6a719a5!2sInfinity%20Sports%20Turf!5e0!3m2!1sen!2sin!4v1234567890"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-
-        {/* Instagram Link */}
-      <div className="mb-6">
-        <a href="https://www.instagram.com/_infinity_turf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-600 hover:text-zinc-900 transition-colors">
-          <div className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center">
-            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/></svg>
-          </div>
-          <span className="text-sm font-bold">Follow us on Instagram</span>
-        </a>
-      </div>
-        
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────
-   LOCATION & MAP SECTION
-────────────────────────── */
-function LocationSection({ turf }) {
-  // Using the resolved address: Stephen Menezes Marg, Virar West
-  const encodedAddress = encodeURIComponent("Infinity Sports Turf, Virar West, Maharashtra");
-  const mapEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=${encodedAddress}`;
-
-  return (
-    <section className="mt-12">
-      <SectionHeading icon={MapPin} label="Location" />
-      <p className="text-zinc-500 text-sm font-medium mb-5">
-        Exact location will be shared after booking confirmation.
-      </p>
-      
-      <div className="relative w-full rounded-4xl overflow-hidden border border-zinc-200 shadow-sm bg-white p-2">
-        <div className="absolute top-6 left-6 z-10">
-          <a 
-            href="https://maps.app.goo.gl/..." 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 bg-white/90 backdrop-blur-md border border-zinc-200 rounded-xl text-zinc-900 text-xs font-bold shadow-sm hover:bg-white transition-all"
-          >
-            Open in Maps <ArrowLeft size={14} className="rotate-135" />
-          </a>
-        </div>
-        
-        {/* Map Container */}
-        <div className="w-full h-[280 px] md:h-87.5px rounded-3xl overflow-hidden bg-zinc-100">
-          <iframe
-            title="Turf Location"
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            style={{ border: 0 }}
-            src={mapEmbedUrl}
-            allowFullScreen
-          ></iframe>
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-col gap-3">
-         <a href="https://www.instagram.com/_infinity_turf" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-zinc-600 hover:text-zinc-900 transition-colors">
-            <div className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center">
-              <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2A5.75 5.75 0 0 0 2 7.75v8.5A5.75 5.75 0 0 0 7.75 22h8.5A5.75 5.75 0 0 0 22 16.25v-8.5A5.75 5.75 0 0 0 16.25 2h-8.5ZM12 7.25A4.75 4.75 0 1 1 7.25 12 4.75 4.75 0 0 1 12 7.25Zm0 1.5A3.25 3.25 0 1 0 15.25 12 3.25 3.25 0 0 0 12 8.75Zm5.25-.5a1.25 1.25 0 1 1-1.25 1.25 1.25 1.25 0 0 1 1.25-1.25ZM12 9.75A2.25 2.25 0 1 1 9.75 12 2.25 2.25 0 0 1 12 9.75Z"/></svg>
-            </div>
-            <span className="text-sm font-bold">
-              Follow us on Instagram 
-              </span>
-         </a>
       </div>
     </section>
   );
@@ -509,12 +374,6 @@ export default function TurfPage() {
       try {
         const base = import.meta.env.VITE_API_URL || "http://localhost:5001";
         const res = await axios.get(`${base}/api/turfs/${id}`);
-        // Ensure all amenities are set to true for highlighting
-        const updatedAmenities = Object.keys(AMENITY_META).reduce((acc, key) => {
-          acc[key] = true; // Set all amenities to true
-          return acc;
-        }, {});
-        res.data.turf.amenities = updatedAmenities;
         setTurf(res.data.turf);
       } catch (err) {
         setError(err.response?.data?.message || "Could not load turf details.");
@@ -529,11 +388,11 @@ export default function TurfPage() {
   if (error || !turf) return <ErrorScreen message={error} onBack={() => navigate(-1)} />;
 
   const sym = turf.currency === "INR" ? "₹" : (turf.currency || "₹");
-  const activeAmenities = turf.amenities ? Object.values(turf.amenities).filter(Boolean).length : 0;
+  const activeAmenities = turf.amenities ? turf.amenities.length : 0;
   const fullAddress = [turf.location?.address, turf.location?.city, turf.location?.state].filter(Boolean).join(", ");
 
   return (
-    <div className="bg-zinc-50 text-zinc-900 min-h-screen pb-20">
+    <div className="bg-zinc-50 text-zinc-900 min-h-screen pb-0">
 
       {/* ── BACK NAV ── */}
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-6">
@@ -556,23 +415,23 @@ export default function TurfPage() {
           {/* ════ LEFT COLUMN ════ */}
           <div>
             <div className="flex flex-wrap gap-2">
-              {turf.turf_type && (
+              {/* {turf.turf_type && (
                 <span className="bg-green-100 border border-green-200 text-green-700 text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">
                   {TURF_TYPE_LABEL[turf.turf_type] || turf.turf_type}
                 </span>
-              )}
-              {turf.status && (
+              )} */}
+              {/* {turf.status && (
                 <span className={`text-[11px] px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border ${STATUS_STYLE[turf.status] || STATUS_STYLE.inactive}`}>
                   {turf.status.replace(/_/g, " ")}
                 </span>
-              )}
+              )} */}
             </div>
 
-            <h1 className="mt-4 text-3xl md:text-4xl font-black tracking-tight text-zinc-900">
+            {/* <h1 className="mt-4 text-3xl md:text-4xl font-black tracking-tight text-zinc-900">
               {turf.name}
-            </h1>
+            </h1> */}
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            {/* <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
               {fullAddress && (
                 <p className="flex items-center gap-1.5 text-sm font-medium text-zinc-500">
                   <MapPin size={14} className="text-green-600" />
@@ -586,10 +445,10 @@ export default function TurfPage() {
                   <span className="text-zinc-500 text-xs font-bold">({turf.rating.total_reviews})</span>
                 </div>
               )}
-            </div>
+            </div> */}
 
             {/* Quick stats pills */}
-            <div className="mt-6 flex flex-wrap gap-3">
+            {/* <div className="mt-6 flex flex-wrap gap-3">
               <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-4 py-2.5 rounded-xl text-sm">
                 <IndianRupee size={14} className="text-green-400" />
                 <span className="text-zinc-200 font-semibold">{sym}{turf.price_per_hour}</span>
@@ -605,9 +464,9 @@ export default function TurfPage() {
                 <span className="text-zinc-900 font-bold">{turf.slot_duration_minutes} min</span>
                 <span className="text-zinc-500">Slots</span>
               </div>
-            </div>
+            </div> */}
 
-            {turf.sports?.length > 0 && (
+            {/* {turf.sports?.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-2">
                 {turf.sports.map(sport => (
                   <span key={sport} className="flex items-center gap-1.5 bg-white border border-zinc-200 text-zinc-700 text-[11px] font-bold uppercase py-1.5 px-3 rounded-lg shadow-sm">
@@ -615,11 +474,11 @@ export default function TurfPage() {
                   </span>
                 ))}
               </div>
-            )}
+            )} */}
           </div>
 
           {/* ════ RIGHT COLUMN ════ */}
-          <div className="w-full">
+          {/* <div className="w-full">
             <div className="sticky top-24">
               <div className="bg-white border border-zinc-200 rounded-[32px] shadow-xl shadow-zinc-200/50 p-7 relative">
                 <h3 className="text-zinc-900 font-black text-xl mb-2">Ready to play?</h3>
@@ -638,18 +497,18 @@ export default function TurfPage() {
                 </button>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* ── FULL WIDTH SECTIONS ── */}
-        <Divider />
+        {/* <Divider />
         <Highlights highlights={turf.highlights} />
         <AmenitiesGrid amenities={turf.amenities} />
         <Divider />
-        <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} />
+        <OperatingHours hours={turf.operating_hours} pricing_overrides={turf.pricing_overrides} /> */}
         <Divider />
-        <BookingStepsLinksSection turf={turf} />
         <Rules rules={turf.rules} />
+        <LocationMap />
       </div>
 
       {/* ── MOBILE STICKY FOOTER ── */}

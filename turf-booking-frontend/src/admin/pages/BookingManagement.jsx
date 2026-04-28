@@ -11,10 +11,12 @@ const statusStyle = {
 }
 
 const payStyle = {
-  paid:     { color: '#166534', bg: '#ebf9f3', label: 'Paid'    },
-  pending:  { color: '#92400e', bg: '#fffbeb', label: 'Pending' },
-  failed:   { color: '#991b1b', bg: '#fef2f2', label: 'Failed'  },
-  refunded: { color: '#5b21b6', bg: '#f5f3ff', label: 'Refunded'},
+  paid:         { color: '#166534', bg: '#ebf9f3', label: 'Paid'         },
+  advance_paid: { color: '#92400e', bg: '#fffbeb', label: 'Advance Paid' },
+  pending:      { color: '#92400e', bg: '#fffbeb', label: 'Pending'      },
+  failed:       { color: '#991b1b', bg: '#fef2f2', label: 'Failed'       },
+  refunded:     { color: '#5b21b6', bg: '#f5f3ff', label: 'Refunded'     },
+  cancelled:    { color: '#64748b', bg: '#f1f5f9', label: 'N/A'          },
 }
 
 const StatusBadge = ({ status, map }) => {
@@ -75,6 +77,16 @@ const BookingManagement = () => {
       fetchBookings(page)
     } catch (err) { showToast(err?.response?.data?.message || 'Failed to cancel', 'error') }
     finally { setCancelling(false) }
+  }
+
+  const handleMarkFullyPaid = async (booking) => {
+    if (!window.confirm(`Mark booking #${booking._id?.toString().slice(-6).toUpperCase()} as fully paid? This will send the Blue Card email to the customer.`)) return
+    try {
+      await adminApi.post(`/payment/mark-fully-paid/${booking._id}`)
+      showToast('Marked as fully paid. Blue Card email sent! ✅')
+      setDetailBooking(null)
+      fetchBookings(page)
+    } catch (err) { showToast(err?.response?.data?.message || 'Failed to mark paid', 'error') }
   }
 
   const filteredBookings = search
@@ -191,21 +203,33 @@ const BookingManagement = () => {
                       <div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>{b.start_time} – {b.end_time}</div>
                     </td>
                     <td style={{ ...td, color: '#00844d', fontWeight: 800 }}>₹{b.total_amount?.toLocaleString('en-IN')}</td>
-                    <td style={td}><StatusBadge status={b.payment?.status} map={payStyle} /></td>
+                    <td style={td}>
+                      <StatusBadge
+                        status={b.booking_status === 'cancelled' && b.payment?.status === 'pending' ? 'cancelled' : b.payment?.status}
+                        map={payStyle}
+                      />
+                    </td>
                     <td style={td}><StatusBadge status={b.booking_status} map={statusStyle} /></td>
                     <td style={td}>
-                      <div style={{ display: 'flex', gap: '0.4rem' }}>
-                        <button onClick={() => setDetailBooking(b)}
-                          style={{ background: '#eff6ff', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#2563eb', display: 'flex' }} title="View">
-                          <Eye size={14} />
-                        </button>
-                        {['pending', 'confirmed'].includes(b.booking_status) && (
-                          <button onClick={() => setCancelModal(b)}
-                            style={{ background: '#fef2f2', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#dc2626', display: 'flex' }} title="Cancel">
-                            <X size={14} />
+                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <button onClick={() => setDetailBooking(b)}
+                            style={{ background: '#eff6ff', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#2563eb', display: 'flex' }} title="View">
+                            <Eye size={14} />
                           </button>
-                        )}
-                      </div>
+                          {b.payment?.status === 'advance_paid' && (
+                            <button onClick={() => handleMarkFullyPaid(b)}
+                              style={{ background: '#ebf9f3', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '0.35rem 0.6rem', cursor: 'pointer', color: '#166534', fontSize: '0.7rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                              title="Mark Fully Paid">
+                              ✅ Mark Paid
+                            </button>
+                          )}
+                          {['pending', 'confirmed'].includes(b.booking_status) && (
+                            <button onClick={() => setCancelModal(b)}
+                              style={{ background: '#fef2f2', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#dc2626', display: 'flex' }} title="Cancel">
+                              <X size={14} />
+                            </button>
+                          )}
+                        </div>
                     </td>
                   </tr>
                 ))}
@@ -247,6 +271,12 @@ const BookingManagement = () => {
                 </div>
               ))}
             </div>
+            {detailBooking.payment?.status === 'advance_paid' && (
+              <button onClick={() => handleMarkFullyPaid(detailBooking)}
+                style={{ marginTop: '1rem', width: '100%', padding: '0.8rem', borderRadius: '14px', background: '#ebf9f3', border: '1px solid #bbf7d0', color: '#166534', fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                ✅ Mark as Fully Paid (Send Blue Card Email)
+              </button>
+            )}
             {['pending', 'confirmed'].includes(detailBooking.booking_status) && (
               <button onClick={() => { setCancelModal(detailBooking); setDetailBooking(null) }}
                 style={{ marginTop: '1.5rem', width: '100%', padding: '0.8rem', borderRadius: '14px', background: '#fef2f2', border: '1px solid #fee2e2', color: '#dc2626', fontWeight: 800, cursor: 'pointer', fontSize: '0.875rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>

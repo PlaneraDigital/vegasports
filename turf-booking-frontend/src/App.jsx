@@ -11,6 +11,7 @@ import TurfDetails from './pages/TurfDetails'
 import TurfPage from './pages/TurfPage'
 import BookingPage from './pages/BookingPage'
 import ProfilePage from './pages/ProfilePage'
+import TicketPage from './pages/TicketPage'
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 import { AdminAuthProvider } from './admin/context/AdminAuthContext'
@@ -67,6 +68,9 @@ function App() {
             </div>
           }
         />
+
+        {/* ── Immersive standalone Ticket (No Navbar/Footer) ── */}
+        <Route path="/ticket/:id" element={<TicketPage />} />
       </Routes>
     </AdminAuthProvider>
   )

@@ -7,12 +7,6 @@ const SURFACE_OPTIONS = ['artificial_grass', 'natural_grass', 'concrete', 'clay'
 const TYPE_OPTIONS = ['multi-purpose', 'football-only', 'cricket-only', 'badminton-only']
 const DURATION_OPTIONS = [30, 60, 90, 120]
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
-const AMENITY_KEYS = [
-  'floodlights', 'parking', 'washroom', 'changing_room', 'drinking_water',
-  'professional_surface', 'safe_premises', 'equipment_rental', 'cafeteria',
-  'shade_for_day_matches', 'cctv_surveillance', 'electricity_24_7',
-  'open_24_7', 'sitting_area', 'turf_grass', 'clean_environment'
-]
 const IMAGE_LABELS = ['main', 'exterior', 'night-view', 'aerial', 'changing-room']
 
 const labelOf = (k) => k.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
@@ -21,11 +15,12 @@ const defaultForm = () => ({
   name: '', slug: '', turf_type: 'multi-purpose', surface: 'artificial_grass',
   slot_duration_minutes: 60, price_per_hour: '', sports: [],
   location: { address: '', city: '', state: '', pincode: '' },
-  amenities: Object.fromEntries(AMENITY_KEYS.map(k => [k, false])),
+  amenities: [],
   operating_hours: Object.fromEntries(DAYS.map(d => [d, { open: '', close: '', is_closed: false }])),
   pricing_overrides: { weekend_price: '', peak_hour_price: '', peak_hours: { start: '', end: '' } },
   rules: [],
   highlights: [],
+  offers: [],
   images: [],
 })
 
@@ -60,6 +55,8 @@ const TurfForm = ({ turf, onClose, onSave }) => {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [newRule, setNewRule] = useState('')
+  const [newAmenity, setNewAmenity] = useState('')
+  const [newOffer, setNewOffer] = useState('')
   const [newHighlight, setNewHighlight] = useState({ title: '', description: '' })
   const [newImage, setNewImage] = useState({ url: '', label: 'main', is_primary: false })
 
@@ -74,7 +71,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
         price_per_hour: turf.price_per_hour || '',
         sports: turf.sports || [],
         location: { address: turf.location?.address || '', city: turf.location?.city || '', state: turf.location?.state || '', pincode: turf.location?.pincode || '' },
-        amenities: { ...Object.fromEntries(AMENITY_KEYS.map(k => [k, false])), ...(turf.amenities || {}) },
+        amenities: turf.amenities || [],
         operating_hours: turf.operating_hours || Object.fromEntries(DAYS.map(d => [d, { open: '', close: '', is_closed: false }])),
         pricing_overrides: {
           weekend_price: turf.pricing_overrides?.weekend_price || '',
@@ -83,6 +80,7 @@ const TurfForm = ({ turf, onClose, onSave }) => {
         },
         rules: turf.rules || [],
         highlights: turf.highlights || [],
+        offers: turf.offers || [],
         images: turf.images || [],
       })
     }
@@ -256,12 +254,41 @@ const TurfForm = ({ turf, onClose, onSave }) => {
 
           {/* ── Amenities ── */}
           <SectionTitle>Amenities</SectionTitle>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-            {AMENITY_KEYS.map(k => (
-              <label key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem 0.75rem', background: form.amenities[k] ? '#ebf9f3' : '#ffffff', borderRadius: '9px', border: `1px solid ${form.amenities[k] ? '#00844d' : '#e2e8f0'}`, transition: 'all 0.15s' }}>
-                <input type="checkbox" checked={!!form.amenities[k]} onChange={e => set(`amenities.${k}`, e.target.checked)} style={{ accentColor: '#00844d', width: '14px', height: '14px' }} />
-                <span style={{ color: form.amenities[k] ? '#00844d' : '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>{labelOf(k)}</span>
-              </label>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
+            <input value={newAmenity} onChange={e => setNewAmenity(e.target.value)} placeholder="Add an amenity (e.g. Floodlights)..."
+              style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+            <button type="button" onClick={() => { if (newAmenity.trim()) { setForm(p => ({ ...p, amenities: [...p.amenities, newAmenity.trim()] })); setNewAmenity('') } }}
+              style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 0.875rem', color: '#00844d', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
+              +
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {form.amenities.map((a, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#ebf9f3', border: '1px solid #00844d', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
+                <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 700 }}>{a}</span>
+                <button type="button" onClick={() => setForm(p => ({ ...p, amenities: p.amenities.filter((_, j) => j !== i) }))}
+                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>×</button>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Offers ── */}
+          <SectionTitle>Offers</SectionTitle>
+          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <input value={newOffer} onChange={e => setNewOffer(e.target.value)} placeholder="Add an offer heading (e.g. 20% Off weekday moring)..."
+              style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+            <button type="button" onClick={() => { if (newOffer.trim()) { setForm(p => ({ ...p, offers: [...p.offers, newOffer.trim()] })); setNewOffer('') } }}
+              style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 0.875rem', color: '#00844d', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
+              +
+            </button>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+            {form.offers.map((o, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
+                <span style={{ color: '#92400e', fontSize: '0.8rem', fontWeight: 800 }}>🎫 {o}</span>
+                <button type="button" onClick={() => setForm(p => ({ ...p, offers: p.offers.filter((_, j) => j !== i) }))}
+                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.1rem', padding: '0 0.25rem' }}>×</button>
+              </div>
             ))}
           </div>
 

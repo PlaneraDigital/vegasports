@@ -14,11 +14,12 @@ const Footer = () => {
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-6">
           <Link to="/terms_&_conditions" className="hover:text-green-500 transition">
-            Terms & Conditions
+            Cancellation Policy
           </Link>
-          <Link to="/sitemap" className="hover:text-green-500 transition">
+          <a href="https://www.google.com/maps/dir//Infinity+Sports+Turf,+Stephen+Menezes+Marg,+Virar+West,+Virar,+Maharashtra+401303/@19.4358522,72.7100486,12z/data=!4m8!4m7!1m0!1m5!1m1!1s0x3be7ab610f52c693:0x122bc1c9d6a719a5!2m2!1d72.7924501!2d19.4358472?entry=ttu"
+            target="_blank" rel="noopener noreferrer" className="hover:text-green-500 transition">
             Sitemap
-          </Link>
+          </a>
         </div>
       </div>
 

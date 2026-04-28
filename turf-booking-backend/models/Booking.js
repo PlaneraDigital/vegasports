@@ -33,8 +33,13 @@ const bookingSchema = new mongoose.Schema(
     payment: {
       status: {
         type: String,
-        enum: ["pending", "paid", "failed", "refunded"],
+        enum: ["pending", "advance_paid", "paid", "failed", "refunded"],
         default: "pending",
+      },
+      payment_type: {
+        type: String,
+        enum: ["full", "advance"],
+        default: "full",
       },
       transaction_id: { type: String, default: null },
       gateway: {
@@ -42,9 +47,18 @@ const bookingSchema = new mongoose.Schema(
         enum: ["razorpay", "stripe", "paytm", "cashfree"],
         default: "razorpay",
       },
-      paid_at: { type: Date, default: null },
+      paid_at:  { type: Date, default: null },
 
-      // Razorpay specific fields
+      // Advance payment fields
+      advance_amount:     { type: Number, default: 0 },
+      advance_paid_at:    { type: Date, default: null },
+
+      // Balance payment link (Razorpay Payment Link)
+      balance_link_id:    { type: String, default: null },
+      balance_link_url:   { type: String, default: null },
+      balance_paid_at:    { type: Date, default: null },
+
+      // Razorpay specific fields (advance order)
       razorpay_order_id:   { type: String, default: null },
       razorpay_payment_id: { type: String, default: null },
       razorpay_signature:  { type: String, default: null },
@@ -60,8 +74,9 @@ const bookingSchema = new mongoose.Schema(
       cancelled_at: { type: Date,   default: null },
       reason: {
         type: String,
-        enum: ["Changed plans", "Emergency", "Weather", "Other", null],
+        enum: ["Changed plans", "Emergency", "Weather", "Other"],
         default: null,
+        required: false,
       },
       cancelled_by: {
         type: String,

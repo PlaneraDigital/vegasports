@@ -62,7 +62,7 @@ const TurfCard = ({ turf }) => {
             /* Updated Button for Light Theme */
             className="w-full sm:w-auto px-5 py-2 bg-green-600 text-white rounded-lg text-sm sm:text-base font-semibold hover:bg-green-700 transition shadow-sm"
           >
-            Check slots
+            View Photos
           </button>
         </div>
       </div>
