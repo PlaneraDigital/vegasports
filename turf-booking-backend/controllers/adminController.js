@@ -315,10 +315,59 @@ const getPeakHoursAnalysis = async (req, res) => { res.status(200).json({ data: 
 const getTurfRevenueBreakdown = async (req, res) => { res.status(200).json({ data: [] }); };
 const getUserAnalytics = async (req, res) => { res.status(200).json({ data: [] }); };
 
+const getUsersWithStats = async (req, res) => {
+  try {
+    const users = await User.aggregate([
+      { $match: { role: "user" } },
+      {
+        $lookup: {
+          from: "bookings",
+          localField: "_id",
+          foreignField: "user_id",
+          as: "bookings"
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          email: 1,
+          phone: 1,
+          status: 1,
+          created_at: 1,
+          bookingCount: { $size: "$bookings" }
+        }
+      },
+      { $sort: { created_at: -1 } }
+    ]);
+    res.status(200).json({ message: "Users fetched successfully", users });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const toggleUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.status = user.status === "active" ? "suspended" : "active";
+    await user.save();
+
+    res.status(200).json({ 
+      message: `User ${user.status === "active" ? "activated" : "suspended"} successfully`, 
+      user: { id: user._id, status: user.status } 
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = { 
   adminRegister, adminLogin, addTurf, editTurf, deleteTurf, 
   getAdminSlots, generateSlots, updateSlotStatus, updateSlotPrice,
   getAllBookings, getBookingByIdAdmin, cancelBookingAdmin, 
   updatePricing, getDashboardStats, 
-  getRevenueReport, getPeakHoursAnalysis, getTurfRevenueBreakdown, getUserAnalytics 
+  getRevenueReport, getPeakHoursAnalysis, getTurfRevenueBreakdown, getUserAnalytics,
+  getUsersWithStats, toggleUserStatus
 };
