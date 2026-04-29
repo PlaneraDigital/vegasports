@@ -20,6 +20,8 @@ const {
   getPeakHoursAnalysis,
   getTurfRevenueBreakdown,
   getUserAnalytics,
+  getUsersWithStats,
+  toggleUserStatus,
 } = require("../controllers/adminController");
 const { markFullyPaid } = require("../controllers/paymentController");
 const { protect, adminOnly } = require("../middleware/authMiddleware");
@@ -78,6 +80,10 @@ router.get("/bookings",            protect, adminOnly, getAllBookings);
 router.get("/bookings/:id",        protect, adminOnly, getBookingByIdAdmin);
 router.put("/bookings/:id/cancel", protect, adminOnly, cancelBookingAdmin);
 router.post("/payment/mark-fully-paid/:booking_id", protect, adminOnly, markFullyPaid);
+
+// ─── User Management ──────────────────────────────────────────────────────────
+router.get("/users",             protect, adminOnly, getUsersWithStats);
+router.patch("/users/:id/status", protect, adminOnly, toggleUserStatus);
 
 // ─── Dashboard + Reports ──────────────────────────────────────────────────────
 router.get("/dashboard",              protect, adminOnly, getDashboardStats);

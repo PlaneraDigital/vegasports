@@ -19,8 +19,8 @@ const isOverlapping = (s1, e1, s2, e2) => {
   let end1   = toMins(e1);
   let start2 = toMins(s2);
   let end2   = toMins(e2);
-  if (end1 === 0 && start1 > 1200) end1 = 1440;
-  if (end2 === 0 && start2 > 1200) end2 = 1440;
+  if (end1 <= start1) end1 += 1440;
+  if (end2 <= start2) end2 += 1440;
   return start1 < end2 && start2 < end1;
 };
 
@@ -62,7 +62,8 @@ const createBooking = async (req, res) => {
     for (const sid of slot_ids) {
       let slot;
       if (typeof sid === "string" && sid.startsWith("temp-")) {
-        const startTime = sid.replace("temp-", "");
+        const parts = sid.replace("temp-", "").split("|");
+        const startTime = parts.length > 1 ? parts[1] : parts[0];
         const [h, mm] = startTime.split(":").map(Number);
         const startMins = h * 60 + mm;
         const duration = turf.slot_duration_minutes || 60;

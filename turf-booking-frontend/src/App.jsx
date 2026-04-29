@@ -23,6 +23,7 @@ import TurfManagement from './admin/pages/TurfManagement'
 import SlotManagement from './admin/pages/SlotManagement'
 import PricingManagement from './admin/pages/PricingManagement'
 import BookingManagement from './admin/pages/BookingManagement'
+import UserManagement from './admin/pages/UserManagement'
 import Reports from './admin/pages/Reports'
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
           <Route path="slots"     element={<SlotManagement />} />
           <Route path="pricing"   element={<PricingManagement />} />
           <Route path="bookings"  element={<BookingManagement />} />
+          <Route path="users"     element={<UserManagement />} />
           <Route path="reports"   element={<Reports />} />
         </Route>
 

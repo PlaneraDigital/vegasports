@@ -11,6 +11,7 @@ const navItems = [
   { icon: Clock,           label: 'Slots',      to: '/admin/slots'     },
   { icon: DollarSign,      label: 'Pricing',    to: '/admin/pricing'   },
   { icon: CalendarCheck,   label: 'Bookings',   to: '/admin/bookings'  },
+  { icon: ShieldCheck,     label: 'Users',      to: '/admin/users'     },
   { icon: BarChart2,       label: 'Reports',    to: '/admin/reports'   },
 ]
 
