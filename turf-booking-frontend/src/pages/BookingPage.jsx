@@ -12,6 +12,19 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const DAYS_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
 /* ─── Helpers ─────────────────────────────────────────────────────────────── */
+function fmtTime(t) {
+  if (!t) return "";
+  const [h, m] = t.split(":").map(Number);
+  const ap = h >= 12 ? "PM" : "AM";
+  const hours = h % 12 || 12;
+  const mins = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+  return `${hours}${mins} ${ap}`;
+}
+
+function fmtRange(start, end) {
+  return `${fmtTime(start)} - ${fmtTime(end)}`;
+}
+
 function fmt(t) {
   if (!t) return "";
   const [h, m] = t.split(":").map(Number);
@@ -22,7 +35,8 @@ function fmt(t) {
 function isMorningSlot(start_time) {
   if (!start_time) return true;
   const [h] = start_time.split(":").map(Number);
-  return h >= 7 && h < 19;
+  // Morning now starts from 12 AM (0) and goes until 7 PM (19)
+  return h >= 0 && h < 19;
 }
 
 const isOverlapping = (s1, e1, s2, e2) => {
@@ -34,8 +48,8 @@ const isOverlapping = (s1, e1, s2, e2) => {
   let end1 = toMins(e1);
   let start2 = toMins(s2);
   let end2 = toMins(e2);
-  if (end1 <= start1 && end1 === 0) end1 = 1440;
-  if (end2 <= start2 && end2 === 0) end2 = 1440;
+  if (end1 <= start1) end1 += 1440;
+  if (end2 <= start2) end2 += 1440;
   return start1 < end2 && start2 < end1;
 };
 
@@ -259,6 +273,8 @@ export default function BookingPage() {
         const dStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
         const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dStr}`);
         setSlots(res.data.slots || []);
+        // Selection is cleared on date change to avoid confusion
+        setSelectedSlots([]);
       } catch (err) { console.error(err); }
       finally { setLoadingSlots(false); }
     };
@@ -300,7 +316,7 @@ export default function BookingPage() {
 
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-black mb-1">Reserve your slot</h1>
+            <h1 className="text-3xl font-black mb-1">Time slots available</h1>
             <p className="text-zinc-500 font-medium">{turf.name}</p>
           </div>
 
@@ -360,15 +376,23 @@ export default function BookingPage() {
                   const isSel = selectedSlots.some(s => s._id === slot._id);
                   const isBlockedBySelection = selectedSlots.some(s => s._id !== slot._id && isOverlapping(s.start_time, s.end_time, slot.start_time, slot.end_time));
 
+                  // Real-time disabling logic (with 30-min buffer)
+                  const isToday = selectedDate.toDateString() === new Date().toDateString();
+                  const now = new Date();
+                  const currentMins = now.getHours() * 60 + now.getMinutes();
+                  const [sh, sm] = slot.start_time.split(":").map(Number);
+                  const slotMins = sh * 60 + sm;
+                  // Disable if slot has passed OR starts within the next 30 minutes
+                  const isPast = isToday && slotMins < (currentMins + 30);
+
                   return (
-                    <button key={slot._id} disabled={isBooked || (isBlockedBySelection && !isSel)} onClick={() => toggleSlot(slot)}
-                      className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-zinc-900 border-zinc-900 text-white shadow-xl scale-[1.02]' : isBooked || (isBlockedBySelection && !isSel) ? 'bg-zinc-50 border-zinc-50 text-zinc-200 cursor-not-allowed grayscale' : 'bg-white border-zinc-100 text-zinc-900 hover:border-zinc-900 hover:shadow-lg'}`}>
-                      <div className="flex flex-col items-center gap-1">
-                        <Clock size={16} className={isSel ? 'text-zinc-400' : 'text-zinc-300 group-hover:text-zinc-900'} />
-                        <span className="text-lg font-black tracking-tight">{fmt(slot.start_time)}</span>
+                    <button key={slot._id} disabled={isBooked || isPast || (isBlockedBySelection && !isSel)} onClick={() => toggleSlot(slot)}
+                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-zinc-900 border-zinc-900 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-50 border-zinc-50 text-zinc-200 cursor-not-allowed grayscale' : 'bg-white border-zinc-100 text-zinc-900 hover:border-zinc-900 hover:shadow-lg'}`}>
+                      <div className="flex flex-col items-center gap-0.5">
+                        <span className="text-sm font-black tracking-tight whitespace-nowrap">{fmtRange(slot.start_time, slot.end_time)}</span>
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isSel ? 'text-zinc-500' : 'text-zinc-400'}`}>₹{slot.price}</span>
                       </div>
-                      {isBooked && <div className="absolute top-2 right-2"><XCircle size={12} /></div>}
+                      {(isBooked || isPast) && <div className="absolute top-2 right-2"><XCircle size={12} className="text-zinc-200" /></div>}
                     </button>
                   );
                 })}

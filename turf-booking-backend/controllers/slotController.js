@@ -20,12 +20,13 @@ const isOverlapping = (s1, e1, s2, e2) => {
     return h * 60 + m;
   };
   const start1 = toMins(s1);
-  const end1   = toMins(e1);
+  let end1 = toMins(e1);
   const start2 = toMins(s2);
-  const end2   = toMins(e2);
+  let end2 = toMins(e2);
 
-  // Range 1 is [start1, end1], Range 2 is [start2, end2]
-  // Overlap if (start1 < end2) AND (start2 < end1)
+  if (end1 <= start1) end1 += 1440;
+  if (end2 <= start2) end2 += 1440;
+
   return start1 < end2 && start2 < end1;
 };
 
@@ -53,10 +54,26 @@ const getSlotsByTurfAndDate = async (req, res) => {
     const endOfDay   = new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999));
 
     // ── Fetch existing booked/held slots for overlap checking ────────────────
-    const existingBookedSlots = await Slot.find({
+    const prevDay = new Date(startOfDay);
+    prevDay.setUTCDate(prevDay.getUTCDate() - 1);
+
+    const relevantBookings = await Slot.find({
       turf_id,
-      date: { $gte: startOfDay, $lte: endOfDay },
+      $or: [
+        { date: { $gte: startOfDay, $lte: endOfDay } },
+        { date: prevDay } // Fetch previous day to check for midnight crossovers
+      ],
       status: { $in: ["booked", "on_hold", "blocked"] }
+    });
+
+    const existingBookedSlots = relevantBookings.filter(s => s.date.getTime() === startOfDay.getTime());
+    const crossoverBookings = relevantBookings.filter(s => {
+      if (s.date.getTime() !== prevDay.getTime()) return false;
+      const [sh, sm] = s.start_time.split(":").map(Number);
+      const [eh, em] = s.end_time.split(":").map(Number);
+      let emins = eh * 60 + em;
+      if (emins <= sh * 60 + sm) emins += 1440;
+      return emins > 1440; // Ended after midnight
     });
 
     // ── Morning/Evening price helper ──────────────────────────────────────────
@@ -104,21 +121,33 @@ const getSlotsByTurfAndDate = async (req, res) => {
         }
 
         // Loop using INTERVAL (30 mins) but create slots of DURATION (60 mins)
-        for (let tM = startMin; tM + duration <= endMin; tM += interval) {
+        // tM < endMin allows starting a slot at the very last minute of the schedule
+        for (let tM = startMin; tM < endMin; tM += interval) {
           const sT = formatTime(tM);
           const eT = formatTime(tM + duration);
 
-          // Check if this slot overlaps with ANY booked slot
+          // Check if this slot overlaps with ANY booked slot on the same day
           const overlap = existingBookedSlots.find(booked => 
             isOverlapping(sT, eT, booked.start_time, booked.end_time)
           );
+
+          // Check if this slot overlaps with a crossover booking from the previous day
+          const prevDayOverlap = crossoverBookings.find(booked => {
+            const [psh, psm] = booked.start_time.split(":").map(Number);
+            const [peh, pem] = booked.end_time.split(":").map(Number);
+            let pemins = peh * 60 + pem;
+            if (pemins <= psh * 60 + psm) pemins += 1440;
+            const crossoverEndMins = pemins - 1440;
+            // Current slot starts at tM and ends at tM + duration
+            return tM < crossoverEndMins;
+          });
 
           // Find exact match in DB if it exists
           const exact = existingBookedSlots.find(s => s.start_time === sT);
 
           let status = "available";
           let booked_by = null;
-          let _id = `temp-${sT}`;
+          let _id = `temp-${date}|${sT}`;
 
           if (exact) {
             status = exact.status;
@@ -129,7 +158,7 @@ const getSlotsByTurfAndDate = async (req, res) => {
             if (status === "on_hold" && booked_by && req.user && booked_by.toString() === req.user._id.toString()) {
               status = "available";
             }
-          } else if (overlap) {
+          } else if (overlap || prevDayOverlap) {
             // If it overlaps with a booking but isn't the booking itself, mark it as blocked/booked
             status = "booked"; // Or "blocked"
           }

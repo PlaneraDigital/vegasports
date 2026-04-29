@@ -104,7 +104,28 @@ const getAdminSlots = async (req, res) => {
     const endOfDay   = new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999));
     const turf = await Turf.findById(turf_id);
     if (!turf) return res.status(404).json({ message: "Turf not found" });
-    const slotsFromDb = await Slot.find({ turf_id, date: { $gte: startOfDay, $lte: endOfDay } }).sort({ start_time: 1 });
+
+    const prevDay = new Date(startOfDay);
+    prevDay.setUTCDate(prevDay.getUTCDate() - 1);
+
+    const relevantBookings = await Slot.find({
+      turf_id,
+      $or: [
+        { date: { $gte: startOfDay, $lte: endOfDay } },
+        { date: prevDay }
+      ],
+      status: { $in: ["booked", "on_hold", "blocked"] }
+    });
+
+    const slotsFromDb = relevantBookings.filter(s => s.date.getTime() === startOfDay.getTime()).sort((a,b) => a.start_time.localeCompare(b.start_time));
+    const crossoverBookings = relevantBookings.filter(s => {
+      if (s.date.getTime() !== prevDay.getTime()) return false;
+      const [sh, sm] = s.start_time.split(":").map(Number);
+      const [eh, em] = s.end_time.split(":").map(Number);
+      let emins = eh * 60 + em;
+      if (emins <= sh * 60 + sm) emins += 1440;
+      return emins > 1440;
+    });
     const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
     const dayName = dayNames[startOfDay.getUTCDay()];
     const schedule = turf.operating_hours ? turf.operating_hours[dayName] : null;
@@ -112,7 +133,11 @@ const getAdminSlots = async (req, res) => {
     const interval = turf.slot_interval_minutes || 30;
     const isOverlapping = (s1, e1, s2, e2) => {
       const toMins = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
-      return toMins(s1) < toMins(e2) && toMins(s2) < toMins(e1);
+      let start1 = toMins(s1); let end1 = toMins(e1);
+      let start2 = toMins(s2); let end2 = toMins(e2);
+      if (end1 <= start1) end1 += 1440;
+      if (end2 <= start2) end2 += 1440;
+      return start1 < end2 && start2 < end1;
     };
     let finalSlots = [];
     if (schedule && !schedule.is_closed) {
@@ -128,12 +153,19 @@ const getAdminSlots = async (req, res) => {
           if (norm >= 420 && norm < 1140) return turf.pricing?.morning?.price ?? turf.price_per_hour;
           return turf.pricing?.evening?.price ?? turf.price_per_hour;
         };
-        for (let tM = startMin; tM + duration <= endMin; tM += interval) {
+        for (let tM = startMin; tM < endMin; tM += interval) {
           const sT = formatTime(tM); const eT = formatTime(tM + duration);
           const exact = slotsFromDb.find(s => s.start_time === sT);
           const overlap = slotsFromDb.find(booked => ["booked", "on_hold", "blocked"].includes(booked.status) && isOverlapping(sT, eT, booked.start_time, booked.end_time));
+          const prevDayOverlap = crossoverBookings.find(booked => {
+            const [psh, psm] = booked.start_time.split(":").map(Number);
+            const [peh, pem] = booked.end_time.split(":").map(Number);
+            let pemins = peh * 60 + pem;
+            if (pemins <= psh * 60 + psm) pemins += 1440;
+            return tM < (pemins - 1440);
+          });
           if (exact) finalSlots.push(exact);
-          else finalSlots.push({ _id: `temp-${sT}`, turf_id, date: startOfDay, start_time: sT, end_time: eT, price: getAdminSlotPrice(tM), status: overlap ? "booked" : "available", is_temp: true });
+          else finalSlots.push({ _id: `temp-${date}|${sT}`, turf_id, date: startOfDay, start_time: sT, end_time: eT, price: getAdminSlotPrice(tM), status: (overlap || prevDayOverlap) ? "booked" : "available", is_temp: true });
         }
       }
     }
