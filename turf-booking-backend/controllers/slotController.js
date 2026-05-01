@@ -61,9 +61,8 @@ const getSlotsByTurfAndDate = async (req, res) => {
       turf_id,
       $or: [
         { date: { $gte: startOfDay, $lte: endOfDay } },
-        { date: prevDay } // Fetch previous day to check for midnight crossovers
-      ],
-      status: { $in: ["booked", "on_hold", "blocked"] }
+        { date: prevDay }
+      ]
     });
 
     const existingBookedSlots = relevantBookings.filter(s => s.date.getTime() === startOfDay.getTime());
@@ -79,7 +78,13 @@ const getSlotsByTurfAndDate = async (req, res) => {
     // ── Morning/Evening price helper ──────────────────────────────────────────
     const MORNING_START = 7 * 60;
     const MORNING_END   = 19 * 60;
-    const getPriceForSlot = (startMinutes) => {
+    const getPriceForSlot = (startMinutes, sT) => {
+      // 1. Check granular hourly overrides first
+      if (turf.pricing_overrides?.hourly_pricing?.length > 0) {
+        const override = turf.pricing_overrides.hourly_pricing.find(p => p.start_time === sT);
+        if (override) return override.price;
+      }
+
       const normMins = startMinutes % 1440;
       if (normMins >= MORNING_START && normMins < MORNING_END) {
         return turf.pricing?.morning?.price ?? turf.price_per_hour;
@@ -169,7 +174,7 @@ const getSlotsByTurfAndDate = async (req, res) => {
             date: startOfDay,
             start_time: sT,
             end_time: eT,
-            price: getPriceForSlot(tM),
+            price: exact ? exact.price : getPriceForSlot(tM, sT),
             status,
             is_past: isToday && (tM <= nowMinsIST),
             is_temp: !exact
