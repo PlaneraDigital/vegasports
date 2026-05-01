@@ -113,8 +113,7 @@ const getAdminSlots = async (req, res) => {
       $or: [
         { date: { $gte: startOfDay, $lte: endOfDay } },
         { date: prevDay }
-      ],
-      status: { $in: ["booked", "on_hold", "blocked"] }
+      ]
     });
 
     const slotsFromDb = relevantBookings.filter(s => s.date.getTime() === startOfDay.getTime()).sort((a,b) => a.start_time.localeCompare(b.start_time));
@@ -148,7 +147,13 @@ const getAdminSlots = async (req, res) => {
         let startMin, endMin;
         if (is24Hours) { startMin = 0; endMin = 1440; }
         else { const [oH, oM] = openStr.split(":").map(Number); const [cH, cM] = closeStr.split(":").map(Number); startMin = oH * 60 + oM; endMin = cH * 60 + cM; if (endMin <= startMin) endMin += 1440; }
-        const getAdminSlotPrice = (startMins) => {
+        const getAdminSlotPrice = (startMins, sT, eT) => {
+          // 1. Check granular hourly overrides first
+          if (turf.pricing_overrides?.hourly_pricing?.length > 0) {
+            const override = turf.pricing_overrides.hourly_pricing.find(p => p.start_time === sT);
+            if (override) return override.price;
+          }
+
           const norm = startMins % 1440;
           if (norm >= 420 && norm < 1140) return turf.pricing?.morning?.price ?? turf.price_per_hour;
           return turf.pricing?.evening?.price ?? turf.price_per_hour;
@@ -165,7 +170,7 @@ const getAdminSlots = async (req, res) => {
             return tM < (pemins - 1440);
           });
           if (exact) finalSlots.push(exact);
-          else finalSlots.push({ _id: `temp-${date}|${sT}`, turf_id, date: startOfDay, start_time: sT, end_time: eT, price: getAdminSlotPrice(tM), status: (overlap || prevDayOverlap) ? "booked" : "available", is_temp: true });
+          else finalSlots.push({ _id: `temp-${date}|${sT}`, turf_id, date: startOfDay, start_time: sT, end_time: eT, price: getAdminSlotPrice(tM, sT, eT), status: (overlap || prevDayOverlap) ? "booked" : "available", is_temp: true });
         }
       }
     }
@@ -182,18 +187,55 @@ const generateSlots = async (req, res) => {
 
 const updateSlotStatus = async (req, res) => {
   try {
-    const { status } = req.body;
-    await Slot.findByIdAndUpdate(req.params.id, { status });
+    const { status, blocked_reason, turf_id, date, start_time, end_time, price } = req.body;
+    const { id } = req.params;
+
+    if (id.startsWith("temp-")) {
+      await Slot.create({ turf_id, date: new Date(date), start_time, end_time, price, status, blocked_reason });
+      return res.status(200).json({ message: "Slot created and status updated" });
+    }
+
+    await Slot.findByIdAndUpdate(id, { status, blocked_reason });
     res.status(200).json({ message: "Slot status updated" });
-  } catch (error) { res.status(500).json({ message: "Error updating status" }); }
+  } catch (error) { res.status(500).json({ message: "Error updating status", error: error.message }); }
 };
 
 const updateSlotPrice = async (req, res) => {
   try {
-    const { price } = req.body;
-    await Slot.findByIdAndUpdate(req.params.id, { price });
+    const { price, turf_id, date, start_time, end_time, status, applyToAllDays } = req.body;
+    const { id } = req.params;
+
+    if (applyToAllDays) {
+      const turf = await Turf.findById(turf_id);
+      if (!turf) return res.status(404).json({ message: "Turf not found" });
+
+      if (!turf.pricing_overrides) turf.pricing_overrides = {};
+      if (!turf.pricing_overrides.hourly_pricing) turf.pricing_overrides.hourly_pricing = [];
+
+      const existingIndex = turf.pricing_overrides.hourly_pricing.findIndex(p => p.start_time === start_time);
+      if (existingIndex > -1) {
+        turf.pricing_overrides.hourly_pricing[existingIndex].price = Number(price);
+      } else {
+        turf.pricing_overrides.hourly_pricing.push({ start_time, end_time, price: Number(price) });
+      }
+      
+      turf.markModified("pricing_overrides");
+      await turf.save();
+
+      // Update existing available slots for this specific time on other days too
+      await Slot.updateMany({ turf_id, start_time, status: "available" }, { price: Number(price) });
+      
+      return res.status(200).json({ message: "Price updated for all days (granular)" });
+    }
+
+    if (id.startsWith("temp-")) {
+      await Slot.create({ turf_id, date: new Date(date), start_time, end_time, price: Number(price), status: status || "available" });
+      return res.status(200).json({ message: "Slot created and price updated" });
+    }
+
+    await Slot.findByIdAndUpdate(id, { price: Number(price) });
     res.status(200).json({ message: "Slot price updated" });
-  } catch (error) { res.status(500).json({ message: "Error updating price" }); }
+  } catch (error) { res.status(500).json({ message: "Error updating price", error: error.message }); }
 };
 
 // ... Rest of the file (Bookings, Reports, Pricing) remains as before ...

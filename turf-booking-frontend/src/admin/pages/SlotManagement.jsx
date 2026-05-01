@@ -29,6 +29,7 @@ const SlotManagement = () => {
   const [actionSlot, setActionSlot] = useState(null)   // { slot, mode: 'block'|'price' }
   const [blockReason, setBlockReason] = useState('Maintenance')
   const [newPrice, setNewPrice] = useState('')
+  const [applyToAllDays, setApplyToAllDays] = useState(false)
   const [saving, setSaving] = useState(false)
 
   const [toast, setToast] = useState(null)
@@ -72,7 +73,18 @@ const SlotManagement = () => {
     try {
       const slot = actionSlot.slot
       const newStatus = slot.status === 'blocked' ? 'available' : 'blocked'
-      await adminApi.put(`/slots/${slot._id}/status`, { status: newStatus, blocked_reason: blockReason })
+      const payload = { 
+        status: newStatus, 
+        blocked_reason: blockReason,
+        turf_id: selectedTurf,
+        ...(slot._id.startsWith('temp-') ? {
+          date: selectedDate,
+          start_time: slot.start_time,
+          end_time: slot.end_time,
+          price: slot.price
+        } : {})
+      }
+      await adminApi.put(`/slots/${slot._id}/status`, payload)
       showToast(`Slot ${newStatus === 'blocked' ? 'blocked' : 'unblocked'}`)
       setActionSlot(null); fetchSlots()
     } catch (err) { showToast(err?.response?.data?.message || 'Failed', 'error') }
@@ -83,9 +95,21 @@ const SlotManagement = () => {
     if (!newPrice) { showToast('Enter a price', 'error'); return }
     setSaving(true)
     try {
-      await adminApi.put(`/slots/${actionSlot.slot._id}/price`, { price: Number(newPrice) })
+      const slot = actionSlot.slot
+      const payload = { 
+        price: Number(newPrice),
+        applyToAllDays,
+        turf_id: selectedTurf,
+        start_time: slot.start_time,
+        end_time: slot.end_time,
+        ...(slot._id.startsWith('temp-') ? {
+          date: selectedDate,
+          status: slot.status
+        } : {})
+      }
+      await adminApi.put(`/slots/${slot._id}/price`, payload)
       showToast('Price updated!')
-      setActionSlot(null); fetchSlots()
+      setActionSlot(null); setApplyToAllDays(false); fetchSlots()
     } catch (err) { showToast(err?.response?.data?.message || 'Failed', 'error') }
     finally { setSaving(false) }
   }
@@ -277,8 +301,15 @@ const SlotManagement = () => {
                   <input type="number" value={newPrice} onChange={e => setNewPrice(e.target.value)}
                     style={{ width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none', boxSizing: 'border-box' }} />
                 </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
+                  <input type="checkbox" id="allDays" checked={applyToAllDays} onChange={e => setApplyToAllDays(e.target.checked)}
+                    style={{ width: '16px', height: '16px', cursor: 'pointer' }} />
+                  <label htmlFor="allDays" style={{ fontSize: '0.8rem', fontWeight: 600, color: '#475569', cursor: 'pointer' }}>Apply to all future days</label>
+                </div>
+
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  <button onClick={() => setActionSlot(null)} style={{ flex: 1, padding: '0.7rem', borderRadius: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>
+                  <button onClick={() => { setActionSlot(null); setApplyToAllDays(false) }} style={{ flex: 1, padding: '0.7rem', borderRadius: '12px', background: '#f8fafc', border: '1px solid #e2e8f0', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>
                     Cancel
                   </button>
                   <button onClick={handlePriceUpdate} disabled={saving} style={{ flex: 2, padding: '0.7rem', borderRadius: '12px', background: 'linear-gradient(135deg,#00844d,#006b3e)', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, boxShadow: '0 4px 12px rgba(22,163,74,0.2)' }}>

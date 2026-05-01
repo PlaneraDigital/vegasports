@@ -375,12 +375,15 @@ export default function BookingSection({ turf }) {
 
                   return (
                     <button key={slot._id} disabled={isBooked || isPast || (isBlockedBySelection && !isSel)} onClick={() => toggleSlot(slot)}
-                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-zinc-900 border-zinc-900 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-50 border-zinc-50 text-zinc-200 cursor-not-allowed grayscale' : 'bg-white border-zinc-100 text-zinc-900 hover:border-zinc-900 hover:shadow-lg'}`}>
+                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-zinc-900 border-zinc-900 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-50 border-zinc-100 text-zinc-400 cursor-not-allowed' : 'bg-white border-zinc-100 text-zinc-900 hover:border-zinc-900 hover:shadow-lg'}`}>
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-sm font-black tracking-tight whitespace-nowrap">{fmtRange(slot.start_time, slot.end_time)}</span>
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isSel ? 'text-zinc-500' : 'text-zinc-400'}`}>₹{slot.price}</span>
+                        <span className={`text-[9px] font-bold mt-1 ${isSel ? 'text-white/80' : (isBooked || isPast) ? 'text-red-500' : 'text-emerald-500'}`}>
+                          {isBooked || isPast ? "Booked" : "✓ Available"}
+                        </span>
                       </div>
-                      {(isBooked || isPast) && <div className="absolute top-2 right-2"><XCircle size={12} className="text-zinc-200" /></div>}
+
                     </button>
                   );
                 })}
