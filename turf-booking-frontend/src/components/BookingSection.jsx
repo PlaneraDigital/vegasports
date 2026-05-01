@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { api } from "../utils/auth";
 import {
@@ -57,7 +57,7 @@ const isOverlapping = (s1, e1, s2, e2) => {
 function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
   const { balance_due, balance_link_url } = advanceResult;
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-6 text-center">
+    <div className="fixed inset-0 z-[300] bg-zinc-50 overflow-y-auto flex flex-col items-center justify-center p-6 text-center">
       <div className="bg-white border-2 border-red-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
         <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-6">
           <AlertCircle size={40} className="text-red-500" />
@@ -90,7 +90,7 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
 
 function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-6 text-center">
+    <div className="fixed inset-0 z-[300] bg-zinc-50 overflow-y-auto flex flex-col items-center justify-center p-6 text-center">
       <div className="bg-white border-2 border-emerald-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
         <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 size={40} className="text-emerald-500" />
@@ -225,11 +225,11 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
 }
 
 /* ─── Main Page ──────────────────────────────────────────────────────────── */
-export default function BookingPage() {
-  const { id } = useParams();
+export default function BookingSection({ turf }) {
+  
   const navigate = useNavigate();
-  const [turf, setTurf] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  
   const [slots, setSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -254,16 +254,7 @@ export default function BookingPage() {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  useEffect(() => {
-    const fetchTurf = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/turfs/${id}`);
-        setTurf(res.data.turf);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    };
-    fetchTurf();
-  }, [id]);
+  
 
   useEffect(() => {
     if (!turf) return;
@@ -281,8 +272,7 @@ export default function BookingPage() {
     fetchSlots();
   }, [selectedDate, turf]);
 
-  if (loading) return <div className="min-h-screen bg-zinc-50 flex items-center justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>;
-  if (advanceResult) return <RedCardScreen advanceResult={advanceResult} turf={turf} onGoTicket={() => navigate(`/ticket/${confirmedId}`)} onGoHome={() => navigate("/")} />;
+    if (advanceResult) return <RedCardScreen advanceResult={advanceResult} turf={turf} onGoTicket={() => navigate(`/ticket/${confirmedId}`)} onGoHome={() => navigate("/")} />;
   if (fullResult) return <BlueCardScreen booking={{ ...fullResult, start_time: selectedSlots[0].start_time, end_time: selectedSlots[selectedSlots.length - 1].end_time }} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
 
   const toggleSlot = (slot) => {
@@ -308,11 +298,9 @@ export default function BookingPage() {
   const visibleSlots = activeTab === "morning" ? morningSlots : eveningSlots;
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 pb-20 pt-10">
+    <div className="bg-zinc-50 border border-zinc-200 rounded-[2.5rem] shadow-sm text-zinc-900 pb-20 pt-10 mt-10" id="booking-section">
       <div className="max-w-4xl mx-auto px-6">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-zinc-900 transition-colors mb-10">
-          <ArrowLeft size={16} /> Back
-        </button>
+        
 
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>

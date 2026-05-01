@@ -8,7 +8,7 @@ import {
   Layers, Tag, CalendarDays, Info, CheckCircle2, XCircle,
   Shirt, ArrowLeft, Sun, Camera, Plug, Sofa, Leaf, Sparkles, Map,
 } from "lucide-react";
-import LocationMap from "../components/LocationMap";
+import BookingSection from "../components/BookingSection";
 
 /* ─────────────────────────
    LOOKUP MAPS
@@ -54,6 +54,7 @@ function SkeletonLoader() {
       <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-5">
         <div className="w-full h-[300px] md:h-[460px] bg-zinc-200 rounded-2xl" />
       </div>
+
       <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-8">
         <div className="grid md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] gap-10 lg:gap-14">
           <div className="space-y-5">
@@ -362,93 +363,6 @@ function Rules({ rules }) {
   );
 }
 
-/* ─────────────────────────
-   SLOTS LIST (MOBILE)
-────────────────────────── */
-function SlotsList({ turfId }) {
-  const navigate = useNavigate();
-  const [slots, setSlots] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  useEffect(() => {
-    const fetchSlots = async () => {
-      setLoading(true);
-      try {
-        const dStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
-        const res = await api.get(`/api/slots?turf_id=${turfId}&date=${dStr}`);
-        setSlots(res.data.slots || []);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSlots();
-  }, [selectedDate, turfId]);
-
-  const formatTime = (t) => {
-    if (!t) return "";
-    const [h, m] = t.split(":").map(Number);
-    const ap = h >= 12 ? "PM" : "AM";
-    return `${h % 12 || 12}:${String(m).padStart(2, "0")} ${ap}`;
-  };
-
-  const formatPrice = (price) => {
-    return `₹${price}`;
-  };
-
-  return (
-    <div className="bg-white border-b border-zinc-100 px-5 py-5">
-      <h3 className="text-sm font-bold text-zinc-900 mb-4 flex items-center gap-2">
-        <CalendarDays size={14} className="text-green-600" /> Available Slots
-      </h3>
-
-      {/* Date Selector */}
-      <div className="mb-4 pb-4 border-b border-zinc-100">
-        <input
-          type="date"
-          value={selectedDate.toISOString().split('T')[0]}
-          onChange={(e) => setSelectedDate(new Date(e.target.value))}
-          className="w-full px-3 py-2 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900"
-        />
-      </div>
-
-      {/* Slots Grid */}
-      {loading ? (
-        <div className="text-center py-6">
-          <p className="text-xs text-zinc-500 font-medium">Loading slots...</p>
-        </div>
-      ) : slots.length === 0 ? (
-        <div className="text-center py-6">
-          <p className="text-xs text-zinc-500 font-medium">No slots available for this date</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          {slots.map((slot) => (
-            <div key={slot._id} className="border border-green-200 bg-green-50 rounded-lg p-3 text-center hover:bg-green-100 transition-colors cursor-pointer">
-              <p className="text-xs font-black text-green-700">{formatTime(slot.start_time)}</p>
-              <p className="text-[10px] text-green-600 font-semibold">{formatPrice(slot.price)}</p>
-              <p className={`text-[9px] font-bold mt-1 ${slot.status === 'available' ? 'text-green-600' : 'text-red-600'}`}>
-                {slot.status === 'available' ? '✓ Available' : 'Booked'}
-              </p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* View Full Booking Page Button */}
-      <button
-        onClick={() => navigate(`/turf/${turfId}/book`)}
-        className="w-full mt-4 py-3 bg-green-600 hover:bg-green-700 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
-      >
-        <CalendarDays size={16} />
-        View All Slots & Book
-      </button>
-    </div>
-  );
-}
-
 export default function TurfPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -482,6 +396,7 @@ export default function TurfPage() {
     <div className="bg-white md:bg-zinc-50 text-zinc-900 min-h-screen pb-24 md:pb-0">
 
       {/* ── HERO IMAGE SECTION (MOBILE) ── */}
+      {/* ── HERO IMAGE SECTION (MOBILE) ── */}
       <div className="md:hidden relative">
         <ImageGallery images={turf.images} isMobile={true} />
         
@@ -501,11 +416,11 @@ export default function TurfPage() {
         </button>
       </div>
 
+
       {/* ── DESKTOP IMAGE GALLERY ── */}
       <div className="hidden md:block max-w-6xl mx-auto px-5 sm:px-8 mt-5">
         <ImageGallery images={turf.images} />
       </div>
-
       {/* ── MAIN CONTENT ── */}
       <div className="max-w-6xl mx-auto px-0 md:px-5 sm:px-8 mt-0 md:mt-8">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] gap-0 md:gap-10 lg:gap-14 items-start">
@@ -584,16 +499,7 @@ export default function TurfPage() {
               </div>
             )}
 
-            {/* Card: Gallery */}
-            <div className="bg-white border-b border-zinc-100 px-5 py-5">
-              <h3 className="text-sm font-bold text-zinc-900 mb-3 flex items-center gap-2">
-                <Camera size={14} className="text-green-600" /> Gallery
-              </h3>
-              <ImageGallery images={turf.images} />
-            </div>
 
-            {/* Card: Available Slots */}
-            <SlotsList turfId={turf._id} />
 
             {/* Card: Rules */}
             {turf.rules?.length > 0 && (
@@ -706,7 +612,7 @@ export default function TurfPage() {
 
                 {/* Book Button */}
                 <button
-                  onClick={() => navigate(`/turf/${id}/book`)}
+                  onClick={() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' })}
                   className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-black text-sm uppercase tracking-widest rounded-xl transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                 >
                   <CalendarDays size={18} />
@@ -721,22 +627,14 @@ export default function TurfPage() {
         <div className="hidden md:block">
           <Divider />
           <AmenitiesGrid amenities={turf.amenities} />
-
-          <Divider />
-          <section>
-            <SectionHeading icon={Camera} label="Gallery" />
-            <ImageGallery images={turf.images} />
-          </section>
-
-          
-          
-
           <Divider />
           <Rules rules={turf.rules} />
-          <LocationMap />
         </div>
       </div>      
 
+      <div className="max-w-6xl mx-auto px-0 md:px-5 sm:px-8 mt-4 md:mt-8">
+        <BookingSection turf={turf} />
+      </div>
     </div>
   );
 }
