@@ -165,16 +165,39 @@ const getBookingById = async (req, res) => {
   } catch (error) { res.status(500).json({ message: "Server error", error: error.message }); }
 };
 
+const { processRefund } = require("./paymentController");
+
 const cancelBooking = async (req, res) => {
   try {
     const user_id = req.user._id;
+    const { reason } = req.body;
     const booking = await Booking.findOne({ _id: req.params.id, user_id });
     if (!booking) return res.status(404).json({ message: "Booking not found" });
     if (!["pending", "confirmed"].includes(booking.booking_status)) return res.status(400).json({ message: "Cannot cancel" });
-    await Slot.updateMany({ _id: { $in: booking.slot_ids } }, { $set: { status: "available", booked_by: null } });
+    
+    // Free slots
+    await Slot.updateMany({ _id: { $in: booking.slot_ids } }, { $set: { status: "available", booked_by: null, held_until: null, booking_id: null } });
+    
+    const isPaid = ["paid", "advance_paid"].includes(booking.payment.status);
+    const refund_amount = isPaid ? (booking.payment.status === "paid" ? booking.total_amount : booking.payment.advance_amount) : 0;
+    
     booking.booking_status = "cancelled";
+    booking.cancellation = {
+      cancelled_at: new Date(),
+      reason: reason || "Changed plans",
+      cancelled_by: "user",
+      refund_amount,
+      refund_status: isPaid ? "pending" : "na"
+    };
+    
     await booking.save();
-    res.status(200).json({ message: "Booking cancelled" });
+
+    // Trigger automatic refund if paid
+    if (isPaid) {
+      await processRefund(booking);
+    }
+
+    res.status(200).json({ message: "Booking cancelled successfully", refund_amount, refund_status: booking.cancellation.refund_status });
   } catch (error) { res.status(500).json({ message: "Server error", error: error.message }); }
 };
 

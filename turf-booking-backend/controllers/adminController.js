@@ -263,19 +263,38 @@ const getBookingByIdAdmin = async (req, res) => {
   } catch (error) { res.status(500).json({ message: "Server error", error: error.message }); }
 };
 
+const { processRefund } = require("./paymentController");
+
 const cancelBookingAdmin = async (req, res) => {
   try {
     const { reason } = req.body;
     const booking = await Booking.findById(req.params.id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
     if (!["pending", "confirmed"].includes(booking.booking_status)) return res.status(400).json({ message: `Cannot cancel booking with status: ${booking.booking_status}` });
+    
+    // Free slots
     await Slot.updateMany({ _id: { $in: booking.slot_ids } }, { $set: { status: "available", booked_by: null, held_until: null, booking_id: null } });
-    const refund_amount = booking.payment.status === "paid" ? booking.total_amount : 0;
-    const refund_status = booking.payment.status === "paid" ? "pending" : "na";
+    
+    const isPaid = ["paid", "advance_paid"].includes(booking.payment.status);
+    const refund_amount = isPaid ? (booking.payment.status === "paid" ? booking.total_amount : booking.payment.advance_amount) : 0;
+    const refund_status = isPaid ? "pending" : "na";
+    
     booking.booking_status = "cancelled";
-    booking.cancellation = { cancelled_at: new Date(), reason: reason || "Other", cancelled_by: "admin", refund_amount, refund_status };
+    booking.cancellation = { 
+      cancelled_at: new Date(), 
+      reason: reason || "Other", 
+      cancelled_by: "admin", 
+      refund_amount, 
+      refund_status 
+    };
     await booking.save();
-    res.status(200).json({ message: "Booking cancelled by admin successfully", booking_id: booking._id, refund_amount, refund_status });
+
+    // Trigger automatic refund if paid
+    if (isPaid) {
+      await processRefund(booking);
+    }
+
+    res.status(200).json({ message: "Booking cancelled by admin successfully", booking_id: booking._id, refund_amount, refund_status: booking.cancellation.refund_status });
   } catch (error) { res.status(500).json({ message: "Server error", error: error.message }); }
 };
 
