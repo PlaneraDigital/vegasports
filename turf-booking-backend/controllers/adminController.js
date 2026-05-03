@@ -295,11 +295,24 @@ const getDashboardStats = async (req, res) => {
 
 const getRevenueReport = async (req, res) => {
   try {
+    const { period = "monthly", year = new Date().getFullYear(), turf_id } = req.query;
+    const match = { "payment.status": { $in: ["paid", "advance_paid"] } };
+    
+    if (turf_id) {
+      match.turf_id = new mongoose.Types.ObjectId(turf_id);
+    }
+
+    const startOfYear = new Date(`${year}-01-01`);
+    const endOfYear = new Date(`${year}-12-31T23:59:59.999Z`);
+    match.date = { $gte: startOfYear, $lte: endOfYear };
+
+    const format = period === "daily" ? "%Y-%m-%d" : "%Y-%m";
+    
     const revenueData = await Booking.aggregate([
-      { $match: { "payment.status": { $in: ["paid", "advance_paid"] } } },
+      { $match: match },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m", date: "$date" } },
+          _id: { $dateToString: { format, date: "$date" } },
           total_revenue: { $sum: "$total_amount" },
           total_bookings: { $sum: 1 }
         }
@@ -307,13 +320,129 @@ const getRevenueReport = async (req, res) => {
       { $sort: { "_id": 1 } },
       { $project: { period: "$_id", total_revenue: 1, total_bookings: 1, _id: 0 } }
     ]);
-    res.status(200).json({ data: revenueData });
-  } catch (error) { res.status(500).json({ message: "Error fetching report" }); }
+
+    const total_revenue = revenueData.reduce((acc, curr) => acc + curr.total_revenue, 0);
+
+    res.status(200).json({ 
+      total_revenue,
+      data: revenueData 
+    });
+  } catch (error) { 
+    res.status(500).json({ message: "Error fetching revenue report", error: error.message }); 
+  }
 };
 
-const getPeakHoursAnalysis = async (req, res) => { res.status(200).json({ data: [] }); };
-const getTurfRevenueBreakdown = async (req, res) => { res.status(200).json({ data: [] }); };
-const getUserAnalytics = async (req, res) => { res.status(200).json({ data: [] }); };
+const getPeakHoursAnalysis = async (req, res) => { 
+  try {
+    const { turf_id } = req.query;
+    const match = { booking_status: { $in: ["confirmed", "completed"] } };
+    if (turf_id) match.turf_id = new mongoose.Types.ObjectId(turf_id);
+
+    const peakHours = await Booking.aggregate([
+      { $match: match },
+      { $group: { _id: "$start_time", total_bookings: { $sum: 1 } } },
+      { $sort: { total_bookings: -1 } },
+      { $project: { start_time: "$_id", total_bookings: 1, _id: 0 } }
+    ]);
+
+    res.status(200).json({ peak_hours: peakHours });
+  } catch (error) {
+    res.status(500).json({ message: "Error analyzing peak hours", error: error.message });
+  }
+};
+
+const getTurfRevenueBreakdown = async (req, res) => { 
+  try {
+    const breakdown = await Booking.aggregate([
+      { $match: { "payment.status": { $in: ["paid", "advance_paid"] } } },
+      {
+        $group: {
+          _id: "$turf_id",
+          total_revenue: { $sum: "$total_amount" },
+          total_bookings: { $sum: 1 }
+        }
+      },
+      {
+        $lookup: {
+          from: "turfs",
+          localField: "_id",
+          foreignField: "_id",
+          as: "turf_info"
+        }
+      },
+      { $unwind: "$turf_info" },
+      { $sort: { total_revenue: -1 } },
+      {
+        $project: {
+          turf_name: "$turf_info.name",
+          total_revenue: 1,
+          total_bookings: 1,
+          _id: 0
+        }
+      }
+    ]);
+    res.status(200).json({ data: breakdown });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching turf breakdown", error: error.message });
+  }
+};
+
+const getUserAnalytics = async (req, res) => { 
+  try {
+    const total_users = await User.countDocuments({ role: "user" });
+    const active_users = await Booking.distinct("user_id").then(ids => ids.length);
+    
+    // Users who registered in current month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const new_users = await User.countDocuments({ 
+      role: "user", 
+      created_at: { $gte: startOfMonth } 
+    });
+
+    const topUsers = await Booking.aggregate([
+      { $match: { booking_status: { $in: ["confirmed", "completed"] } } },
+      {
+        $group: {
+          _id: "$user_id",
+          total_bookings: { $sum: 1 },
+          total_spent: { $sum: "$total_amount" }
+        }
+      },
+      { $sort: { total_bookings: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "_id",
+          foreignField: "_id",
+          as: "user_info"
+        }
+      },
+      { $unwind: "$user_info" },
+      {
+        $project: {
+          name: "$user_info.name",
+          email: "$user_info.email",
+          total_bookings: 1,
+          total_spent: 1,
+          _id: 0
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      analytics: {
+        total_users,
+        active_users,
+        new_users_this_month: new_users,
+        top_users_by_bookings: topUsers
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user analytics", error: error.message });
+  }
+};
 
 const getUsersWithStats = async (req, res) => {
   try {
