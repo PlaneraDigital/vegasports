@@ -5,8 +5,13 @@ function Footer() {
   return (
     <footer className="footer">
       <div className="footer__grid">
-        <div>
-          <h3 className="footer__brand brand-wordmark">Infinity Sports Turf</h3>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden border border-zinc-800">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
+            </div>
+            <h3 className="footer__brand brand-wordmark text-2xl">Infinity Sports Turf</h3>
+          </div>
           <p className="footer__text">Your premier destination for sports turf bookings.</p>
         </div>
         <div>

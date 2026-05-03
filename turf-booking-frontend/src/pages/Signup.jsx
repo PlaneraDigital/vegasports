@@ -85,12 +85,15 @@ const Signup = () => {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl font-black" style={{ color: '#4ade80' }}>
-            <span style={{ color: '#f4f4f5' }}>Infinity</span> Sports Turf
+          <Link to="/" className="flex flex-col items-center gap-2 group">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-500/20 group-hover:border-emerald-500 transition-all duration-500 shadow-xl">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
+            </div>
+            <span className="text-2xl font-black mt-2" style={{ color: '#f4f4f5' }}>
+              Infinity <span style={{ color: '#4ade80' }}>Turf</span>
+            </span>
           </Link>
-          <p className="text-zinc-500 text-sm mt-2">
-            Create your account and start booking.
-          </p>
+          <p className="text-zinc-500 text-sm mt-2">Create your account and start booking.</p>
         </div>
 
         {/* Card */}

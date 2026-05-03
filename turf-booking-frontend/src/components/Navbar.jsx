@@ -33,10 +33,18 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-6 py-4 md:py-2 flex justify-between items-center">
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 text-2xl font-bold cursor-pointer group"
-          style={{ color: '#4ade80' }}>
-          <IoFootballSharp className="transition duration-700 group-hover:rotate-180" />
-          <span className="brand-wordmark text-zinc-100">Infinity <span style={{ color: '#4ade80' }}>Sports Turf</span></span>
+        <Link to="/" className="flex items-center gap-3 cursor-pointer group">
+          <div className="relative w-10 h-10 overflow-hidden rounded-full border-2 border-emerald-500/20 group-hover:border-emerald-500 transition-all duration-500">
+            <img 
+              src="/logo.png" 
+              alt="Infinity Sports Turf" 
+              className="w-full h-full object-cover scale-110" 
+              style={{ filter: 'brightness(1.1)' }}
+            />
+          </div>
+          <span className="brand-wordmark text-zinc-100 text-xl font-black tracking-tight">
+            Infinity <span style={{ color: '#4ade80' }}>Turf</span>
+          </span>
         </Link>
 
         {/* Desktop Links */}
