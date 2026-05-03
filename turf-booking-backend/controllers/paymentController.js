@@ -391,4 +391,44 @@ const markFullyPaid = async (req, res) => {
   }
 };
 
-module.exports = { createOrder, verifyPayment, createAdvanceOrder, verifyAdvancePayment, balanceWebhook, markFullyPaid };
+// ─── Refund Logic (Internal Helper) ──────────────────────────────────────────
+const processRefund = async (booking) => {
+  try {
+    const paymentIds = new Set();
+    if (booking.payment.razorpay_payment_id) paymentIds.add(booking.payment.razorpay_payment_id);
+    if (booking.payment.transaction_id) paymentIds.add(booking.payment.transaction_id);
+
+    if (paymentIds.size === 0) return { status: "na", message: "No payments to refund" };
+
+    const refundResults = [];
+    for (const pid of paymentIds) {
+      try {
+        const refund = await razorpay.payments.refund(pid, {
+          notes: { 
+            booking_id: booking._id.toString(), 
+            reason: booking.cancellation?.reason || "Booking Cancelled" 
+          }
+        });
+        refundResults.push(refund.id);
+      } catch (err) {
+        console.error(`Refund failed for payment ${pid}:`, err.message);
+      }
+    }
+
+    if (refundResults.length > 0) {
+      booking.cancellation.refund_status = "processed";
+      booking.cancellation.refund_ids = (booking.cancellation.refund_ids || []).concat(refundResults);
+      await booking.save();
+      return { status: "processed", refund_ids: refundResults };
+    }
+
+    booking.cancellation.refund_status = "failed";
+    await booking.save();
+    return { status: "failed", message: "Refund initiation failed for all payments" };
+  } catch (error) {
+    console.error("processRefund error:", error.message);
+    return { status: "failed", error: error.message };
+  }
+};
+
+module.exports = { createOrder, verifyPayment, createAdvanceOrder, verifyAdvancePayment, balanceWebhook, markFullyPaid, processRefund };

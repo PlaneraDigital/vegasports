@@ -86,9 +86,10 @@ const bookingSchema = new mongoose.Schema(
       refund_amount: { type: Number, default: 0 },
       refund_status: {
         type: String,
-        enum: ["pending", "processed", "na"],
+        enum: ["pending", "processed", "failed", "na"],
         default: "na",
       },
+      refund_ids: [{ type: String }],
     },
   },
   { timestamps: { createdAt: "created_at" } }

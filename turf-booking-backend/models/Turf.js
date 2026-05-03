@@ -89,6 +89,13 @@ const turfSchema = new mongoose.Schema(
         start: { type: String, default: null },
         end: { type: String, default: null },
       },
+      hourly_pricing: [
+        {
+          start_time: { type: String, required: true },
+          end_time: { type: String, required: true },
+          price: { type: Number, required: true }
+        }
+      ]
     },
 
     rules: [{ type: String }],

@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { api } from "../utils/auth";
 import {
   ShieldCheck, ArrowLeft, CheckCircle2, AlertCircle, Loader2, CalendarDays,
@@ -35,7 +34,6 @@ function fmt(t) {
 function isMorningSlot(start_time) {
   if (!start_time) return true;
   const [h] = start_time.split(":").map(Number);
-  // Morning now starts from 12 AM (0) and goes until 7 PM (19)
   return h >= 0 && h < 19;
 }
 
@@ -53,12 +51,12 @@ const isOverlapping = (s1, e1, s2, e2) => {
   return start1 < end2 && start2 < end1;
 };
 
-/* ─── Success Screens (Red Card / Blue Card) ────────────────────────────────── */
+/* ─── Success Screens ─────────────────────────────────────────────────────── */
 function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
   const { balance_due, balance_link_url } = advanceResult;
   return (
-    <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-zinc-800 border-2 border-red-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
+    <div className="fixed inset-0 z-[300] bg-zinc-950 overflow-y-auto flex flex-col items-center justify-center p-6 text-center">
+      <div className="bg-zinc-900 border-2 border-red-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
         <div className="w-20 h-20 rounded-full bg-red-900/20 flex items-center justify-center mx-auto mb-6">
           <AlertCircle size={40} className="text-red-500" />
         </div>
@@ -74,15 +72,15 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
         </div>
 
         {balance_link_url && (
-          <div className="mb-6 p-4 bg-zinc-900 rounded-2xl border border-zinc-800">
+          <div className="mb-6 p-4 bg-zinc-950 rounded-2xl border border-zinc-800">
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Scan to pay remaining</p>
             <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(balance_link_url)}`} className="mx-auto rounded-xl border-4 border-white mb-3" alt="QR" />
             <a href={balance_link_url} target="_blank" rel="noreferrer" className="text-blue-400 font-bold text-xs underline">Pay Balance Online ↗</a>
           </div>
         )}
 
-        <button onClick={onGoTicket} className="w-full py-4 bg-zinc-700 text-white font-bold rounded-2xl mb-3">View Ticket</button>
-        <button onClick={onGoHome} className="w-full py-3 text-zinc-500 font-bold text-sm">Return Home</button>
+        <button onClick={onGoTicket} className="w-full py-4 bg-zinc-800 text-white font-bold rounded-2xl mb-3 hover:bg-zinc-700 transition-colors">View Ticket</button>
+        <button onClick={onGoHome} className="w-full py-3 text-zinc-500 font-bold text-sm hover:text-zinc-300">Return Home</button>
       </div>
     </div>
   );
@@ -90,8 +88,8 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
 
 function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
   return (
-    <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-zinc-800 border-2 border-emerald-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
+    <div className="fixed inset-0 z-[300] bg-zinc-950 overflow-y-auto flex flex-col items-center justify-center p-6 text-center">
+      <div className="bg-zinc-900 border-2 border-emerald-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
         <div className="w-20 h-20 rounded-full bg-emerald-900/20 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 size={40} className="text-emerald-500" />
         </div>
@@ -106,8 +104,8 @@ function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
           </div>
         </div>
 
-        <button onClick={onGoTicket} className="w-full py-4 bg-emerald-600 text-white font-bold rounded-2xl mb-3">View Ticket</button>
-        <button onClick={onGoHome} className="w-full py-3 text-zinc-400 font-bold text-sm">Return Home</button>
+        <button onClick={onGoTicket} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl mb-3 hover:bg-emerald-700 transition-all">View Ticket</button>
+        <button onClick={onGoHome} className="w-full py-3 text-zinc-400 font-bold text-sm hover:text-zinc-200">Return Home</button>
       </div>
     </div>
   );
@@ -214,7 +212,7 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
           {err && <p className="mb-4 text-red-500 text-xs font-bold">{err}</p>}
           <div className="flex gap-3">
             <button onClick={onClose} className="flex-1 py-4 text-zinc-500 font-bold hover:text-zinc-100 transition-colors">Cancel</button>
-            <button onClick={handlePay} disabled={booking} className={`flex-[2] py-4 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${payType === 'advance' ? 'bg-red-600 hover:bg-red-700 shadow-red-100' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100'}`}>
+            <button onClick={handlePay} disabled={booking} className={`flex-[2] py-4 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${payType === 'advance' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
               {booking ? <Loader2 size={18} className="animate-spin" /> : "Confirm & Pay"}
             </button>
           </div>
@@ -224,12 +222,9 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
   );
 }
 
-/* ─── Main Page ──────────────────────────────────────────────────────────── */
-export default function BookingPage() {
-  const { id } = useParams();
+/* ─── Main Component ─────────────────────────────────────────────────────── */
+export default function BookingSection({ turf }) {
   const navigate = useNavigate();
-  const [turf, setTurf] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [slots, setSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -255,17 +250,6 @@ export default function BookingPage() {
   }, []);
 
   useEffect(() => {
-    const fetchTurf = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL || "http://localhost:5001"}/api/turfs/${id}`);
-        setTurf(res.data.turf);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    };
-    fetchTurf();
-  }, [id]);
-
-  useEffect(() => {
     if (!turf) return;
     const fetchSlots = async () => {
       setLoadingSlots(true);
@@ -273,7 +257,6 @@ export default function BookingPage() {
         const dStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
         const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dStr}`);
         setSlots(res.data.slots || []);
-        // Selection is cleared on date change to avoid confusion
         setSelectedSlots([]);
       } catch (err) { console.error(err); }
       finally { setLoadingSlots(false); }
@@ -281,9 +264,8 @@ export default function BookingPage() {
     fetchSlots();
   }, [selectedDate, turf]);
 
-  if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>;
   if (advanceResult) return <RedCardScreen advanceResult={advanceResult} turf={turf} onGoTicket={() => navigate(`/ticket/${confirmedId}`)} onGoHome={() => navigate("/")} />;
-  if (fullResult) return <BlueCardScreen booking={{ ...fullResult, start_time: selectedSlots[0].start_time, end_time: selectedSlots[selectedSlots.length - 1].end_time }} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
+  if (fullResult) return <BlueCardScreen booking={{ ...fullResult, start_time: selectedSlots[0]?.start_time, end_time: selectedSlots[selectedSlots.length - 1]?.end_time }} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
 
   const toggleSlot = (slot) => {
     if (selectedSlots.some(s => s._id === slot._id)) {
@@ -308,11 +290,8 @@ export default function BookingPage() {
   const visibleSlots = activeTab === "morning" ? morningSlots : eveningSlots;
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-zinc-100 pb-20 pt-10">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-[2.5rem] shadow-sm text-zinc-100 pb-20 pt-10 mt-10" id="booking-section">
       <div className="max-w-4xl mx-auto px-6">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-500 font-bold text-sm hover:text-zinc-100 transition-colors mb-10">
-          <ArrowLeft size={16} /> Back
-        </button>
 
         <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
@@ -330,12 +309,12 @@ export default function BookingPage() {
                 <div className="flex justify-between items-center mb-4 px-1">
                   <span className="font-black text-sm text-zinc-100">{MONTHS[viewMonth]} {viewYear}</span>
                   <div className="flex gap-1">
-                    <button onClick={prevMonth} disabled={isPrevDisabled} className="p-1 disabled:opacity-20"><ChevronUp size={16} /></button>
-                    <button onClick={nextMonth} className="p-1"><ChevronDown size={16} /></button>
+                    <button onClick={prevMonth} disabled={isPrevDisabled} className="p-1 disabled:opacity-20 text-zinc-400"><ChevronUp size={16} /></button>
+                    <button onClick={nextMonth} className="p-1 text-zinc-400"><ChevronDown size={16} /></button>
                   </div>
                 </div>
                 <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                  {DAYS_SHORT.map(d => <span key={d} className="text-[10px] font-black text-zinc-300 uppercase">{d}</span>)}
+                  {DAYS_SHORT.map(d => <span key={d} className="text-[10px] font-black text-zinc-500 uppercase">{d}</span>)}
                 </div>
                 <div className="grid grid-cols-7 gap-1">
                   {calCells.map((d, i) => {
@@ -345,7 +324,7 @@ export default function BookingPage() {
                     const isSel = dObj.toDateString() === selectedDate.toDateString();
                     return (
                       <button key={i} disabled={isPast} onClick={() => { setSelectedDate(dObj); setCalOpen(false); }}
-                        className={`aspect-square text-xs font-bold rounded-lg transition-all ${isSel ? 'bg-green-600 text-white' : isPast ? 'text-zinc-700 cursor-not-allowed' : 'text-zinc-300 hover:bg-zinc-700'}`}>
+                        className={`aspect-square text-xs font-bold rounded-lg transition-all ${isSel ? 'bg-emerald-600 text-white' : isPast ? 'text-zinc-700 cursor-not-allowed' : 'text-zinc-300 hover:bg-zinc-700'}`}>
                         {d}
                       </button>
                     );
@@ -376,23 +355,23 @@ export default function BookingPage() {
                   const isSel = selectedSlots.some(s => s._id === slot._id);
                   const isBlockedBySelection = selectedSlots.some(s => s._id !== slot._id && isOverlapping(s.start_time, s.end_time, slot.start_time, slot.end_time));
 
-                  // Real-time disabling logic (with 30-min buffer)
                   const isToday = selectedDate.toDateString() === new Date().toDateString();
                   const now = new Date();
                   const currentMins = now.getHours() * 60 + now.getMinutes();
                   const [sh, sm] = slot.start_time.split(":").map(Number);
                   const slotMins = sh * 60 + sm;
-                  // Disable if slot has passed OR starts within the next 30 minutes
                   const isPast = isToday && slotMins < (currentMins + 30);
 
                   return (
                     <button key={slot._id} disabled={isBooked || isPast || (isBlockedBySelection && !isSel)} onClick={() => toggleSlot(slot)}
-                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-green-600 border-green-600 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-800 border-zinc-800 text-zinc-600 cursor-not-allowed grayscale' : 'bg-zinc-700 border-zinc-700 text-zinc-200 hover:border-green-500 hover:shadow-lg'}`}>
+                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-emerald-600 border-emerald-600 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-900 border-zinc-800 text-zinc-700 cursor-not-allowed grayscale' : 'bg-zinc-700 border-zinc-700 text-zinc-200 hover:border-emerald-500 hover:shadow-lg'}`}>
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-sm font-black tracking-tight whitespace-nowrap">{fmtRange(slot.start_time, slot.end_time)}</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isSel ? 'text-zinc-500' : 'text-zinc-400'}`}>₹{slot.price}</span>
+                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isSel ? 'text-zinc-300' : 'text-zinc-400'}`}>₹{slot.price}</span>
+                        <span className={`text-[9px] font-bold mt-1 ${isSel ? 'text-white/80' : (isBooked || isPast) ? 'text-red-500' : 'text-emerald-500'}`}>
+                          {isBooked || isPast ? "Booked" : "✓ Available"}
+                        </span>
                       </div>
-                      {(isBooked || isPast) && <div className="absolute top-2 right-2"><XCircle size={12} className="text-zinc-200" /></div>}
                     </button>
                   );
                 })}
@@ -405,7 +384,7 @@ export default function BookingPage() {
 
         {selectedSlots.length > 0 && (
           <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-[100]">
-            <button onClick={() => setIsSummaryOpen(true)} className="w-full bg-zinc-900 text-white p-6 rounded-3xl shadow-2xl shadow-black/50 flex items-center justify-between group hover:bg-black transition-all active:scale-95 border border-zinc-800">
+            <button onClick={() => setIsSummaryOpen(true)} className="w-full bg-zinc-950 text-white p-6 rounded-3xl shadow-2xl shadow-black/50 flex items-center justify-between group hover:bg-black transition-all active:scale-95 border border-zinc-800">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-black text-sm">{selectedSlots.length}</div>
                 <div className="text-left"><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Total Amount</p><p className="text-xl font-black">₹{selectedSlots.reduce((acc, s) => acc + s.price, 0)}</p></div>
