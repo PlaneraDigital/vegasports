@@ -20,42 +20,43 @@ const AdminTopbar = ({ onMenuClick }) => {
   const label = sectionLabels[section] || 'Admin'
 
   return (
-    <header className="h-[60px] bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40" style={{
+    <header className="h-[60px] bg-zinc-900/90 backdrop-blur-md border-b border-zinc-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40" style={{
       fontFamily: "'Plus Jakarta Sans', sans-serif",
     }}>
       <div className="flex items-center gap-3">
         <button 
           onClick={onMenuClick}
-          className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900"
+          className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-zinc-100"
         >
           <Menu size={18} />
         </button>
         <div>
-          <h1 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#0f172a' }}>{label}</h1>
-          <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '1px' }}>
+          <h1 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: '#f4f4f5' }}>{label}</h1>
+          <div style={{ fontSize: '0.7rem', color: '#71717a', marginTop: '1px' }}>
             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </div>
         </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <button className="hidden sm:flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 cursor-pointer">
+        <button className="hidden sm:flex items-center justify-center w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 cursor-pointer">
           <Bell size={15} />
         </button>
         <div style={{
           display: 'flex', alignItems: 'center', gap: '0.6rem',
-          background: '#f8fafc', border: '1px solid #e2e8f0',
+          background: '#27272a', border: '1px solid #3f3f46',
           borderRadius: '10px', padding: '0.4rem 0.75rem',
         }}>
           <div style={{
             width: '26px', height: '26px', borderRadius: '50%',
-            background: 'linear-gradient(135deg, #00844d, #006b3e)',
+            background: 'rgba(74, 222, 128, 0.1)',
+            border: '1px solid rgba(74, 222, 128, 0.2)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '0.7rem', fontWeight: 800, color: '#fff', flexShrink: 0,
+            fontSize: '0.7rem', fontWeight: 800, color: '#4ade80', flexShrink: 0,
           }}>
             A
           </div>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0f172a' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#f4f4f5' }}>
             Admin
           </div>
         </div>

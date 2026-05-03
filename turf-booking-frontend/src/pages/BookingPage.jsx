@@ -57,32 +57,32 @@ const isOverlapping = (s1, e1, s2, e2) => {
 function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
   const { balance_due, balance_link_url } = advanceResult;
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-white border-2 border-red-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
-        <div className="w-20 h-20 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-6">
+    <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-6 text-center">
+      <div className="bg-zinc-800 border-2 border-red-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
+        <div className="w-20 h-20 rounded-full bg-red-900/20 flex items-center justify-center mx-auto mb-6">
           <AlertCircle size={40} className="text-red-500" />
         </div>
-        <h2 className="text-2xl font-black text-zinc-900 mb-2">Advance Paid!</h2>
+        <h2 className="text-2xl font-black text-zinc-100 mb-2">Advance Paid!</h2>
         <p className="text-zinc-500 text-sm mb-6">Slot secured at {turf.name}</p>
 
-        <div className="bg-red-50 rounded-2xl p-6 text-left mb-6 border border-red-100">
-          <p className="text-red-800 font-black text-sm mb-3">🔴 RED CARD: BALANCE DUE</p>
+        <div className="bg-red-900/20 rounded-2xl p-6 text-left mb-6 border border-red-900/30">
+          <p className="text-red-400 font-black text-sm mb-3">🔴 RED CARD: BALANCE DUE</p>
           <div className="space-y-2 text-xs">
-            <div className="flex justify-between"><span className="text-red-400 font-bold uppercase">Balance</span><span className="text-red-700 font-black">₹{balance_due}</span></div>
-            <div className="flex justify-between"><span className="text-red-400 font-bold uppercase">Status</span><span className="text-red-700 font-bold">Pending Clearance</span></div>
+            <div className="flex justify-between"><span className="text-red-500/60 font-bold uppercase">Balance</span><span className="text-red-400 font-black">₹{balance_due}</span></div>
+            <div className="flex justify-between"><span className="text-red-500/60 font-bold uppercase">Status</span><span className="text-red-400 font-bold">Pending Clearance</span></div>
           </div>
         </div>
 
         {balance_link_url && (
-          <div className="mb-6 p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
-            <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-3">Scan to pay remaining</p>
+          <div className="mb-6 p-4 bg-zinc-900 rounded-2xl border border-zinc-800">
+            <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Scan to pay remaining</p>
             <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(balance_link_url)}`} className="mx-auto rounded-xl border-4 border-white mb-3" alt="QR" />
-            <a href={balance_link_url} target="_blank" rel="noreferrer" className="text-blue-600 font-bold text-xs underline">Pay Balance Online ↗</a>
+            <a href={balance_link_url} target="_blank" rel="noreferrer" className="text-blue-400 font-bold text-xs underline">Pay Balance Online ↗</a>
           </div>
         )}
 
-        <button onClick={onGoTicket} className="w-full py-4 bg-zinc-900 text-white font-bold rounded-2xl mb-3">View Ticket</button>
-        <button onClick={onGoHome} className="w-full py-3 text-zinc-400 font-bold text-sm">Return Home</button>
+        <button onClick={onGoTicket} className="w-full py-4 bg-zinc-700 text-white font-bold rounded-2xl mb-3">View Ticket</button>
+        <button onClick={onGoHome} className="w-full py-3 text-zinc-500 font-bold text-sm">Return Home</button>
       </div>
     </div>
   );
@@ -90,19 +90,19 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
 
 function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
   return (
-    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-6 text-center">
-      <div className="bg-white border-2 border-emerald-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
-        <div className="w-20 h-20 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-6">
+    <div className="min-h-screen bg-zinc-900 flex flex-col items-center justify-center p-6 text-center">
+      <div className="bg-zinc-800 border-2 border-emerald-500 rounded-[2.5rem] w-full max-w-md overflow-hidden shadow-2xl p-10">
+        <div className="w-20 h-20 rounded-full bg-emerald-900/20 flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 size={40} className="text-emerald-500" />
         </div>
-        <h2 className="text-2xl font-black text-zinc-900 mb-2">You're Pitch Ready!</h2>
+        <h2 className="text-2xl font-black text-zinc-100 mb-2">You're Pitch Ready!</h2>
         <p className="text-zinc-500 text-sm mb-6">Full payment confirmed at {turf.name}</p>
 
-        <div className="bg-emerald-50 rounded-2xl p-6 text-left mb-8 border border-emerald-100">
-          <p className="text-emerald-800 font-black text-sm mb-3">🔵 BLUE CARD: FULL ACCESS</p>
+        <div className="bg-emerald-900/20 rounded-2xl p-6 text-left mb-8 border border-emerald-900/30">
+          <p className="text-emerald-400 font-black text-sm mb-3">🔵 BLUE CARD: FULL ACCESS</p>
           <div className="space-y-2 text-xs">
-            <div className="flex justify-between"><span className="text-emerald-400 font-bold uppercase">Time</span><span className="text-emerald-700 font-black">{fmt(booking.start_time)} – {fmt(booking.end_time)}</span></div>
-            <div className="flex justify-between"><span className="text-emerald-400 font-bold uppercase">Paid</span><span className="text-emerald-700 font-black">₹{booking.total_amount}</span></div>
+            <div className="flex justify-between"><span className="text-emerald-500/60 font-bold uppercase">Time</span><span className="text-emerald-400 font-black">{fmt(booking.start_time)} – {fmt(booking.end_time)}</span></div>
+            <div className="flex justify-between"><span className="text-emerald-500/60 font-bold uppercase">Paid</span><span className="text-emerald-400 font-black">₹{booking.total_amount}</span></div>
           </div>
         </div>
 
@@ -176,44 +176,44 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-zinc-900/40 backdrop-blur-sm p-4">
-      <div className="bg-white border border-zinc-200 rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="bg-zinc-900 border border-zinc-700 rounded-[2rem] w-full max-w-md overflow-hidden shadow-2xl">
         <div className="p-8 pb-4">
-          <h2 className="text-xl font-black text-zinc-900">Summary</h2>
+          <h2 className="text-xl font-black text-zinc-100">Summary</h2>
           <div className="mt-6 space-y-4">
-            <div className="flex justify-between items-center text-sm"><span className="text-zinc-400">Venue</span><span className="text-zinc-900 font-bold">{turf.name}</span></div>
+            <div className="flex justify-between items-center text-sm"><span className="text-zinc-500">Venue</span><span className="text-zinc-100 font-bold">{turf.name}</span></div>
             <div className="space-y-2">
               <span className="text-zinc-400 text-[10px] uppercase font-bold tracking-widest">Slots</span>
               <div className="flex flex-wrap gap-2">
                 {selectedSlots.map(s => (
-                  <div key={s._id} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1.5 rounded-xl text-xs font-bold">{fmt(s.start_time)}</div>
+                  <div key={s._id} className="bg-emerald-900/20 text-emerald-400 border border-emerald-900/30 px-3 py-1.5 rounded-xl text-xs font-bold">{fmt(s.start_time)}</div>
                 ))}
               </div>
             </div>
           </div>
 
           <div className="mt-8 grid grid-cols-2 gap-3">
-            <button onClick={() => setPayType("advance")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'advance' ? 'border-red-500 bg-red-50' : 'border-zinc-100 bg-white hover:border-zinc-200'}`}>
-              <Wallet size={18} className={payType === 'advance' ? 'text-red-500' : 'text-zinc-400'} />
-              <span className="text-[11px] font-black uppercase">Advance</span>
-              <span className="text-xs font-bold text-zinc-900">₹200</span>
+            <button onClick={() => setPayType("advance")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'advance' ? 'border-red-500 bg-red-900/20' : 'border-zinc-700 bg-zinc-800 hover:border-zinc-600'}`}>
+              <Wallet size={18} className={payType === 'advance' ? 'text-red-500' : 'text-zinc-500'} />
+              <span className="text-[11px] font-black uppercase text-zinc-200">Advance</span>
+              <span className="text-xs font-bold text-zinc-100">₹200</span>
             </button>
-            <button onClick={() => setPayType("full")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'full' ? 'border-emerald-500 bg-emerald-50' : 'border-zinc-100 bg-white hover:border-zinc-200'}`}>
-              <CreditCard size={18} className={payType === 'full' ? 'text-emerald-500' : 'text-zinc-400'} />
-              <span className="text-[11px] font-black uppercase">Full Pay</span>
-              <span className="text-xs font-bold text-zinc-900">₹{total}</span>
+            <button onClick={() => setPayType("full")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'full' ? 'border-emerald-500 bg-emerald-900/20' : 'border-zinc-700 bg-zinc-800 hover:border-zinc-600'}`}>
+              <CreditCard size={18} className={payType === 'full' ? 'text-emerald-500' : 'text-zinc-500'} />
+              <span className="text-[11px] font-black uppercase text-zinc-200">Full Pay</span>
+              <span className="text-xs font-bold text-zinc-100">₹{total}</span>
             </button>
           </div>
         </div>
 
-        <div className="p-8 bg-zinc-50 border-t border-zinc-100">
+        <div className="p-8 bg-zinc-800 border-t border-zinc-700">
           <div className="flex justify-between items-end mb-6">
-            <span className="text-zinc-400 text-sm font-bold mb-1">Payable Now</span>
-            <span className="text-3xl font-black text-zinc-900">₹{payable}</span>
+            <span className="text-zinc-500 text-sm font-bold mb-1">Payable Now</span>
+            <span className="text-3xl font-black text-zinc-100">₹{payable}</span>
           </div>
           {err && <p className="mb-4 text-red-500 text-xs font-bold">{err}</p>}
           <div className="flex gap-3">
-            <button onClick={onClose} className="flex-1 py-4 text-zinc-400 font-bold hover:text-zinc-900 transition-colors">Cancel</button>
+            <button onClick={onClose} className="flex-1 py-4 text-zinc-500 font-bold hover:text-zinc-100 transition-colors">Cancel</button>
             <button onClick={handlePay} disabled={booking} className={`flex-[2] py-4 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${payType === 'advance' ? 'bg-red-600 hover:bg-red-700 shadow-red-100' : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-100'}`}>
               {booking ? <Loader2 size={18} className="animate-spin" /> : "Confirm & Pay"}
             </button>
@@ -281,7 +281,7 @@ export default function BookingPage() {
     fetchSlots();
   }, [selectedDate, turf]);
 
-  if (loading) return <div className="min-h-screen bg-zinc-50 flex items-center justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>;
+  if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center"><Loader2 className="animate-spin text-emerald-500" /></div>;
   if (advanceResult) return <RedCardScreen advanceResult={advanceResult} turf={turf} onGoTicket={() => navigate(`/ticket/${confirmedId}`)} onGoHome={() => navigate("/")} />;
   if (fullResult) return <BlueCardScreen booking={{ ...fullResult, start_time: selectedSlots[0].start_time, end_time: selectedSlots[selectedSlots.length - 1].end_time }} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
 
@@ -308,9 +308,9 @@ export default function BookingPage() {
   const visibleSlots = activeTab === "morning" ? morningSlots : eveningSlots;
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 pb-20 pt-10">
+    <div className="min-h-screen bg-zinc-900 text-zinc-100 pb-20 pt-10">
       <div className="max-w-4xl mx-auto px-6">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-400 font-bold text-sm hover:text-zinc-900 transition-colors mb-10">
+        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-zinc-500 font-bold text-sm hover:text-zinc-100 transition-colors mb-10">
           <ArrowLeft size={16} /> Back
         </button>
 
@@ -321,14 +321,14 @@ export default function BookingPage() {
           </div>
 
           <div ref={calRef} className="relative">
-            <button onClick={() => setCalOpen(!calOpen)} className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:border-zinc-300 transition-all">
-              <CalendarDays size={16} className="text-zinc-400" />
+            <button onClick={() => setCalOpen(!calOpen)} className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:border-zinc-600 transition-all text-zinc-200">
+              <CalendarDays size={16} className="text-zinc-500" />
               {selectedDate.getDate()} {MONTHS[selectedDate.getMonth()]}
             </button>
             {calOpen && (
-              <div className="absolute top-full right-0 mt-2 bg-white border border-zinc-200 rounded-2xl p-4 shadow-2xl z-[150] w-[280px]">
+              <div className="absolute top-full right-0 mt-2 bg-zinc-800 border border-zinc-700 rounded-2xl p-4 shadow-2xl z-[150] w-[280px]">
                 <div className="flex justify-between items-center mb-4 px-1">
-                  <span className="font-black text-sm">{MONTHS[viewMonth]} {viewYear}</span>
+                  <span className="font-black text-sm text-zinc-100">{MONTHS[viewMonth]} {viewYear}</span>
                   <div className="flex gap-1">
                     <button onClick={prevMonth} disabled={isPrevDisabled} className="p-1 disabled:opacity-20"><ChevronUp size={16} /></button>
                     <button onClick={nextMonth} className="p-1"><ChevronDown size={16} /></button>
@@ -345,7 +345,7 @@ export default function BookingPage() {
                     const isSel = dObj.toDateString() === selectedDate.toDateString();
                     return (
                       <button key={i} disabled={isPast} onClick={() => { setSelectedDate(dObj); setCalOpen(false); }}
-                        className={`aspect-square text-xs font-bold rounded-lg transition-all ${isSel ? 'bg-zinc-900 text-white' : isPast ? 'text-zinc-200 cursor-not-allowed' : 'text-zinc-600 hover:bg-zinc-100'}`}>
+                        className={`aspect-square text-xs font-bold rounded-lg transition-all ${isSel ? 'bg-green-600 text-white' : isPast ? 'text-zinc-700 cursor-not-allowed' : 'text-zinc-300 hover:bg-zinc-700'}`}>
                         {d}
                       </button>
                     );
@@ -356,12 +356,12 @@ export default function BookingPage() {
           </div>
         </header>
 
-        <div className="bg-white border border-zinc-200 rounded-[2.5rem] overflow-hidden shadow-sm">
-          <div className="flex border-b border-zinc-100">
-            <button onClick={() => setActiveTab("morning")} className={`flex-1 py-6 flex items-center justify-center gap-2 text-sm font-black transition-all ${activeTab === 'morning' ? 'text-zinc-900 bg-white' : 'text-zinc-300 bg-zinc-50/50 hover:text-zinc-500'}`}>
+        <div className="bg-zinc-800 border border-zinc-700 rounded-[2.5rem] overflow-hidden shadow-sm">
+          <div className="flex border-b border-zinc-700">
+            <button onClick={() => setActiveTab("morning")} className={`flex-1 py-6 flex items-center justify-center gap-2 text-sm font-black transition-all ${activeTab === 'morning' ? 'text-zinc-100 bg-zinc-800' : 'text-zinc-600 bg-zinc-900/50 hover:text-zinc-400'}`}>
               <Sun size={18} /> Morning
             </button>
-            <button onClick={() => setActiveTab("evening")} className={`flex-1 py-6 flex items-center justify-center gap-2 text-sm font-black transition-all ${activeTab === 'evening' ? 'text-zinc-900 bg-white' : 'text-zinc-300 bg-zinc-50/50 hover:text-zinc-500'}`}>
+            <button onClick={() => setActiveTab("evening")} className={`flex-1 py-6 flex items-center justify-center gap-2 text-sm font-black transition-all ${activeTab === 'evening' ? 'text-zinc-100 bg-zinc-800' : 'text-zinc-600 bg-zinc-900/50 hover:text-zinc-400'}`}>
               <Moon size={18} /> Evening
             </button>
           </div>
@@ -387,7 +387,7 @@ export default function BookingPage() {
 
                   return (
                     <button key={slot._id} disabled={isBooked || isPast || (isBlockedBySelection && !isSel)} onClick={() => toggleSlot(slot)}
-                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-zinc-900 border-zinc-900 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-50 border-zinc-50 text-zinc-200 cursor-not-allowed grayscale' : 'bg-white border-zinc-100 text-zinc-900 hover:border-zinc-900 hover:shadow-lg'}`}>
+                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-green-600 border-green-600 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-800 border-zinc-800 text-zinc-600 cursor-not-allowed grayscale' : 'bg-zinc-700 border-zinc-700 text-zinc-200 hover:border-green-500 hover:shadow-lg'}`}>
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-sm font-black tracking-tight whitespace-nowrap">{fmtRange(slot.start_time, slot.end_time)}</span>
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isSel ? 'text-zinc-500' : 'text-zinc-400'}`}>₹{slot.price}</span>
@@ -405,7 +405,7 @@ export default function BookingPage() {
 
         {selectedSlots.length > 0 && (
           <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-md px-6 z-[100]">
-            <button onClick={() => setIsSummaryOpen(true)} className="w-full bg-zinc-900 text-white p-6 rounded-3xl shadow-2xl shadow-zinc-200 flex items-center justify-between group hover:bg-black transition-all active:scale-95">
+            <button onClick={() => setIsSummaryOpen(true)} className="w-full bg-zinc-900 text-white p-6 rounded-3xl shadow-2xl shadow-black/50 flex items-center justify-between group hover:bg-black transition-all active:scale-95 border border-zinc-800">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-black text-sm">{selectedSlots.length}</div>
                 <div className="text-left"><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Total Amount</p><p className="text-xl font-black">₹{selectedSlots.reduce((acc, s) => acc + s.price, 0)}</p></div>

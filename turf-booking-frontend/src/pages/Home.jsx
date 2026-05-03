@@ -87,29 +87,29 @@ function Home() {
 
       {/* Offers Section */}
       {offers.length > 0 && (
-        <section className="offers-modern pt-12 pb-8 border-t border-zinc-100">
+        <section className="offers-modern pt-12 pb-8 border-t border-zinc-800">
           <div className="max-w-7xl mx-auto px-6">
             <div className="section-header mb-8 text-center">
-               <h2 className="text-xl font-black">Exclusive Offers</h2>
+               <h2 className="text-xl font-black text-zinc-100">Exclusive Offers</h2>
             </div>
           </div>
         </section>
       )}
 
       {/* Facilities Section */}
-      <section className="facilities-section pt-10 pb-20 bg-zinc-50/50">
+      <section className="facilities-section pt-10 pb-20 border-t border-zinc-800">
          <div className="max-w-7xl mx-auto px-6">
             <div className="section-header mb-8 text-center">
-               <h2 className="text-xl font-black">Our Facilities</h2>
+               <h2 className="text-xl font-black text-zinc-100">Our Facilities</h2>
             </div>
             <div className="flex flex-wrap justify-center gap-3">
                {amenities.length > 0 ? amenities.map((label, i) => (
-                 <div key={i} className="flex items-center gap-2 px-5 py-2.5 bg-white border border-zinc-100 rounded-full shadow-md hover:shadow-lg transition-all">
-                    <CheckCircle2 size={14} className="text-emerald-500" />
-                    <span className="text-sm font-bold text-zinc-700 tracking-tight">{label}</span>
+                 <div key={i} className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-full shadow-md hover:shadow-lg transition-all">
+                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    <span className="text-sm font-bold text-zinc-400 tracking-tight">{label}</span>
                  </div>
                )) : (
-                 <div className="text-zinc-400 text-sm italic">Loading amenities...</div>
+                 <div className="text-zinc-600 text-sm italic">Loading amenities...</div>
                )}
             </div>
          </div>

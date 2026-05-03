@@ -1,6 +1,6 @@
 /* ── BASE ── */
 .home { 
-  background: #ffffff; 
+  background: #0f1117; 
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
 }
 
@@ -22,7 +22,7 @@
   background: 
     radial-gradient(ellipse 80% 60% at 50% 0%, rgba(32, 227, 113, 0.12) 0%, transparent 70%),
     radial-gradient(ellipse 60% 40% at 80% 80%, rgba(32, 227, 113, 0.05) 0%, transparent 60%),
-    #ffffff;
+    #0f1117;
   z-index: 0;
 }
 
@@ -30,8 +30,8 @@
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
   background-size: 60px 60px;
   z-index: 0;
 }
@@ -47,7 +47,7 @@
   font-size: 3.5rem;
   font-weight: 900;
   line-height: 1.05;
-  color: #1a1d1e;
+  color: #f4f4f5;
   letter-spacing: -2px;
   margin: 0;
 }
@@ -61,7 +61,7 @@
 
 .hero-sub {
   margin-top: 20px;
-  color: #555e61;
+  color: #a1a1aa;
   font-size: 1.15rem;
   line-height: 1.7;
   max-width: 560px;
@@ -114,18 +114,18 @@
   min-width: 280px;
   padding: 14px 36px;
   height: 52px;
-  background: #18181b;
+  background: #27272a;
   color: white;
   border-radius: 16px;
   font-size: 1rem;
   font-weight: 700;
   text-decoration: none;
   transition: all 0.3s;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
 }
 
 .hero-follow-btn:hover {
-  background: #000;
+  background: #3f3f46;
   transform: translateY(-2px);
 }
 
@@ -229,13 +229,13 @@
 /* ── FACILITIES ──────────────────────────── */
 .facilities-section {
   padding: 30px 0 60px;
-  background: linear-gradient(to bottom, #ffffff, #f9fafb);
+  background: linear-gradient(to bottom, #0f1117, #111827);
 }
 
 /* ── OFFERS MODERN ───────────────────────── */
 .offers-modern {
   padding: 10px 0 25px;
-  background: linear-gradient(to bottom, #ffffff, #ebf9f3);
+  background: linear-gradient(to bottom, #0f1117, #0a1a0f);
 }
 
 .offers-container {
@@ -249,14 +249,14 @@
 }
 
 .offer-pill {
-  background: #ffffff;
+  background: #1c1f26;
   border: 1px solid #00844d;
   border-radius: 14px;
   padding: 6px 16px 6px 6px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 4px 12px rgba(0, 132, 77, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 132, 77, 0.15);
   transition: transform 0.2s;
 }
 
@@ -278,7 +278,7 @@
 .offer-msg {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #1a1d1e;
+  color: #e4e4e7;
   letter-spacing: -0.2px;
 }
 
@@ -311,7 +311,7 @@
 .section-label {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #00844d;
+  color: #4ade80;
   letter-spacing: 2px;
   text-transform: uppercase;
   margin-bottom: 8px;
@@ -320,12 +320,12 @@
 .section-header h2 {
   font-size: 2.4rem;
   font-weight: 800;
-  color: #1a1d1e;
+  color: #f4f4f5;
   letter-spacing: -1px;
 }
 
 .section-header a {
-  color: #00844d;
+  color: #4ade80;
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
@@ -334,15 +334,15 @@
 /* ── HOW IT WORKS (GRID UPDATED) ──────────── */
 .how-section {
   padding: 100px 60px;
-  background: #f9fafb;
-  border-top: 1px solid #f1f5f9;
-  border-bottom: 1px solid #f1f5f9;
+  background: #111827;
+  border-top: 1px solid #1f2937;
+  border-bottom: 1px solid #1f2937;
 }
 
 .how-section h2 {
   font-size: 2.4rem;
   font-weight: 800;
-  color: #1a1d1e;
+  color: #f4f4f5;
   text-align: center;
   letter-spacing: -1px;
 }
@@ -356,27 +356,27 @@
 }
 
 .how-card {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: #1c1f26;
+  border: 1px solid #2d3142;
   border-radius: 20px;
   padding: 32px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
 }
 
 .how-card:hover {
   border-color: #009e5d;
   transform: translateY(-5px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
 }
 
 .how-num {
   font-size: 5rem;
   font-weight: 900;
-  color: #1a1d1e; /* Dark numbers */
-  opacity: 0.08;   /* Subtle watermark effect */
+  color: #ffffff; /* Light numbers on dark */
+  opacity: 0.06;   /* Subtle watermark effect */
   position: absolute;
   top: -10px;
   right: 20px;
@@ -397,13 +397,13 @@
 
 .how-card h3 { 
   font-weight: 700; 
-  color: #1a1d1e; 
+  color: #f4f4f5; 
   font-size: 1.15rem; 
 }
 
 .how-card p { 
   font-size: 0.95rem; 
-  color: #64748b; 
+  color: #71717a; 
   margin-top: 10px; 
   line-height: 1.6; 
 }

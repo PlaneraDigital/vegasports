@@ -59,14 +59,14 @@ const PricingManagement = () => {
   }
 
   const inputStyle = {
-    background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px',
-    padding: '0.65rem 0.875rem', color: '#0f172a', fontSize: '0.875rem',
+    background: '#18181b', border: '1px solid #27272a', borderRadius: '10px',
+    padding: '0.65rem 0.875rem', color: '#f4f4f5', fontSize: '0.875rem',
     outline: 'none', width: '100%', boxSizing: 'border-box',
     fontFamily: "'Plus Jakarta Sans', sans-serif",
     transition: 'all 0.15s',
   }
 
-  const labelStyle = { color: '#64748b', fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.4rem' }
+  const labelStyle = { color: '#71717a', fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.4rem' }
 
   return (
     <div className="flex flex-col lg:flex-row gap-5 items-start font-['Plus_Jakarta_Sans',sans-serif]">
@@ -75,9 +75,9 @@ const PricingManagement = () => {
       {toast && (
         <div style={{
           position: 'fixed', top: '1.5rem', right: '1.5rem', zIndex: 1000,
-          background: toast.type === 'error' ? '#fef2f2' : '#ebf9f3',
-          border: `1px solid ${toast.type === 'error' ? '#fecaca' : '#bbf7d0'}`,
-          color: toast.type === 'error' ? '#991b1b' : '#166534',
+          background: toast.type === 'error' ? '#1a1111' : '#111a14',
+          border: `1px solid ${toast.type === 'error' ? '#442222' : '#224433'}`,
+          color: toast.type === 'error' ? '#f87171' : '#4ade80',
           borderRadius: '12px', padding: '0.875rem 1.25rem',
           fontSize: '0.85rem', fontWeight: 600,
           display: 'flex', alignItems: 'center', gap: '0.6rem',
@@ -88,27 +88,27 @@ const PricingManagement = () => {
       )}
 
       {/* ── Left: Turf Selector ── */}
-      <div className="w-full lg:w-[280px] shrink-0 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-        <div style={{ padding: '1.25rem 1.25rem', borderBottom: '1px solid #f1f5f9' }}>
-          <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 800, color: '#0f172a' }}>Select Turf</h3>
-          <p style={{ margin: '0.25rem 0 0', color: '#64748b', fontSize: '0.75rem', fontWeight: 600 }}>{turfs.length} turfs available</p>
+      <div className="w-full lg:w-[280px] shrink-0 bg-zinc-900 border border-zinc-700 rounded-2xl overflow-hidden shadow-sm">
+        <div style={{ padding: '1.25rem 1.25rem', borderBottom: '1px solid #27272a' }}>
+          <h3 style={{ margin: 0, fontSize: '0.85rem', fontWeight: 800, color: '#f4f4f5' }}>Select Turf</h3>
+          <p style={{ margin: '0.25rem 0 0', color: '#71717a', fontSize: '0.75rem', fontWeight: 600 }}>{turfs.length} turfs available</p>
         </div>
         <div style={{ maxHeight: 'calc(100vh - 220px)', overflowY: 'auto' }}>
           {turfs.map(t => (
             <button key={t._id} onClick={() => handleSelectTurf(t)}
               style={{
                 width: '100%', textAlign: 'left', padding: '1rem 1.25rem', border: 'none',
-                background: selectedTurf?._id === t._id ? '#ebf9f3' : 'transparent',
-                borderLeft: `3px solid ${selectedTurf?._id === t._id ? '#00844d' : 'transparent'}`,
+                background: selectedTurf?._id === t._id ? 'rgba(74, 222, 128, 0.1)' : 'transparent',
+                borderLeft: `3px solid ${selectedTurf?._id === t._id ? '#4ade80' : 'transparent'}`,
                 cursor: 'pointer', transition: 'all 0.15s',
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
-                borderBottom: '1px solid #f8fafc',
+                borderBottom: '1px solid #27272a',
               }}
-              onMouseEnter={e => { if (selectedTurf?._id !== t._id) e.currentTarget.style.background = '#f8fafc' }}
+              onMouseEnter={e => { if (selectedTurf?._id !== t._id) e.currentTarget.style.background = 'rgba(255,255,255,0.03)' }}
               onMouseLeave={e => { if (selectedTurf?._id !== t._id) e.currentTarget.style.background = 'transparent' }}
             >
-              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: selectedTurf?._id === t._id ? '#00844d' : '#0f172a' }}>{t.name}</div>
-              <div style={{ fontSize: '0.7rem', color: '#64748b', marginTop: '0.15rem', fontWeight: 600 }}>{t.location?.city} · ₹{t.price_per_hour}/slot</div>
+              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: selectedTurf?._id === t._id ? '#4ade80' : '#f4f4f5' }}>{t.name}</div>
+              <div style={{ fontSize: '0.7rem', color: '#71717a', marginTop: '0.15rem', fontWeight: 600 }}>{t.location?.city} · ₹{t.price_per_hour}/slot</div>
             </button>
           ))}
         </div>
@@ -117,19 +117,19 @@ const PricingManagement = () => {
       {/* ── Right: Pricing Form ── */}
       <div className="w-full flex-1">
         {!selectedTurf ? (
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '4rem', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+          <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '16px', padding: '4rem', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
             <DollarSign size={36} color="#e2e8f0" style={{ marginBottom: '0.75rem' }} />
-            <p style={{ color: '#94a3b8', fontSize: '0.875rem', margin: 0, fontWeight: 600 }}>Select a turf from the left to manage pricing</p>
+            <p style={{ color: '#52525b', fontSize: '0.875rem', margin: 0, fontWeight: 600 }}>Select a turf from the left to manage pricing</p>
           </div>
         ) : (
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+          <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '16px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
             <div>
-              <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>{selectedTurf.name}</h3>
-              <p style={{ margin: 0, color: '#64748b', fontSize: '0.8rem', fontWeight: 600 }}>{selectedTurf.location?.address}, {selectedTurf.location?.city}</p>
+              <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem', fontWeight: 800, color: '#f4f4f5' }}>{selectedTurf.name}</h3>
+              <p style={{ margin: 0, color: '#71717a', fontSize: '0.8rem', fontWeight: 600 }}>{selectedTurf.location?.address}, {selectedTurf.location?.city}</p>
             </div>
 
             {/* Base Pricing */}
-            <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '1.25rem', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#18181b', borderRadius: '14px', padding: '1.25rem', border: '1px solid #27272a' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00844d' }} />
                 <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Base Pricing</span>
@@ -138,10 +138,10 @@ const PricingManagement = () => {
                 <label style={labelStyle}>Base Price per Hour (₹)</label>
                 <input type="number" value={form.price_per_hour} onChange={e => setForm(p => ({ ...p, price_per_hour: e.target.value }))}
                   style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = '#00844d'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={e => e.target.style.borderColor = '#4ade80'}
+                  onBlur={e => e.target.style.borderColor = '#27272a'}
                 />
-                <p style={{ color: '#64748b', fontSize: '0.7rem', margin: '0.4rem 0 0', fontWeight: 600 }}>Applied to all weekday normal slots</p>
+                <p style={{ color: '#71717a', fontSize: '0.7rem', margin: '0.4rem 0 0', fontWeight: 600 }}>Applied to all weekday normal slots</p>
               </div>
 
               <div style={{ marginTop: '1.25rem' }}>
@@ -149,15 +149,15 @@ const PricingManagement = () => {
                 <input type="number" value={form.slot_interval_minutes} onChange={e => setForm(p => ({ ...p, slot_interval_minutes: e.target.value }))}
                   placeholder="e.g. 30"
                   style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = '#00844d'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={e => e.target.style.borderColor = '#4ade80'}
+                  onBlur={e => e.target.style.borderColor = '#27272a'}
                 />
-                <p style={{ color: '#64748b', fontSize: '0.65rem', marginTop: '4px' }}>How often a new slot starts (e.g. 30 = slots start at 12:00, 12:30, etc.)</p>
+                <p style={{ color: '#71717a', fontSize: '0.65rem', marginTop: '4px' }}>How often a new slot starts (e.g. 30 = slots start at 12:00, 12:30, etc.)</p>
               </div>
             </div>
 
             {/* Morning / Evening Pricing */}
-            <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '1.25rem', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#18181b', borderRadius: '14px', padding: '1.25rem', border: '1px solid #27272a' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
                 <span style={{ color: '#d97706', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Morning / Evening Rates</span>
@@ -168,8 +168,8 @@ const PricingManagement = () => {
                   <input type="number" value={form.morning_price} onChange={e => setForm(p => ({ ...p, morning_price: e.target.value }))}
                     placeholder="e.g. 500"
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#f59e0b'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = '#fbbf24'}
+                    onBlur={e => e.target.style.borderColor = '#27272a'}
                   />
                 </div>
                 <div>
@@ -177,16 +177,16 @@ const PricingManagement = () => {
                   <input type="number" value={form.evening_price} onChange={e => setForm(p => ({ ...p, evening_price: e.target.value }))}
                     placeholder="e.g. 800"
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#6366f1'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = '#60a5fa'}
+                    onBlur={e => e.target.style.borderColor = '#27272a'}
                   />
                 </div>
               </div>
-              <p style={{ color: '#64748b', fontSize: '0.7rem', margin: '0.75rem 0 0', fontWeight: 600 }}>These override base price based on time of day (shown as Morning / Evening tabs in booking UI)</p>
+              <p style={{ color: '#71717a', fontSize: '0.7rem', margin: '0.75rem 0 0', fontWeight: 600 }}>These override base price based on time of day (shown as Morning / Evening tabs in booking UI)</p>
             </div>
 
             {/* Weekend Pricing */}
-            <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '1.25rem', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#18181b', borderRadius: '14px', padding: '1.25rem', border: '1px solid #27272a' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#2563eb' }} />
                 <span style={{ color: '#2563eb', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Weekend Override</span>
@@ -196,15 +196,15 @@ const PricingManagement = () => {
                 <input type="number" value={form.weekend_price} onChange={e => setForm(p => ({ ...p, weekend_price: e.target.value }))}
                   placeholder="Leave blank to use base price"
                   style={inputStyle}
-                  onFocus={e => e.target.style.borderColor = '#2563eb'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={e => e.target.style.borderColor = '#60a5fa'}
+                  onBlur={e => e.target.style.borderColor = '#27272a'}
                 />
-                <p style={{ color: '#64748b', fontSize: '0.7rem', margin: '0.4rem 0 0', fontWeight: 600 }}>Applied on Saturdays and Sundays</p>
+                <p style={{ color: '#71717a', fontSize: '0.7rem', margin: '0.4rem 0 0', fontWeight: 600 }}>Applied on Saturdays and Sundays</p>
               </div>
             </div>
 
             {/* Peak Hour Pricing */}
-            <div style={{ background: '#f8fafc', borderRadius: '14px', padding: '1.25rem', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#18181b', borderRadius: '14px', padding: '1.25rem', border: '1px solid #27272a' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#d97706' }} />
                 <span style={{ color: '#d97706', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Peak Hour Override</span>
@@ -215,42 +215,42 @@ const PricingManagement = () => {
                   <input type="number" value={form.peak_hour_price} onChange={e => setForm(p => ({ ...p, peak_hour_price: e.target.value }))}
                     placeholder="e.g. 1800"
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#d97706'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = '#fbbf24'}
+                    onBlur={e => e.target.style.borderColor = '#27272a'}
                   />
                 </div>
                 <div>
                   <label style={labelStyle}>Peak Start Time</label>
                   <input type="time" value={form.peak_start} onChange={e => setForm(p => ({ ...p, peak_start: e.target.value }))}
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#d97706'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = '#fbbf24'}
+                    onBlur={e => e.target.style.borderColor = '#27272a'}
                   />
                 </div>
                 <div>
                   <label style={labelStyle}>Peak End Time</label>
                   <input type="time" value={form.peak_end} onChange={e => setForm(p => ({ ...p, peak_end: e.target.value }))}
                     style={inputStyle}
-                    onFocus={e => e.target.style.borderColor = '#d97706'}
-                    onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                    onFocus={e => e.target.style.borderColor = '#fbbf24'}
+                    onBlur={e => e.target.style.borderColor = '#27272a'}
                   />
                 </div>
               </div>
-              <p style={{ color: '#64748b', fontSize: '0.7rem', margin: '0.75rem 0 0', fontWeight: 600 }}>Overrides base price during specified hours on both weekdays and weekends</p>
+              <p style={{ color: '#71717a', fontSize: '0.7rem', margin: '0.75rem 0 0', fontWeight: 600 }}>Overrides base price during specified hours on both weekdays and weekends</p>
             </div>
 
             {/* Current Pricing Summary */}
-            <div style={{ background: '#ebf9f3', borderRadius: '12px', padding: '1rem 1.25rem', border: '1px solid #bbf7d0' }}>
-              <div style={{ color: '#166534', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
+            <div style={{ background: 'rgba(74, 222, 128, 0.1)', borderRadius: '12px', padding: '1rem 1.25rem', border: '1px solid rgba(74, 222, 128, 0.2)' }}>
+              <div style={{ color: '#4ade80', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.625rem' }}>
                 Current Saved Pricing
               </div>
               <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Base</div><div style={{ color: '#00844d', fontWeight: 800, fontSize: '1rem' }}>₹{selectedTurf.price_per_hour}/slot</div></div>
-                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Morning</div><div style={{ color: '#d97706', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing?.morning?.price ? `₹${selectedTurf.pricing.morning.price}/slot` : '—'}</div></div>
-                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Evening</div><div style={{ color: '#6366f1', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing?.evening?.price ? `₹${selectedTurf.pricing.evening.price}/slot` : '—'}</div></div>
-                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Weekend</div><div style={{ color: '#2563eb', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.weekend_price ? `₹${selectedTurf.pricing_overrides.weekend_price}/slot` : '—'}</div></div>
-                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Peak Hour</div><div style={{ color: '#d97706', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hour_price ? `₹${selectedTurf.pricing_overrides.peak_hour_price}/slot` : '—'}</div></div>
-                <div><div style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 600 }}>Peak Window</div><div style={{ color: '#475569', fontWeight: 700, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hours?.start ? `${selectedTurf.pricing_overrides.peak_hours.start} – ${selectedTurf.pricing_overrides.peak_hours.end}` : '—'}</div></div>
+                <div><div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>Base</div><div style={{ color: '#4ade80', fontWeight: 800, fontSize: '1rem' }}>₹{selectedTurf.price_per_hour}/slot</div></div>
+                <div><div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>Morning</div><div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing?.morning?.price ? `₹${selectedTurf.pricing.morning.price}/slot` : '—'}</div></div>
+                <div><div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>Evening</div><div style={{ color: '#60a5fa', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing?.evening?.price ? `₹${selectedTurf.pricing.evening.price}/slot` : '—'}</div></div>
+                <div><div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>Weekend</div><div style={{ color: '#60a5fa', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.weekend_price ? `₹${selectedTurf.pricing_overrides.weekend_price}/slot` : '—'}</div></div>
+                <div><div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>Peak Hour</div><div style={{ color: '#fbbf24', fontWeight: 800, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hour_price ? `₹${selectedTurf.pricing_overrides.peak_hour_price}/slot` : '—'}</div></div>
+                <div><div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>Peak Window</div><div style={{ color: '#a1a1aa', fontWeight: 700, fontSize: '0.875rem' }}>{selectedTurf.pricing_overrides?.peak_hours?.start ? `${selectedTurf.pricing_overrides.peak_hours.start} – ${selectedTurf.pricing_overrides.peak_hours.end}` : '—'}</div></div>
               </div>
             </div>
 

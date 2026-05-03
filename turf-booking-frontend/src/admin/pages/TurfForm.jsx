@@ -26,25 +26,25 @@ const defaultForm = () => ({
 
 const Input = ({ label, ...props }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-    <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>{label}</label>
+    <label style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700 }}>{label}</label>
     <input
       {...props}
       style={{
-        background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px',
-        padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none',
+        background: '#18181b', border: '1px solid #27272a', borderRadius: '10px',
+        padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none',
         width: '100%', boxSizing: 'border-box', transition: 'all 0.15s',
         ...props.style,
       }}
-      onFocus={e => { e.target.style.borderColor = '#00844d'; e.target.style.boxShadow = '0 0 0 3px rgba(22,163,74,0.05)' }}
-      onBlur={e => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none' }}
+      onFocus={e => { e.target.style.borderColor = '#4ade80'; e.target.style.boxShadow = '0 0 0 3px rgba(74,222,128,0.05)' }}
+      onBlur={e => { e.target.style.borderColor = '#27272a'; e.target.style.boxShadow = 'none' }}
     />
   </div>
 )
 
 const SectionTitle = ({ children }) => (
   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '1.25rem 0 0.75rem' }}>
-    <ChevronRight size={14} color="#00844d" />
-    <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+    <ChevronRight size={14} color="#4ade80" />
+    <span style={{ color: '#4ade80', fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
       {children}
     </span>
   </div>
@@ -134,19 +134,19 @@ const TurfForm = ({ turf, onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[200] flex items-start justify-center overflow-y-auto p-4 md:p-8">
-      <div className="bg-white border border-slate-200 rounded-[24px] w-full max-w-[680px] p-5 sm:p-8 font-['Plus_Jakarta_Sans',sans-serif] shadow-2xl">
+      <div className="bg-zinc-900 border border-zinc-700 rounded-[24px] w-full max-w-[680px] p-5 sm:p-8 font-['Plus_Jakarta_Sans',sans-serif] shadow-2xl">
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0f172a' }}>
+          <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#f4f4f5' }}>
             {turf ? 'Edit Turf' : 'Add New Turf'}
           </h2>
-          <button onClick={onClose} style={{ background: '#f1f5f9', border: 'none', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer', color: '#64748b', display: 'flex' }}>
+          <button onClick={onClose} style={{ background: '#18181b', border: 'none', borderRadius: '8px', padding: '0.4rem', cursor: 'pointer', color: '#71717a', display: 'flex' }}>
             <X size={18} />
           </button>
         </div>
 
         {error && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '0.625rem 0.875rem', color: '#991b1b', fontSize: '0.8rem', marginBottom: '1rem' }}>
+          <div style={{ background: '#1a1111', border: '1px solid #442222', borderRadius: '10px', padding: '0.625rem 0.875rem', color: '#f87171', fontSize: '0.8rem', marginBottom: '1rem' }}>
             {error}
           </div>
         )}
@@ -158,23 +158,23 @@ const TurfForm = ({ turf, onClose, onSave }) => {
             <Input label="Turf Name *" value={form.name} onChange={e => { set('name', e.target.value); set('slug', autoSlug(e.target.value)) }} placeholder="e.g. Champions Arena" />
             <Input label="Slug *" value={form.slug} onChange={e => set('slug', e.target.value)} placeholder="auto-generated" />
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>Turf Type</label>
+              <label style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700 }}>Turf Type</label>
               <select value={form.turf_type} onChange={e => set('turf_type', e.target.value)}
-                style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }}>
+                style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }}>
                 {TYPE_OPTIONS.map(o => <option key={o} value={o}>{labelOf(o)}</option>)}
               </select>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>Surface *</label>
+              <label style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700 }}>Surface *</label>
               <select value={form.surface} onChange={e => set('surface', e.target.value)}
-                style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }}>
+                style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }}>
                 {SURFACE_OPTIONS.map(o => <option key={o} value={o}>{labelOf(o)}</option>)}
               </select>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>Slot Duration (mins) *</label>
+              <label style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700 }}>Slot Duration (mins) *</label>
               <select value={form.slot_duration_minutes} onChange={e => set('slot_duration_minutes', Number(e.target.value))}
-                style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }}>
+                style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }}>
                 {DURATION_OPTIONS.map(o => <option key={o} value={o}>{o} mins</option>)}
               </select>
             </div>
@@ -189,9 +189,9 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                 style={{
                   padding: '0.4rem 0.875rem', borderRadius: '8px', border: '1px solid',
                   fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer', textTransform: 'capitalize',
-                  background: form.sports.includes(s) ? '#ebf9f3' : '#ffffff',
-                  borderColor: form.sports.includes(s) ? '#00844d' : '#e2e8f0',
-                  color: form.sports.includes(s) ? '#00844d' : '#64748b',
+                  background: form.sports.includes(s) ? 'rgba(74, 222, 128, 0.1)' : '#18181b',
+                  borderColor: form.sports.includes(s) ? '#4ade80' : '#27272a',
+                  color: form.sports.includes(s) ? '#4ade80' : '#71717a',
                   transition: 'all 0.15s',
                 }}>
                 {s}
@@ -232,20 +232,20 @@ const TurfForm = ({ turf, onClose, onSave }) => {
               }
               return (
                 <div key={day} className="flex flex-wrap sm:grid sm:grid-cols-[100px_1fr_1fr_auto] gap-2 items-center">
-                  <span style={{ color: '#64748b', fontSize: '0.8rem', fontWeight: 700, textTransform: 'capitalize' }}>{day}</span>
+                  <span style={{ color: '#71717a', fontSize: '0.8rem', fontWeight: 700, textTransform: 'capitalize' }}>{day}</span>
                   <input type="time" value={h.open} disabled={h.is_closed}
                     onChange={e => set(`operating_hours.${day}.open`, e.target.value)}
                     placeholder="--:--"
-                    style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.45rem 0.6rem', color: h.is_closed ? '#94a3b8' : '#0f172a', fontSize: '0.8rem', outline: 'none' }} />
+                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '0.45rem 0.6rem', color: h.is_closed ? '#52525b' : '#f4f4f5', fontSize: '0.8rem', outline: 'none' }} />
                   <input type="time" value={h.close} disabled={h.is_closed}
                     onChange={e => set(`operating_hours.${day}.close`, e.target.value)}
-                    style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.45rem 0.6rem', color: h.is_closed ? '#94a3b8' : '#0f172a', fontSize: '0.8rem', outline: 'none' }} />
+                    style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '0.45rem 0.6rem', color: h.is_closed ? '#52525b' : '#f4f4f5', fontSize: '0.8rem', outline: 'none' }} />
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
                     <input type="checkbox" checked={!!h.is_closed}
                       onChange={e => set(`operating_hours.${day}.is_closed`, e.target.checked)}
                       placeholder="--:--"
                       style={{ accentColor: '#ef4444', width: '14px', height: '14px' }} />
-                    <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600 }}>Closed</span>
+                    <span style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 600 }}>Closed</span>
                   </label>
                 </div>
               )
@@ -256,18 +256,18 @@ const TurfForm = ({ turf, onClose, onSave }) => {
           <SectionTitle>Amenities</SectionTitle>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem' }}>
             <input value={newAmenity} onChange={e => setNewAmenity(e.target.value)} placeholder="Add an amenity (e.g. Floodlights)..."
-              style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+              style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }} />
             <button type="button" onClick={() => { if (newAmenity.trim()) { setForm(p => ({ ...p, amenities: [...p.amenities, newAmenity.trim()] })); setNewAmenity('') } }}
-              style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 0.875rem', color: '#00844d', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
+              style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0 0.875rem', color: '#4ade80', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
               +
             </button>
           </div>
           <div className="flex flex-wrap gap-2 mb-6">
             {form.amenities.map((a, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#ebf9f3', border: '1px solid #00844d', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
-                <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 700 }}>{a}</span>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'rgba(74, 222, 128, 0.1)', border: '1px solid #4ade80', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
+                <span style={{ color: '#4ade80', fontSize: '0.75rem', fontWeight: 700 }}>{a}</span>
                 <button type="button" onClick={() => setForm(p => ({ ...p, amenities: p.amenities.filter((_, j) => j !== i) }))}
-                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>×</button>
+                  style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>×</button>
               </div>
             ))}
           </div>
@@ -276,18 +276,18 @@ const TurfForm = ({ turf, onClose, onSave }) => {
           <SectionTitle>Offers</SectionTitle>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <input value={newOffer} onChange={e => setNewOffer(e.target.value)} placeholder="Add an offer heading (e.g. 20% Off weekday moring)..."
-              style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+              style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }} />
             <button type="button" onClick={() => { if (newOffer.trim()) { setForm(p => ({ ...p, offers: [...p.offers, newOffer.trim()] })); setNewOffer('') } }}
-              style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 0.875rem', color: '#00844d', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
+              style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0 0.875rem', color: '#4ade80', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
               +
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             {form.offers.map((o, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fffbeb', border: '1px solid #fcd34d', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
-                <span style={{ color: '#92400e', fontSize: '0.8rem', fontWeight: 800 }}>🎫 {o}</span>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
+                <span style={{ color: '#fbbf24', fontSize: '0.8rem', fontWeight: 800 }}>🎫 {o}</span>
                 <button type="button" onClick={() => setForm(p => ({ ...p, offers: p.offers.filter((_, j) => j !== i) }))}
-                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.1rem', padding: '0 0.25rem' }}>×</button>
+                  style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '1.1rem', padding: '0 0.25rem' }}>×</button>
               </div>
             ))}
           </div>
@@ -296,37 +296,37 @@ const TurfForm = ({ turf, onClose, onSave }) => {
           <SectionTitle>Rules</SectionTitle>
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
             <input value={newRule} onChange={e => setNewRule(e.target.value)} placeholder="Add a rule..."
-              style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+              style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.55rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }} />
             <button type="button" onClick={() => { if (newRule.trim()) { setForm(p => ({ ...p, rules: [...p.rules, newRule.trim()] })); setNewRule('') } }}
-              style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 0.875rem', color: '#00844d', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
+              style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0 0.875rem', color: '#4ade80', fontWeight: 800, cursor: 'pointer', fontSize: '1.2rem' }}>
               +
             </button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
             {form.rules.map((r, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
-                <span style={{ color: '#475569', fontSize: '0.8rem', fontWeight: 600 }}>• {r}</span>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#18181b', border: '1px solid #27272a', borderRadius: '8px', padding: '0.4rem 0.75rem' }}>
+                <span style={{ color: '#a1a1aa', fontSize: '0.8rem', fontWeight: 600 }}>• {r}</span>
                 <button type="button" onClick={() => setForm(p => ({ ...p, rules: p.rules.filter((_, j) => j !== i) }))}
-                  style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '1.1rem', padding: '0 0.25rem' }}>×</button>
+                  style={{ background: 'none', border: 'none', color: '#f87171', cursor: 'pointer', fontSize: '1.1rem', padding: '0 0.25rem' }}>×</button>
               </div>
             ))}
           </div>
 
           {/* ── Highlights ── */}
           <SectionTitle>Highlights</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem', padding: '1rem', background: '#18181b', borderRadius: '16px', border: '1px solid #27272a' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Highlight Heading</label>
+              <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Highlight Heading</label>
               <input value={newHighlight.title} onChange={e => setNewHighlight(p => ({ ...p, title: e.target.value }))} placeholder="e.g. FIFA Quality Pro"
-                style={{ width: '100%', boxSizing: 'border-box', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+                style={{ width: '100%', boxSizing: 'border-box', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }} />
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Short Description</label>
+              <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Short Description</label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <input value={newHighlight.description} onChange={e => setNewHighlight(p => ({ ...p, description: e.target.value }))} placeholder="e.g. Certified international standard synthetic grass"
-                  style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} />
+                  style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }} />
                 <button type="button" onClick={() => { if (newHighlight.title.trim() && newHighlight.description.trim()) { setForm(p => ({ ...p, highlights: [...p.highlights, { title: newHighlight.title.trim(), description: newHighlight.description.trim() }] })); setNewHighlight({ title: '', description: '' }) } }}
-                  style={{ background: '#00844d', border: 'none', borderRadius: '10px', padding: '0 1rem', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
+                  style={{ background: '#4ade80', border: 'none', borderRadius: '10px', padding: '0 1rem', color: '#fff', fontWeight: 800, cursor: 'pointer' }}>
                   Add
                 </button>
               </div>
@@ -334,22 +334,22 @@ const TurfForm = ({ turf, onClose, onSave }) => {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
             {form.highlights.map((h, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '0.75rem 1rem', shadow: 'sm' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#18181b', border: '1px solid #27272a', borderRadius: '12px', padding: '0.75rem 1rem', shadow: 'sm' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ color: '#0f172a', fontSize: '0.85rem', fontWeight: 800 }}>★ {h.title}</span>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 500 }}>{h.description}</span>
+                  <span style={{ color: '#f4f4f5', fontSize: '0.85rem', fontWeight: 800 }}>★ {h.title}</span>
+                  <span style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 500 }}>{h.description}</span>
                 </div>
                 <button type="button" onClick={() => setForm(p => ({ ...p, highlights: p.highlights.filter((_, j) => j !== i) }))}
-                  style={{ background: '#fee2e2', border: 'none', color: '#ef4444', borderRadius: '8px', width: '28px', height: '28px', display: 'flex', itemsCenter: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.9rem' }}>×</button>
+                  style={{ background: 'rgba(248, 113, 113, 0.1)', border: 'none', color: '#f87171', borderRadius: '8px', width: '28px', height: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '0.9rem' }}>×</button>
               </div>
             ))}
           </div>
 
           {/* ── Images ── */}
           <SectionTitle>Images</SectionTitle>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem', padding: '1rem', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1rem', padding: '1rem', background: '#18181b', borderRadius: '16px', border: '1px solid #27272a' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Upload Image</label>
+              <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Upload Image</label>
               <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                 <input 
                   type="file" 
@@ -389,10 +389,10 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                       setSaving(false);
                     }
                   }}
-                  style={{ flex: 1, background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.5rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }} 
+                  style={{ flex: 1, background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.5rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }} 
                 />
                 {newImage.url && (
-                  <div style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #00844d' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '8px', overflow: 'hidden', border: '2px solid #4ade80' }}>
                     <img src={newImage.url} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 )}
@@ -400,15 +400,15 @@ const TurfForm = ({ turf, onClose, onSave }) => {
             </div>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: '150px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                <label style={{ color: '#64748b', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Label</label>
+                <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase' }}>Label</label>
                 <select value={newImage.label} onChange={e => setNewImage(p => ({ ...p, label: e.target.value }))}
-                  style={{ width: '100%', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#0f172a', fontSize: '0.85rem', outline: 'none' }}>
+                  style={{ width: '100%', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }}>
                   {IMAGE_LABELS.map(l => <option key={l} value={l}>{labelOf(l)}</option>)}
                 </select>
               </div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', paddingBottom: '0.75rem' }}>
-                <input type="checkbox" checked={newImage.is_primary} onChange={e => setNewImage(p => ({ ...p, is_primary: e.target.checked }))} style={{ accentColor: '#00844d', width: '14px', height: '14px' }} />
-                <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 700 }}>Primary</span>
+                <input type="checkbox" checked={newImage.is_primary} onChange={e => setNewImage(p => ({ ...p, is_primary: e.target.checked }))} style={{ accentColor: '#4ade80', width: '14px', height: '14px' }} />
+                <span style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700 }}>Primary</span>
               </label>
               <button type="button" onClick={() => {
                 if (newImage.url.trim()) {
@@ -420,17 +420,17 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                   setNewImage({ url: '', label: 'main', is_primary: false });
                 }
               }}
-              style={{ background: '#00844d', border: 'none', borderRadius: '10px', padding: '0.6rem 1.5rem', color: '#fff', fontWeight: 800, cursor: 'pointer', height: '42px' }}>
+              style={{ background: '#4ade80', border: 'none', borderRadius: '10px', padding: '0.6rem 1.5rem', color: '#fff', fontWeight: 800, cursor: 'pointer', height: '42px' }}>
                 Add
               </button>
             </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
             {form.images.map((img, i) => (
-              <div key={i} style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: `2px solid ${img.is_primary ? '#00844d' : '#e2e8f0'}`, background: '#fff' }}>
+              <div key={i} style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: `2px solid ${img.is_primary ? '#4ade80' : '#27272a'}`, background: '#18181b' }}>
                 <img src={img.url} alt="" style={{ width: '100%', height: '80px', objectFit: 'cover', display: 'block' }} 
                   onError={e => { e.target.src = 'https://placehold.co/100x80?text=Invalid+URL' }} />
-                <div style={{ padding: '0.4rem', borderTop: '1px solid #f1f5f9' }}>
+                <div style={{ padding: '0.4rem', borderTop: '1px solid #27272a' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.25rem' }}>
                     <button 
                       type="button"
@@ -446,9 +446,9 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                         fontSize: '9px', 
                         fontWeight: 800, 
                         textTransform: 'uppercase', 
-                        background: img.is_primary ? '#00844d' : '#f8fafc',
-                        color: img.is_primary ? '#fff' : '#64748b',
-                        border: '1px solid #e2e8f0',
+                        background: img.is_primary ? '#4ade80' : '#18181b',
+                        color: img.is_primary ? '#fff' : '#71717a',
+                        border: '1px solid #27272a',
                         borderRadius: '4px',
                         padding: '2px 4px',
                         cursor: 'pointer'
@@ -456,9 +456,9 @@ const TurfForm = ({ turf, onClose, onSave }) => {
                       {img.is_primary ? 'Primary' : 'Set Pri'}
                     </button>
                     <button type="button" onClick={() => setForm(p => ({ ...p, images: p.images.filter((_, j) => j !== i) }))}
-                      style={{ background: '#fee2e2', border: 'none', color: '#ef4444', borderRadius: '6px', width: '20px', height: '20px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                      style={{ background: 'rgba(248, 113, 113, 0.1)', border: 'none', color: '#f87171', borderRadius: '6px', width: '20px', height: '20px', fontSize: '0.8rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
                   </div>
-                  <div style={{ fontSize: '8px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', marginTop: '2px' }}>
+                  <div style={{ fontSize: '8px', fontWeight: 700, color: '#52525b', textTransform: 'uppercase', marginTop: '2px' }}>
                     {img.label}
                   </div>
                 </div>
@@ -469,11 +469,11 @@ const TurfForm = ({ turf, onClose, onSave }) => {
           {/* ── Actions ── */}
           <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.75rem' }}>
             <button type="button" onClick={onClose}
-              style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', background: '#f1f5f9', border: '1px solid #e2e8f0', color: '#475569', fontWeight: 700, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', background: '#18181b', border: '1px solid #27272a', color: '#a1a1aa', fontWeight: 700, cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               Cancel
             </button>
             <button type="submit" disabled={saving}
-              style={{ flex: 2, padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg, #00844d, #006b3e)', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(22,163,74,0.2)' }}>
+              style={{ flex: 2, padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg, #4ade80, #00844d)', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1, fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 4px 12px rgba(74,222,128,0.2)' }}>
               {saving ? 'Saving...' : turf ? 'Save Changes' : 'Add Turf'}
             </button>
           </div>

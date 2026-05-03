@@ -22,7 +22,7 @@ function Footer() {
           ))}
         </div>
 
-        <div className="footer__contact space-y-4 font-bold">
+        <div className="footer__contact space-y-4">
           {/* Phone - WhatsApp */}
           <a
             href="https://wa.me/918446918814"
@@ -30,10 +30,10 @@ function Footer() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 group w-fit"
           >
-            <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center text-lg border border-green-100 group-hover:bg-green-100 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center text-lg border border-zinc-800 group-hover:bg-zinc-800 transition-colors">
               📞
             </div>
-            <p className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">
+            <p className="text-sm font-semibold text-zinc-400 group-hover:text-zinc-100 transition-colors">
               +91 84469 18814
             </p>
           </a>
@@ -43,10 +43,10 @@ function Footer() {
             href="mailto:infinityturf0@gmail.com"
             className="flex items-center gap-3 group w-fit"
           >
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-lg border border-blue-100 group-hover:bg-blue-100 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center text-lg border border-zinc-800 group-hover:bg-zinc-800 transition-colors">
               ✉️
             </div>
-            <p className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors">
+            <p className="text-sm font-semibold text-zinc-400 group-hover:text-zinc-100 transition-colors">
               infinityturf0@gmail.com
             </p>
           </a>
@@ -58,10 +58,10 @@ function Footer() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 group w-fit"
           >
-            <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-lg border border-red-100 group-hover:bg-red-100 transition-colors">
+            <div className="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center text-lg border border-zinc-800 group-hover:bg-zinc-800 transition-colors">
               📍
             </div>
-            <p className="text-sm font-semibold text-gray-600 group-hover:text-gray-900 transition-colors leading-tight">
+            <p className="text-sm font-semibold text-zinc-400 group-hover:text-zinc-100 transition-colors leading-tight">
               Vasai Maharashtra, India
             </p>
           </a>
@@ -73,10 +73,10 @@ function Footer() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 group w-fit"
           >
-            <div className="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center text-lg border border-pink-100 group-hover:bg-pink-100 transition-all group-hover:rotate-6">
+            <div className="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center text-lg border border-zinc-700 group-hover:bg-zinc-800 transition-all group-hover:rotate-6">
               📸
             </div>
-            <p className="text-sm font-bold text-gray-700 underline underline-offset-4 decoration-pink-300 group-hover:decoration-pink-500 transition-all">
+            <p className="text-sm font-bold text-zinc-300 underline underline-offset-4 decoration-emerald-500/30 group-hover:decoration-emerald-500 transition-all">
               @_infinity_turf
             </p>
           </a>

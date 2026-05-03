@@ -46,38 +46,37 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4"
-      /* Light theme background with subtle mint glow */
-      style={{ background: 'radial-gradient(ellipse at top, #ebf9f3 0%, #ffffff 70%)' }}>
+      style={{ background: 'radial-gradient(ellipse at top, #0a1a0f 0%, #0f1117 70%)' }}>
 
       <div className="w-full max-w-md">
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <Link to="/" className="text-2xl font-black" style={{ color: '#00844d' }}>
-            <span style={{ color: '#1a1d1e' }}>Infinity</span> Sports Turf
+          <Link to="/" className="text-2xl font-black" style={{ color: '#4ade80' }}>
+            <span style={{ color: '#f4f4f5' }}>Infinity</span> Sports Turf
           </Link>
-          <p className="text-gray-500 text-sm mt-2">Welcome back. Login to book your turf.</p>
+          <p className="text-zinc-500 text-sm mt-2">Welcome back. Login to book your turf.</p>
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl p-8 border border-gray-100 shadow-xl bg-zinc-100">
+        <div className="rounded-2xl p-8 border border-zinc-800 shadow-xl bg-zinc-900">
 
-          <h2 className="text-gray-900 text-2xl font-bold text-center mb-6">Login</h2>
+          <h2 className="text-zinc-100 text-2xl font-bold text-center mb-6">Login</h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
 
             {/* Email */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-gray-700 font-bold text-sm">Email</label>
+              <label className="text-zinc-300 font-bold text-sm">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className={`rounded-xl px-4 py-3 text-sm text-gray-900 outline-none transition
-                  border ${errors.email ? 'border-red-500' : 'border-gray-200'}
-                  focus:border-green-500 focus:ring-4 focus:ring-green-50/50`}
-                style={{ backgroundColor: '#f9fafb' }}
+                className={`rounded-xl px-4 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none transition
+                  border ${errors.email ? 'border-red-500' : 'border-zinc-700'}
+                  focus:border-green-500 focus:ring-4 focus:ring-green-500/10`}
+                style={{ backgroundColor: '#1c1f26' }}
               />
               {errors.email && (
                 <span className="text-red-500 text-xs">{errors.email}</span>
@@ -87,8 +86,8 @@ const Login = () => {
             {/* Password */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-gray-700 font-bold text-sm">Password</label>
-                <a href="#" className="text-xs font-semibold" style={{ color: '#00844d' }}>
+                <label className="text-zinc-300 font-bold text-sm">Password</label>
+                <a href="#" className="text-xs font-semibold" style={{ color: '#4ade80' }}>
                   Forgot password?
                 </a>
               </div>
@@ -99,15 +98,15 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition
-                    border ${errors.password ? 'border-red-500' : 'border-gray-200'}
-                    focus:border-green-500 focus:ring-4 focus:ring-green-50/50`}
-                  style={{ backgroundColor: '#f9fafb' }}
+                  className={`w-full rounded-xl px-4 py-3 pr-16 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none transition
+                    border ${errors.password ? 'border-red-500' : 'border-zinc-700'}
+                    focus:border-green-500 focus:ring-4 focus:ring-green-500/10`}
+                  style={{ backgroundColor: '#1c1f26' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition text-xs font-bold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition text-xs font-bold"
                 >
                   {showPassword ? 'HIDE' : 'SHOW'}
                 </button>
@@ -119,8 +118,8 @@ const Login = () => {
             </div>
 
             {serverError && (
-              <div className="flex items-center gap-2 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
-                <span className="text-red-600 text-xs font-medium">{serverError}</span>
+              <div className="flex items-center gap-2 bg-red-900/20 border border-red-900 rounded-lg px-3 py-2">
+                <span className="text-red-400 text-xs font-medium">{serverError}</span>
               </div>
             )}
 
@@ -128,10 +127,21 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full cursor-pointer py-3.5 rounded-xl text-sm font-bold text-white transition disabled:opacity-60 shadow-lg shadow-green-200"
-              style={{ backgroundColor: '#00844d' }}
-              onMouseEnter={e => e.target.style.backgroundColor = '#006b3e'}
-              onMouseLeave={e => e.target.style.backgroundColor = '#00844d'}
+              className="w-full cursor-pointer py-3.5 rounded-xl text-sm font-bold transition disabled:opacity-60 border-2"
+              style={{ 
+                backgroundColor: '#0a1a0f', 
+                color: '#4ade80', 
+                borderColor: '#4ade80',
+                boxShadow: '0 4px 20px rgba(74,222,128,0.1)'
+              }}
+              onMouseEnter={e => {
+                e.target.style.backgroundColor = '#4ade80';
+                e.target.style.color = '#000';
+              }}
+              onMouseLeave={e => {
+                e.target.style.backgroundColor = '#0a1a0f';
+                e.target.style.color = '#4ade80';
+              }}
             >
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
@@ -139,18 +149,18 @@ const Login = () => {
           </form>
 
           {/* Switch to signup */}
-          <p className="text-center text-gray-500 text-sm mt-6">
+          <p className="text-center text-zinc-500 text-sm mt-6">
             Don't have an account?{' '}
-            <Link to="/signup" style={{ color: '#00844d' }} className="font-bold hover:underline">
+            <Link to="/signup" style={{ color: '#4ade80' }} className="font-bold hover:underline">
               Sign up
             </Link>
           </p>
 
           {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1rem 0 0' }}>
-            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
-            <span style={{ color: '#9ca3af', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>or</span>
-            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+            <div style={{ flex: 1, height: '1px', background: '#3f3f46' }} />
+            <span style={{ color: '#71717a', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>or</span>
+            <div style={{ flex: 1, height: '1px', background: '#3f3f46' }} />
           </div>
 
           {/* Admin Login button */}
@@ -159,13 +169,13 @@ const Login = () => {
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
               width: '100%', padding: '0.75rem', marginTop: '0.75rem', borderRadius: '12px',
-              border: '1.5px solid #d1d5db', background: '#f9fafb',
-              color: '#374151', fontWeight: 600, fontSize: '0.85rem',
+              border: '1.5px solid #3f3f46', background: '#1c1f26',
+              color: '#a1a1aa', fontWeight: 600, fontSize: '0.85rem',
               textDecoration: 'none', transition: 'all 0.2s',
               boxSizing: 'border-box',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = '#00844d'; e.currentTarget.style.color = '#00844d'; e.currentTarget.style.background = '#ebf9f3'; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = '#d1d5db'; e.currentTarget.style.color = '#374151'; e.currentTarget.style.background = '#f9fafb'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#4ade80'; e.currentTarget.style.color = '#4ade80'; e.currentTarget.style.background = '#0a1a0f'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#3f3f46'; e.currentTarget.style.color = '#a1a1aa'; e.currentTarget.style.background = '#1c1f26'; }}
           >
             <ShieldCheck size={16} />
             Login as Admin

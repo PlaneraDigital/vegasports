@@ -47,28 +47,28 @@ const STATUS_STYLE = {
 ────────────────────────── */
 function SkeletonLoader() {
   return (
-    <div className="bg-zinc-50 min-h-screen animate-pulse">
+    <div className="bg-zinc-900 min-h-screen animate-pulse">
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-6">
-        <div className="w-32 h-4 bg-zinc-200 rounded-full" />
+        <div className="w-32 h-4 bg-zinc-700 rounded-full" />
       </div>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-5">
-        <div className="w-full h-[300px] md:h-[460px] bg-zinc-200 rounded-2xl" />
+        <div className="w-full h-[300px] md:h-[460px] bg-zinc-700 rounded-2xl" />
       </div>
       <div className="max-w-6xl mx-auto px-5 sm:px-8 mt-8">
         <div className="grid md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_360px] gap-10 lg:gap-14">
           <div className="space-y-5">
             <div className="flex gap-2">
-              <div className="w-24 h-6 bg-zinc-200 rounded-full" />
-              <div className="w-20 h-6 bg-zinc-200 rounded-full" />
+              <div className="w-24 h-6 bg-zinc-700 rounded-full" />
+              <div className="w-20 h-6 bg-zinc-700 rounded-full" />
             </div>
-            <div className="w-3/4 h-10 bg-zinc-200 rounded-xl" />
-            <div className="w-1/2 h-4 bg-zinc-200 rounded-full" />
+            <div className="w-3/4 h-10 bg-zinc-700 rounded-xl" />
+            <div className="w-1/2 h-4 bg-zinc-700 rounded-full" />
             <div className="flex gap-3 mt-2">
-              {[1, 2, 3, 4].map(i => <div key={i} className="w-28 h-10 bg-zinc-200 rounded-xl" />)}
+              {[1, 2, 3, 4].map(i => <div key={i} className="w-28 h-10 bg-zinc-700 rounded-xl" />)}
             </div>
           </div>
           <div className="hidden md:block">
-            <div className="w-full h-64 bg-zinc-200 rounded-2xl" />
+            <div className="w-full h-64 bg-zinc-700 rounded-2xl" />
           </div>
         </div>
       </div>
@@ -81,9 +81,9 @@ function SkeletonLoader() {
 ────────────────────────── */
 function ErrorScreen({ message, onBack }) {
   return (
-    <div className="bg-zinc-50 min-h-screen flex flex-col items-center justify-center text-center px-6">
+    <div className="bg-zinc-900 min-h-screen flex flex-col items-center justify-center text-center px-6">
       <div className="text-6xl mb-5">🏟️</div>
-      <h1 className="text-2xl font-bold text-zinc-900 mb-2">Turf Not Found</h1>
+      <h1 className="text-2xl font-bold text-zinc-100 mb-2">Turf Not Found</h1>
       <p className="text-zinc-500 text-sm mb-7 max-w-xs">{message}</p>
       <button onClick={onBack}
         className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-full transition text-sm">
@@ -162,10 +162,10 @@ function ImageGallery({ images }) {
 function SectionHeading({ icon: Icon, label }) {
   return (
     <div className="flex items-center gap-2.5 mb-5">
-      <div className="w-8 h-8 rounded-lg bg-green-50 border border-green-100 flex items-center justify-center flex-shrink-0">
-        <Icon size={15} className="text-green-600" />
+      <div className="w-8 h-8 rounded-lg bg-green-900/50 border border-green-800 flex items-center justify-center flex-shrink-0">
+        <Icon size={15} className="text-green-400" />
       </div>
-      <h2 className="text-base font-bold text-zinc-900 tracking-tight">{label}</h2>
+      <h2 className="text-base font-bold text-zinc-100 tracking-tight">{label}</h2>
     </div>
   );
 }
@@ -174,7 +174,7 @@ function SectionHeading({ icon: Icon, label }) {
    DIVIDER
 ────────────────────────── */
 function Divider() {
-  return <hr className="border-zinc-200 my-8" />;
+  return <hr className="border-zinc-800 my-8" />;
 }
 
 /* ─────────────────────────
@@ -189,8 +189,8 @@ function AmenitiesGrid({ amenities }) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         {amenities.map((a, i) => (
           <div key={i}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-green-200 text-sm bg-white text-zinc-700 shadow-sm transition-colors">
-            <CheckCircle2 size={14} className="flex-shrink-0 text-green-600" />
+            className="flex items-center gap-3 px-4 py-3 rounded-xl border border-green-900 text-sm bg-zinc-800 text-zinc-300 shadow-sm transition-colors">
+            <CheckCircle2 size={14} className="flex-shrink-0 text-green-400" />
             <span className="font-bold tracking-tight">{a}</span>
           </div>
         ))}
@@ -210,13 +210,13 @@ function Highlights({ highlights }) {
         <SectionHeading icon={Star} label="Top Highlights" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {highlights.map((h, i) => (
-            <div key={i} className="group bg-white border border-zinc-200 p-4 rounded-2xl shadow-sm hover:border-emerald-300 hover:shadow-md transition-all duration-300">
+            <div key={i} className="group bg-zinc-800 border border-zinc-700 p-4 rounded-2xl shadow-sm hover:border-emerald-700 hover:shadow-md transition-all duration-300">
               <div className="flex flex-col">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-6 h-6 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-600 transition-colors">
-                    <CheckCircle2 size={12} className="text-emerald-500 group-hover:text-white" />
+                  <div className="w-6 h-6 rounded-lg bg-emerald-900/50 flex items-center justify-center flex-shrink-0 group-hover:bg-emerald-600 transition-colors">
+                    <CheckCircle2 size={12} className="text-emerald-400 group-hover:text-white" />
                   </div>
-                  <h3 className="text-zinc-900 font-bold text-xs uppercase tracking-wider">
+                  <h3 className="text-zinc-100 font-bold text-xs uppercase tracking-wider">
                     {h.title}
                   </h3>
                 </div>
@@ -282,14 +282,14 @@ function OperatingHours({ hours, pricing_overrides }) {
             {groups.map(({ label, slot }) => (
               <div key={label} className="group flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-[15px] font-bold text-zinc-900">{label}</span>
-                  <span className="text-[11px] text-zinc-400 font-medium">Standard timing</span>
+                  <span className="text-[15px] font-bold text-zinc-100">{label}</span>
+                  <span className="text-[11px] text-zinc-500 font-medium">Standard timing</span>
                 </div>
                 <div className="flex items-center gap-3">
                   {slot?.is_closed ? (
-                    <span className="text-red-500 text-[13px] font-bold bg-red-50 px-3 py-1 rounded-lg">Closed</span>
+                    <span className="text-red-400 text-[13px] font-bold bg-red-900/30 px-3 py-1 rounded-lg">Closed</span>
                   ) : (
-                    <span className="text-zinc-900 font-black tabular-nums text-lg tracking-tight">
+                    <span className="text-zinc-100 font-black tabular-nums text-lg tracking-tight">
                       {fmt(slot.open)} – {fmt(slot.close)}
                     </span>
                   )}
@@ -306,13 +306,13 @@ function OperatingHours({ hours, pricing_overrides }) {
         <div className="flex-1 space-y-8">
           {peak?.start && peak?.end && (
             <div>
-              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-4">Peak Hours Demand</p>
-              <div className="bg-white border-2 border-emerald-500/10 rounded-2xl p-5 shadow-sm">
+              <p className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-4">Peak Hours Demand</p>
+              <div className="bg-zinc-800 border-2 border-emerald-500/10 rounded-2xl p-5 shadow-sm">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-lg bg-emerald-500 flex items-center justify-center">
                     <Zap size={12} className="text-white" />
                   </div>
-                  <span className="text-zinc-900 font-black text-[13px]">Evening Rush ({fmt(peak.start)} – {fmt(peak.end)})</span>
+                  <span className="text-zinc-100 font-black text-[13px]">Evening Rush ({fmt(peak.start)} – {fmt(peak.end)})</span>
                 </div>
                 <p className="text-zinc-500 text-xs font-medium leading-relaxed">
                   Slots during this window are highly popular. We recommend booking in advance to secure your preferred time. 
@@ -351,10 +351,10 @@ function Rules({ rules }) {
       <ul className="space-y-3">
         {rules.map((rule, i) => (
           <li key={i} className="flex items-start gap-3.5 group">
-            <span className="flex-shrink-0 mt-0.5 w-6 h-6 rounded-lg bg-zinc-100 text-zinc-500 text-xs flex items-center justify-center font-bold group-hover:bg-zinc-900 group-hover:text-white transition-colors">
+            <span className="flex-shrink-0 mt-0.5 w-6 h-6 rounded-lg bg-zinc-800 text-zinc-400 text-xs flex items-center justify-center font-bold group-hover:bg-zinc-100 group-hover:text-zinc-900 transition-colors">
               {i + 1}
             </span>
-            <span className="text-zinc-600 text-sm leading-relaxed font-medium">{rule}</span>
+            <span className="text-zinc-400 text-sm leading-relaxed font-medium">{rule}</span>
           </li>
         ))}
       </ul>
@@ -392,12 +392,12 @@ export default function TurfPage() {
   const fullAddress = [turf.location?.address, turf.location?.city, turf.location?.state].filter(Boolean).join(", ");
 
   return (
-    <div className="bg-zinc-50 text-zinc-900 min-h-screen pb-0">
+    <div className="bg-zinc-900 text-zinc-100 min-h-screen pb-0">
 
       {/* ── BACK NAV ── */}
       <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-6">
         <button onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 text-sm font-bold transition group">
+          className="flex items-center gap-2 text-zinc-500 hover:text-zinc-100 text-sm font-bold transition group">
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to listings
         </button>
@@ -512,16 +512,16 @@ export default function TurfPage() {
       </div>
 
       {/* ── MOBILE STICKY FOOTER ── */}
-      <div className="fixed bottom-0 left-0 right-0 md:hidden z-50 bg-white/90 backdrop-blur-lg border-t border-zinc-200 px-5 py-4 flex items-center justify-between shadow-2xl">
+      <div className="fixed bottom-0 left-0 right-0 md:hidden z-50 bg-zinc-900/95 backdrop-blur-lg border-t border-zinc-800 px-5 py-4 flex items-center justify-between shadow-2xl">
         <div>
-          <p className="text-zinc-900 font-black text-xl leading-none">
+          <p className="text-zinc-100 font-black text-xl leading-none">
             {sym}{turf.price_per_hour}
             <span className="text-zinc-500 font-normal text-sm"> / {turf.slot_duration_minutes} mins</span>
           </p>
         </div>
         <button
           onClick={() => navigate(`/turf/${turf._id}/book`)}
-          className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-200 active:scale-95 transition-all text-sm">
+          className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-black/50 active:scale-95 transition-all text-sm">
           Book Now
         </button>
       </div>

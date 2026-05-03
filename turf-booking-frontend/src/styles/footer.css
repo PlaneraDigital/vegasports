@@ -1,8 +1,8 @@
 .footer {
-  /* Rich brand green background (Matches the new emerald shade) */
-  background-color: #00844d; 
-  border-top: none; /* Removed border since the color change is enough separation */
-  color: #ffffff;
+  /* Dark zinc background */
+  background-color: #09090b; 
+  border-top: 1px solid #27272a;
+  color: #f4f4f5;
   padding: 64px 60px;
 }
 
@@ -17,14 +17,12 @@
 .footer__brand {
   font-weight: 800;
   font-size: 1.2rem;
-  /* Pure white brand name for contrast */
-  color: #ffffff;
+  color: #f4f4f5;
   margin-bottom: 10px;
 }
 
 .footer__text {
-  /* Slightly transparent white for secondary text */
-  color: rgba(255, 255, 255, 0.85);
+  color: #71717a;
   font-size: 0.85rem;
   line-height: 1.6;
 }
@@ -32,15 +30,14 @@
 .footer__heading {
   font-weight: 700;
   font-size: 0.9rem;
-  color: #ffffff;
+  color: #f4f4f5;
   margin-bottom: 14px;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
 
 .footer__link {
-  /* Slightly transparent white to distinguish from headings */
-  color: rgba(255, 255, 255, 0.8);
+  color: #71717a;
   font-size: 0.85rem;
   margin-bottom: 8px;
   cursor: pointer;
@@ -48,13 +45,12 @@
 }
 
 .footer__link:hover { 
-  /* Brighter white or mint on hover */
-  color: #ffffff;
-  padding-left: 4px; /* Subtle movement effect on hover */
+  color: #4ade80;
+  padding-left: 4px;
 }
 
 .footer__contact p {
-  color: rgba(255, 255, 255, 0.85);
+  color: #71717a;
   font-size: 0.85rem;
   margin-bottom: 10px;
 }
@@ -90,7 +86,7 @@
 
 @media (max-width: 768px) {
   .footer {
-    padding: 8px 16px 40px 16px;
+    padding: 32px 16px 40px 16px;
   }
 
   .footer__grid {
@@ -100,6 +96,9 @@
   }
 
   .footer__contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
   }
 

@@ -15,8 +15,7 @@ const TurfCard = ({ turf }) => {
   return (
     <div
       onClick={() => navigate(`/turf/${turf._id}`)}
-      /* Updated to Light Theme: bg-white, text-gray-900, border-gray-200 */
-      className="bg-white text-gray-900 rounded-2xl overflow-hidden shadow-md hover:shadow-xl cursor-pointer transition duration-300 hover:scale-[1.02] border border-gray-100 hover:border-green-500"
+      className="bg-zinc-800 text-zinc-100 rounded-2xl overflow-hidden shadow-md hover:shadow-xl cursor-pointer transition duration-300 hover:scale-[1.02] border border-zinc-700 hover:border-green-500"
     >
       {/* Image */}
       <div className="relative">
@@ -37,19 +36,19 @@ const TurfCard = ({ turf }) => {
 
       {/* Content */}
       <div className="p-4 sm:p-5">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-800">
+        <h2 className="text-lg sm:text-xl font-bold text-zinc-100">
           {turf.name}
         </h2>
 
-        <p className="text-gray-500 text-sm mt-1 leading-relaxed flex items-center">
-          <MapPin size={14} className="mr-1 text-gray-400" />
+        <p className="text-zinc-400 text-sm mt-1 leading-relaxed flex items-center">
+          <MapPin size={14} className="mr-1 text-zinc-500" />
           {turf.location?.address}, {turf.location?.city}
         </p>
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-5">
-          <span className="text-green-600 font-extrabold text-lg sm:text-xl">
+          <span className="text-green-400 font-extrabold text-lg sm:text-xl">
             ₹{turf.price_per_hour}
-            <span className="text-gray-400 font-normal text-xs sm:text-sm">
+            <span className="text-zinc-500 font-normal text-xs sm:text-sm">
               /{turf.slot_duration_minutes} mins
             </span>
           </span>
@@ -96,21 +95,21 @@ const Card = () => {
 
   if (loading)
     return (
-      <div className="text-center text-gray-500 py-20 font-medium">
+      <div className="text-center text-zinc-500 py-20 font-medium">
         Loading turfs...
       </div>
     )
 
   if (error)
     return (
-      <div className="text-center text-red-500 py-20 font-medium">
+      <div className="text-center text-red-400 py-20 font-medium">
         {error}
       </div>
     )
 
   if (turfs.length === 0)
     return (
-      <div className="text-center text-gray-500 py-20 font-medium">
+      <div className="text-center text-zinc-500 py-20 font-medium">
         No turfs available at the moment.
       </div>
     )

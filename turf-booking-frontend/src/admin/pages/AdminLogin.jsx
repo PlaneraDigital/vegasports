@@ -32,7 +32,7 @@ const AdminLogin = () => {
   return (
     <div
       className="min-h-screen flex items-center justify-center px-4"
-      style={{ background: 'radial-gradient(ellipse at top, #ebf9f3 0%, #ffffff 70%)' }}
+      style={{ background: 'radial-gradient(ellipse at top, #0a1a0f 0%, #0f1117 70%)' }}
     >
       <div className="w-full" style={{ maxWidth: '420px' }}>
 
@@ -48,39 +48,39 @@ const AdminLogin = () => {
             <ShieldCheck size={26} color="white" />
           </div>
           <h1 style={{
-            fontWeight: 800, fontSize: '1.5rem', color: '#1a1d1e',
+            fontWeight: 800, fontSize: '1.5rem', color: '#f4f4f5',
             letterSpacing: '-0.03em', margin: 0,
           }}>
-            Infinity Sports Turf <span style={{ color: '#00844d' }}>Admin</span>
+            Infinity <span style={{ color: '#4ade80' }}>Sports Turf</span>
           </h1>
-          <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.4rem' }}>
+          <p style={{ color: '#71717a', fontSize: '0.875rem', marginTop: '0.4rem' }}>
             Restricted access. Authorised personnel only.
           </p>
         </div>
 
         {/* Card */}
         <div style={{
-          background: '#f4f4f5',
-          border: '1px solid #e5e7eb',
+          background: '#18181b',
+          border: '1px solid #3f3f46',
           borderRadius: '20px',
           padding: '2rem',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.08)',
+          boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
         }}>
           {/* Admin badge */}
           <div style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem',
-            background: '#ebf9f3', border: '1px solid #bbf7d0',
+            background: '#0a1a0f', border: '1px solid #14532d',
             borderRadius: '9999px', padding: '0.35rem 1rem',
             marginBottom: '1.5rem', width: 'fit-content', margin: '0 auto 1.5rem',
           }}>
-            <ShieldCheck size={13} color="#00844d" />
-            <span style={{ color: '#00844d', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>
+            <ShieldCheck size={13} color="#4ade80" />
+            <span style={{ color: '#4ade80', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em' }}>
               ADMIN PORTAL
             </span>
           </div>
 
           <h2 style={{
-            color: '#111827', fontWeight: 700, fontSize: '1.25rem',
+            color: '#f4f4f5', fontWeight: 700, fontSize: '1.25rem',
             marginBottom: '1.5rem', textAlign: 'center',
           }}>
             Sign in to Admin Portal
@@ -90,7 +90,7 @@ const AdminLogin = () => {
 
             {/* Email */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#374151', fontSize: '0.8rem', fontWeight: 700 }}>
+              <label style={{ color: '#a1a1aa', fontSize: '0.8rem', fontWeight: 700 }}>
                 Admin Email
               </label>
               <input
@@ -100,19 +100,19 @@ const AdminLogin = () => {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="admin@infinityturf.com"
                 style={{
-                  width: '100%', background: '#f9fafb',
-                  border: '1px solid #e5e7eb',
+                  width: '100%', background: '#27272a',
+                  border: '1px solid #3f3f46',
                   borderRadius: '12px', padding: '0.75rem 1rem',
-                  color: '#111827', fontSize: '0.875rem',
+                  color: '#f4f4f5', fontSize: '0.875rem',
                   outline: 'none', boxSizing: 'border-box',
                   transition: 'border-color 0.2s, box-shadow 0.2s',
                 }}
                 onFocus={e => {
-                  e.target.style.borderColor = '#00844d'
-                  e.target.style.boxShadow = '0 0 0 4px rgba(22,163,74,0.08)'
+                  e.target.style.borderColor = '#4ade80'
+                  e.target.style.boxShadow = '0 0 0 4px rgba(74,222,128,0.08)'
                 }}
                 onBlur={e => {
-                  e.target.style.borderColor = '#e5e7eb'
+                  e.target.style.borderColor = '#3f3f46'
                   e.target.style.boxShadow = 'none'
                 }}
               />
@@ -120,7 +120,7 @@ const AdminLogin = () => {
 
             {/* Password */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-              <label style={{ color: '#374151', fontSize: '0.8rem', fontWeight: 700 }}>
+              <label style={{ color: '#a1a1aa', fontSize: '0.8rem', fontWeight: 700 }}>
                 Password
               </label>
               <div style={{ position: 'relative' }}>
@@ -131,19 +131,19 @@ const AdminLogin = () => {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   style={{
-                    width: '100%', background: '#f9fafb',
-                    border: '1px solid #e5e7eb',
+                    width: '100%', background: '#27272a',
+                    border: '1px solid #3f3f46',
                     borderRadius: '12px', padding: '0.75rem 3rem 0.75rem 1rem',
-                    color: '#111827', fontSize: '0.875rem',
+                    color: '#f4f4f5', fontSize: '0.875rem',
                     outline: 'none', boxSizing: 'border-box',
                     transition: 'border-color 0.2s, box-shadow 0.2s',
                   }}
                   onFocus={e => {
-                    e.target.style.borderColor = '#00844d'
-                    e.target.style.boxShadow = '0 0 0 4px rgba(22,163,74,0.08)'
+                    e.target.style.borderColor = '#4ade80'
+                    e.target.style.boxShadow = '0 0 0 4px rgba(74,222,128,0.08)'
                   }}
                   onBlur={e => {
-                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.borderColor = '#3f3f46'
                     e.target.style.boxShadow = 'none'
                   }}
                 />
@@ -166,11 +166,11 @@ const AdminLogin = () => {
             {error && (
               <div style={{
                 display: 'flex', alignItems: 'center', gap: '0.5rem',
-                background: '#fef2f2', border: '1px solid #fecaca',
+                background: '#1a1111', border: '1px solid #442222',
                 borderRadius: '10px', padding: '0.6rem 0.875rem',
               }}>
-                <AlertCircle size={14} color="#dc2626" />
-                <span style={{ color: '#dc2626', fontSize: '0.8rem' }}>{error}</span>
+                <AlertCircle size={14} color="#f87171" />
+                <span style={{ color: '#f87171', fontSize: '0.8rem' }}>{error}</span>
               </div>
             )}
 
@@ -181,15 +181,26 @@ const AdminLogin = () => {
               disabled={loading}
               style={{
                 width: '100%', padding: '0.875rem', borderRadius: '12px',
-                background: '#00844d',
-                color: '#fff', fontWeight: 700, fontSize: '0.9rem',
-                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s', opacity: loading ? 0.65 : 1,
-                boxShadow: '0 4px 20px rgba(22,163,74,0.25)',
+                background: '#0a1a0f', 
+                color: '#4ade80', 
+                fontWeight: 800, fontSize: '0.9rem',
+                border: '2px solid #4ade80', 
+                cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s', 
+                opacity: loading ? 0.65 : 1,
+                boxShadow: '0 4px 20px rgba(74,222,128,0.1)',
                 marginTop: '0.25rem',
               }}
-              onMouseEnter={e => { if (!loading) e.target.style.background = '#006b3e' }}
-              onMouseLeave={e => { e.target.style.background = '#00844d' }}
+              onMouseEnter={e => { 
+                if (!loading) {
+                  e.target.style.background = '#4ade80';
+                  e.target.style.color = '#000';
+                }
+              }}
+              onMouseLeave={e => { 
+                e.target.style.background = '#0a1a0f';
+                e.target.style.color = '#4ade80';
+              }}
             >
               {loading ? 'Signing in...' : 'Sign in as Admin'}
             </button>
@@ -197,9 +208,9 @@ const AdminLogin = () => {
 
           {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', margin: '1.25rem 0 0' }}>
-            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
-            <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>or</span>
-            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }} />
+            <div style={{ flex: 1, height: '1px', background: '#3f3f46' }} />
+            <span style={{ color: '#71717a', fontSize: '0.75rem' }}>or</span>
+            <div style={{ flex: 1, height: '1px', background: '#3f3f46' }} />
           </div>
 
           {/* Back to user login */}
@@ -208,19 +219,19 @@ const AdminLogin = () => {
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               marginTop: '0.75rem', padding: '0.7rem', borderRadius: '12px',
-              border: '1.5px solid #d1d5db', background: '#f9fafb',
-              color: '#374151', fontWeight: 600, fontSize: '0.85rem',
+              border: '1.5px solid #3f3f46', background: '#27272a',
+              color: '#a1a1aa', fontWeight: 600, fontSize: '0.85rem',
               textDecoration: 'none', transition: 'all 0.2s',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.borderColor = '#00844d'
-              e.currentTarget.style.color = '#00844d'
-              e.currentTarget.style.background = '#ebf9f3'
+              e.currentTarget.style.borderColor = '#4ade80'
+              e.currentTarget.style.color = '#4ade80'
+              e.currentTarget.style.background = '#0a1a0f'
             }}
             onMouseLeave={e => {
-              e.currentTarget.style.borderColor = '#d1d5db'
-              e.currentTarget.style.color = '#374151'
-              e.currentTarget.style.background = '#f9fafb'
+              e.currentTarget.style.borderColor = '#3f3f46'
+              e.currentTarget.style.color = '#a1a1aa'
+              e.currentTarget.style.background = '#27272a'
             }}
           >
             ← Back to User Login

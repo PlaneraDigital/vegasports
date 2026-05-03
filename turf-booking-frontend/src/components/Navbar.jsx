@@ -27,22 +27,22 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-gray-200"
-      style={{ backgroundColor: '#ffffff' }}>
+    <nav className="sticky top-0 z-50 border-b border-zinc-800"
+      style={{ backgroundColor: '#111827' }}>
 
       <div className="max-w-7xl mx-auto px-6 py-4 md:py-2 flex justify-between items-center">
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-2xl font-bold cursor-pointer group"
-          style={{ color: '#00844d' }}>
+          style={{ color: '#4ade80' }}>
           <IoFootballSharp className="transition duration-700 group-hover:rotate-180" />
-          <span className="brand-wordmark text-gray-900">Infinity <span style={{ color: '#00844d' }}>Sports Turf</span></span>
+          <span className="brand-wordmark text-zinc-100">Infinity <span style={{ color: '#4ade80' }}>Sports Turf</span></span>
         </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-2">
           <Link to="/"
-            className="px-4 py-2 text-gray-600 hover:text-gray-900 transition  text-medium font-semibold tracking-wider">
+            className="px-4 py-2 text-zinc-400 hover:text-zinc-100 transition  text-medium font-semibold tracking-wider">
             Home
           </Link>
           
@@ -50,7 +50,7 @@ const Navbar = () => {
             <>
               <Link
                 to="/profile"
-                className="ml-2 px-3 py-2 text-medium text-gray-600 hover:text-green-600 transition font-medium"
+                className="ml-2 px-3 py-2 text-medium text-zinc-400 hover:text-green-400 transition font-medium"
               >
                 Hi, {authUser.name}
               </Link>
@@ -76,7 +76,7 @@ const Navbar = () => {
         </div>
 
         {/* Hamburger Icon */}
-        <div className="md:hidden text-2xl cursor-pointer text-gray-600 hover:text-gray-900 transition">
+        <div className="md:hidden text-2xl cursor-pointer text-zinc-400 hover:text-zinc-100 transition">
           {open ? (
             <HiX onClick={() => setOpen(false)} />
           ) : (
@@ -87,18 +87,18 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {open && (
-        <div className="md:hidden flex flex-col items-center gap-2 pb-6 pt-2 border-t border-gray-100"
-          style={{ backgroundColor: '#ffffff' }}>
+        <div className="md:hidden flex flex-col items-center gap-2 pb-6 pt-2 border-t border-zinc-800"
+          style={{ backgroundColor: '#111827' }}>
 
           <Link to="/" onClick={() => setOpen(false)}
-            className="w-full text-center px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition text-sm font-semibold">
+            className="w-full text-center px-4 py-3 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition text-sm font-semibold">
             Home
           </Link>
 
           {authUser ? (
             <>
               <Link to="/profile" onClick={() => setOpen(false)}
-                className="w-full text-center px-4 py-3 text-gray-600 hover:text-green-600 transition font-medium">
+                className="w-full text-center px-4 py-3 text-zinc-400 hover:text-green-400 transition font-medium">
                 Hi, {authUser.name}
               </Link>
               <button

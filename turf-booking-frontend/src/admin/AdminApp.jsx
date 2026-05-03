@@ -7,7 +7,7 @@ const AdminApp = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   
   return (
-    <div className="flex min-h-screen bg-[#f8fafc] font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="flex min-h-screen bg-zinc-950 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div 
