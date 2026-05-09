@@ -146,7 +146,7 @@ const getBookingById = async (req, res) => {
         const advanceAmount = booking.payment.advance_amount || 200;
         const balanceDue = booking.total_amount - advanceAmount;
         if (balanceDue > 0) {
-          const backendBase = process.env.BACKEND_URL || `http://localhost:5001`;
+          const backendBase = process.env.BACKEND_URL || `${req.protocol}://${req.get("host")}`;
           const amountPaise = Math.round(balanceDue * 100);
           const link = await razorpay.paymentLink.create({
             amount: amountPaise, currency: "INR", accept_partial: false,

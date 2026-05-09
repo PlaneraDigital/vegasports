@@ -268,8 +268,6 @@ const verifyAdvancePayment = async (req, res) => {
 // ─── Balance Payment Webhook (Razorpay Payment Link callback) ─────────────────
 const balanceWebhook = async (req, res) => {
   try {
-    // Razorpay Payment Link GET callback includes: razorpay_payment_id, razorpay_payment_link_id, 
-    // razorpay_payment_link_reference_id, razorpay_payment_link_status, razorpay_signature
     const { 
       razorpay_payment_link_id, 
       razorpay_payment_id, 
@@ -277,29 +275,30 @@ const balanceWebhook = async (req, res) => {
       razorpay_signature,
     } = req.query;
 
+    // Razorpay webhooks are server-to-server — origin/referer headers are always empty.
+    // Use the known production frontend URL directly.
+    const frontendBase = process.env.FRONTEND_URL || "https://www.infinitysports-turf.com";
+
     if (razorpay_payment_link_status !== "paid") {
-      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/payment-status?status=pending`);
+      return res.redirect(`${frontendBase}/payment-status?status=pending`);
     }
 
-    // Verify signature: payment_link_id + | + payment_link_reference_id + | + payment_link_status + | + payment_id
     const body = `${razorpay_payment_link_id}|${req.query.razorpay_payment_link_reference_id}|${razorpay_payment_link_status}|${razorpay_payment_id}`;
     const expected = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(body).digest("hex");
 
     if (expected !== razorpay_signature) {
-      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/payment-status?status=failed`);
+      return res.redirect(`${frontendBase}/payment-status?status=failed`);
     }
 
-    // Find booking by balance_link_id
     const booking = await Booking.findOne({ "payment.balance_link_id": razorpay_payment_link_id });
     if (!booking) {
-      return res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/payment-status?status=not_found`);
+      return res.redirect(`${frontendBase}/payment-status?status=not_found`);
     }
 
-    // Mark fully paid
-    booking.payment.status        = "paid";
+    booking.payment.status          = "paid";
     booking.payment.balance_paid_at = new Date();
-    booking.payment.paid_at        = new Date();
-    booking.payment.transaction_id = razorpay_payment_id;
+    booking.payment.paid_at         = new Date();
+    booking.payment.transaction_id  = razorpay_payment_id;
     await booking.save();
 
     // Send Blue Card email
@@ -308,11 +307,11 @@ const balanceWebhook = async (req, res) => {
       if (user?.email) await sendBlueCardEmail({ to: user.email, name: user.name, booking });
     } catch (emailErr) { console.error("Blue card email failed:", emailErr.message); }
 
-    // Redirect to ticket page
-    res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/ticket/${booking._id}?paid=true`);
+    res.redirect(`${frontendBase}/ticket/${booking._id}?paid=true`);
   } catch (error) {
     console.error("Balance webhook error:", error.message);
-    res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/payment-status?status=error`);
+    const frontendBase = process.env.FRONTEND_URL || "https://www.infinitysports-turf.com";
+    res.redirect(`${frontendBase}/payment-status?status=error`);
   }
 };
 

@@ -9,10 +9,24 @@ connectDB();
 
 const app = express();
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://www.infinitysports-turf.com"
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Razorpay webhooks)
+    if (!origin) return callback(null, true);
+    const allowed = [
+      "http://localhost:5173",
+      "https://www.infinitysports-turf.com",
+      "https://infinitysports-turf.com",
+    ];
+    // Also allow any Vercel or Render domain automatically
+    if (
+      allowed.includes(origin) ||
+      origin.endsWith(".vercel.app") ||
+      origin.endsWith(".onrender.com")
+    ) {
+      return callback(null, true);
+    }
+    callback(new Error("Not allowed by CORS"));
+  },
   credentials: true
 }));
 app.use(express.json());
