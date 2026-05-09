@@ -195,7 +195,7 @@ const verifyAdvancePayment = async (req, res) => {
     let balanceLinkUrl = null;
     try {
       const user = await User.findById(user_id);
-      const backendBase = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 5001}`;
+      const backendBase = process.env.BACKEND_URL || `${req.protocol}://${req.get("host")}`;
       const paymentLinkOptions = {
         amount:      balanceDue * 100, // paise
         currency:    "INR",
