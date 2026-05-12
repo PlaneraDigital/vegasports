@@ -25,6 +25,11 @@ import BookingManagement from './admin/pages/BookingManagement'
 import UserManagement from './admin/pages/UserManagement'
 import Reports from './admin/pages/Reports'
 
+// ─── Receptionist ─────────────────────────────────────────────────────────────
+import ReceptionistLogin from './admin/pages/ReceptionistLogin'
+import ReceptionistDashboard from './admin/pages/ReceptionistDashboard'
+import ProtectedReceptionistRoute from './admin/components/ProtectedReceptionistRoute'
+
 function App() {
   return (
     <AdminAuthProvider>
@@ -47,6 +52,17 @@ function App() {
           <Route path="users"     element={<UserManagement />} />
           <Route path="reports"   element={<Reports />} />
         </Route>
+
+        {/* ── Receptionist routes ── */}
+        <Route path="/receptionist/login" element={<ReceptionistLogin />} />
+        <Route
+          path="/receptionist"
+          element={
+            <ProtectedReceptionistRoute>
+              <ReceptionistDashboard />
+            </ProtectedReceptionistRoute>
+          }
+        />
 
         {/* ── User-facing routes ── */}
         <Route

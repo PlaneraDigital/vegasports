@@ -4,6 +4,8 @@ const multer  = require("multer");
 const {
   adminRegister,
   adminLogin,
+  receptionistRegister,
+  receptionistLogin,
   addTurf,
   editTurf,
   deleteTurf,
@@ -24,7 +26,7 @@ const {
   toggleUserStatus,
 } = require("../controllers/adminController");
 const { markFullyPaid } = require("../controllers/paymentController");
-const { protect, adminOnly } = require("../middleware/authMiddleware");
+const { protect, adminOnly, adminOrReceptionist } = require("../middleware/authMiddleware");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
@@ -49,6 +51,8 @@ const upload = multer({ storage });
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 router.post("/register", adminRegister);
 router.post("/login",    adminLogin);
+router.post("/receptionist/register", receptionistRegister);
+router.post("/receptionist/login",    receptionistLogin);
 
 // ─── Turf Management ──────────────────────────────────────────────────────────
 router.post("/turfs",            protect, adminOnly, addTurf);
@@ -75,11 +79,11 @@ router.put("/slots/:id/status",  protect, adminOnly, updateSlotStatus);
 router.put("/slots/:id/price",   protect, adminOnly, updateSlotPrice);
 router.get("/slots",             protect, adminOnly, getAdminSlots);
 
-// ─── Booking Management ───────────────────────────────────────────────────────
-router.get("/bookings",            protect, adminOnly, getAllBookings);
-router.get("/bookings/:id",        protect, adminOnly, getBookingByIdAdmin);
-router.put("/bookings/:id/cancel", protect, adminOnly, cancelBookingAdmin);
-router.post("/payment/mark-fully-paid/:booking_id", protect, adminOnly, markFullyPaid);
+// ─── Booking Management (admin + receptionist) ───────────────────────────────
+router.get("/bookings",            protect, adminOrReceptionist, getAllBookings);
+router.get("/bookings/:id",        protect, adminOrReceptionist, getBookingByIdAdmin);
+router.put("/bookings/:id/cancel", protect, adminOrReceptionist, cancelBookingAdmin);
+router.post("/payment/mark-fully-paid/:booking_id", protect, adminOrReceptionist, markFullyPaid);
 
 // ─── User Management ──────────────────────────────────────────────────────────
 router.get("/users",             protect, adminOnly, getUsersWithStats);

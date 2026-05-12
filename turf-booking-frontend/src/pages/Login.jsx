@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { authApi, saveAuthSession } from '../utils/auth'
-import { ShieldCheck } from 'lucide-react'
+import { ShieldCheck, ConciergeBell } from 'lucide-react'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -184,6 +184,24 @@ const Login = () => {
           >
             <ShieldCheck size={16} />
             Login as Admin
+          </Link>
+
+          {/* Receptionist Login button */}
+          <Link
+            to="/receptionist/login"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+              width: '100%', padding: '0.75rem', marginTop: '0.6rem', borderRadius: '12px',
+              border: '1.5px solid #3f3f46', background: '#1c1f26',
+              color: '#a1a1aa', fontWeight: 600, fontSize: '0.85rem',
+              textDecoration: 'none', transition: 'all 0.2s',
+              boxSizing: 'border-box',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#fbbf24'; e.currentTarget.style.color = '#fbbf24'; e.currentTarget.style.background = '#1c1000'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#3f3f46'; e.currentTarget.style.color = '#a1a1aa'; e.currentTarget.style.background = '#1c1f26'; }}
+          >
+            <ConciergeBell size={16} />
+            Login as Receptionist
           </Link>
 
         </div>

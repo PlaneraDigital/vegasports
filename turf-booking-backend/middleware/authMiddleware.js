@@ -43,4 +43,13 @@ const adminOnly = (req, res, next) => {
   }
 };
 
-module.exports = { protect, adminOnly };
+// ─── Admin or Receptionist ────────────────────────────────────────────────────
+const adminOrReceptionist = (req, res, next) => {
+  if (req.user && ["admin", "receptionist"].includes(req.user.role)) {
+    next();
+  } else {
+    res.status(403).json({ message: "Access denied. Authorised staff only." });
+  }
+};
+
+module.exports = { protect, adminOnly, adminOrReceptionist };
