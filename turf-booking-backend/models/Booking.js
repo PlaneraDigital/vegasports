@@ -44,7 +44,7 @@ const bookingSchema = new mongoose.Schema(
       transaction_id: { type: String, default: null },
       gateway: {
         type: String,
-        enum: ["razorpay", "stripe", "paytm", "cashfree"],
+        enum: ["razorpay", "stripe", "paytm", "cashfree", "cash"],
         default: "razorpay",
       },
       paid_at:  { type: Date, default: null },

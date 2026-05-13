@@ -25,7 +25,7 @@ const {
   getUsersWithStats,
   toggleUserStatus,
 } = require("../controllers/adminController");
-const { markFullyPaid } = require("../controllers/paymentController");
+const { markFullyPaid, markPaidCash } = require("../controllers/paymentController");
 const { protect, adminOnly, adminOrReceptionist } = require("../middleware/authMiddleware");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -83,7 +83,8 @@ router.get("/slots",             protect, adminOnly, getAdminSlots);
 router.get("/bookings",            protect, adminOrReceptionist, getAllBookings);
 router.get("/bookings/:id",        protect, adminOrReceptionist, getBookingByIdAdmin);
 router.put("/bookings/:id/cancel", protect, adminOrReceptionist, cancelBookingAdmin);
-router.post("/payment/mark-fully-paid/:booking_id", protect, adminOrReceptionist, markFullyPaid);
+router.post("/pay-online/:id", protect, adminOrReceptionist, markFullyPaid);
+router.post("/pay-cash/:id",   protect, adminOrReceptionist, markPaidCash);
 
 // ─── User Management ──────────────────────────────────────────────────────────
 router.get("/users",             protect, adminOnly, getUsersWithStats);

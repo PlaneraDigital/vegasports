@@ -318,7 +318,8 @@ const balanceWebhook = async (req, res) => {
 // ─── Admin: Mark Booking Fully Paid ──────────────────────────────────────────
 const markFullyPaid = async (req, res) => {
   try {
-    const { booking_id } = req.params;
+    const { id } = req.params;
+    const booking_id = id;
     
     console.log(`[ADMIN] markFullyPaid called for booking: ${booking_id}`);
 
@@ -390,6 +391,68 @@ const markFullyPaid = async (req, res) => {
   }
 };
 
+const markPaidCash = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const booking_id = id;
+    console.log(`[ADMIN] markPaidCash: Starting for booking: ${booking_id}`);
+
+    const booking = await Booking.findById(booking_id);
+    if (!booking) {
+      console.log(`[ADMIN] markPaidCash: Booking ${booking_id} not found`);
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    // Update payment details for Cash
+    booking.payment = {
+      ...(booking.payment || {}),
+      status: "paid",
+      gateway: "cash",
+      paid_at: new Date(),
+      balance_paid_at: new Date()
+    };
+    
+    if (booking.booking_status === "pending" || !booking.booking_status) {
+      booking.booking_status = "confirmed";
+    }
+
+    await booking.save();
+    console.log(`[ADMIN] markPaidCash: Booking ${booking_id} saved successfully`);
+
+    // Update slots
+    try {
+      await Slot.updateMany(
+        { _id: { $in: booking.slot_ids } },
+        { $set: { status: "booked", booking_id: booking._id, held_until: null } }
+      );
+      console.log(`[ADMIN] markPaidCash: Slots updated for booking ${booking_id}`);
+    } catch (slotErr) {
+      console.error(`[ADMIN] Failed to update slots for cash payment:`, slotErr.message);
+    }
+
+    // Send Blue Card email
+    try {
+      const user = await User.findById(booking.user_id);
+      if (user?.email) {
+        console.log(`[ADMIN] markPaidCash: Sending Blue Card to ${user.email}`);
+        await sendBlueCardEmail({ to: user.email, name: user.name, booking });
+      }
+    } catch (emailErr) {
+      console.error(`[ADMIN] Blue card email failed for cash payment:`, emailErr.message);
+    }
+
+    res.status(200).json({
+      message: "Booking marked as Paid via Cash.",
+      booking_id: booking._id,
+      payment_status: "paid",
+      gateway: "cash"
+    });
+  } catch (error) {
+    console.error(`[ADMIN] markPaidCash error:`, error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 // ─── Refund Logic (Internal Helper) ──────────────────────────────────────────
 const processRefund = async (booking) => {
   try {
@@ -430,4 +493,4 @@ const processRefund = async (booking) => {
   }
 };
 
-module.exports = { createOrder, verifyPayment, createAdvanceOrder, verifyAdvancePayment, balanceWebhook, markFullyPaid, processRefund };
+module.exports = { createOrder, verifyPayment, createAdvanceOrder, verifyAdvancePayment, balanceWebhook, markFullyPaid, markPaidCash, processRefund };
