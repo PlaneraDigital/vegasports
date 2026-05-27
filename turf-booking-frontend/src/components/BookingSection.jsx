@@ -115,11 +115,11 @@ function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
 function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSuccess, onFullSuccess }) {
   const [booking, setBooking] = useState(false);
   const [err, setErr] = useState(null);
-  const [payType, setPayType] = useState("full");
+  const [payType, setPayType] = useState("advance");
 
   if (!isOpen) return null;
   const total = selectedSlots.reduce((acc, s) => acc + s.price, 0);
-  const payable = payType === "advance" ? 200 : total;
+  const payable = 200;
 
   const handlePay = async () => {
     setBooking(true); setErr(null);
@@ -190,17 +190,14 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
             </div>
           </div>
 
-          <div className="mt-8 grid grid-cols-2 gap-3">
-            <button onClick={() => setPayType("advance")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'advance' ? 'border-red-500 bg-red-900/20' : 'border-zinc-700 bg-zinc-800 hover:border-zinc-600'}`}>
-              <Wallet size={18} className={payType === 'advance' ? 'text-red-500' : 'text-zinc-500'} />
-              <span className="text-[11px] font-black uppercase text-zinc-200">Advance</span>
-              <span className="text-xs font-bold text-zinc-100">₹200</span>
-            </button>
-            <button onClick={() => setPayType("full")} className={`p-4 rounded-2xl border-2 flex flex-col items-center gap-1 transition-all ${payType === 'full' ? 'border-emerald-500 bg-emerald-900/20' : 'border-zinc-700 bg-zinc-800 hover:border-zinc-600'}`}>
-              <CreditCard size={18} className={payType === 'full' ? 'text-emerald-500' : 'text-zinc-500'} />
-              <span className="text-[11px] font-black uppercase text-zinc-200">Full Pay</span>
-              <span className="text-xs font-bold text-zinc-100">₹{total}</span>
-            </button>
+          <div className="mt-6 p-4 rounded-2xl bg-red-950/20 border border-red-900/30 flex items-start gap-3 text-left">
+            <Wallet size={20} className="text-red-500 mt-0.5 flex-shrink-0" />
+            <div>
+              <span className="text-[11px] font-black uppercase text-red-400 block mb-1">Advance Payment Policy</span>
+              <span className="text-xs text-zinc-400 leading-relaxed block">
+                To secure your slots, a fixed advance payment of <strong>₹200</strong> is required online. The remaining balance of <strong>₹{total - 200}</strong> must be paid at the turf venue to the caretaker or admin.
+              </span>
+            </div>
           </div>
         </div>
 
@@ -212,7 +209,7 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
           {err && <p className="mb-4 text-red-500 text-xs font-bold">{err}</p>}
           <div className="flex gap-3">
             <button onClick={onClose} className="flex-1 py-4 text-zinc-500 font-bold hover:text-zinc-100 transition-colors">Cancel</button>
-            <button onClick={handlePay} disabled={booking} className={`flex-[2] py-4 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${payType === 'advance' ? 'bg-red-600 hover:bg-red-700' : 'bg-emerald-600 hover:bg-emerald-700'}`}>
+            <button onClick={handlePay} disabled={booking} className="flex-[2] py-4 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all bg-red-600 hover:bg-red-700">
               {booking ? <Loader2 size={18} className="animate-spin" /> : "Confirm & Pay"}
             </button>
           </div>

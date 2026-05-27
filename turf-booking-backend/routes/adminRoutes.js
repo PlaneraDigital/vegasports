@@ -74,10 +74,10 @@ router.post("/upload", protect, adminOnly, upload.single("image"), (req, res) =>
 });
 
 // ─── Slot Management ──────────────────────────────────────────────────────────
-router.post("/slots/generate",   protect, adminOnly, generateSlots);
-router.put("/slots/:id/status",  protect, adminOnly, updateSlotStatus);
-router.put("/slots/:id/price",   protect, adminOnly, updateSlotPrice);
-router.get("/slots",             protect, adminOnly, getAdminSlots);
+router.post("/slots/generate",   protect, adminOrReceptionist, generateSlots);
+router.put("/slots/:id/status",  protect, adminOrReceptionist, updateSlotStatus);
+router.put("/slots/:id/price",   protect, adminOrReceptionist, updateSlotPrice);
+router.get("/slots",             protect, adminOrReceptionist, getAdminSlots);
 
 // ─── Booking Management (admin + receptionist) ───────────────────────────────
 router.get("/bookings",            protect, adminOrReceptionist, getAllBookings);

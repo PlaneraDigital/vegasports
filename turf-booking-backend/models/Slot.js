@@ -48,7 +48,7 @@ const slotSchema = new mongoose.Schema(
     },
     blocked_reason: {
       type: String,
-      enum: ["Maintenance", "Holiday", "Private Event", null],
+      enum: ["Maintenance", "Holiday", "Private Event", "Booked", null],
       default: null,
     },
   },

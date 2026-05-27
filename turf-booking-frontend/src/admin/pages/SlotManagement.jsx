@@ -280,7 +280,7 @@ const SlotManagement = () => {
                   <label style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.4rem' }}>Reason</label>
                   <select value={blockReason} onChange={e => setBlockReason(e.target.value)}
                     style={{ width: '100%', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }}>
-                    {['Maintenance', 'Holiday', 'Private Event'].map(r => <option key={r} value={r}>{r}</option>)}
+                    {['Maintenance', 'Holiday', 'Private Event', 'Booked'].map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>

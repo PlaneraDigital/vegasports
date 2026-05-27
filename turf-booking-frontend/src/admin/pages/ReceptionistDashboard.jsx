@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ConciergeBell, LogOut, Menu, X } from 'lucide-react'
 import BookingManagement from './BookingManagement'
+import SlotManagement from './SlotManagement'
 
 // ── Swap adminToken with receptionistToken so BookingManagement's adminApi works ──
 // BookingManagement uses adminApi which reads 'adminToken' from localStorage.
@@ -15,6 +16,7 @@ const ReceptionistDashboard = () => {
   const navigate   = useNavigate()
   const [user, setUser] = useState(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('bookings') // 'bookings' or 'slots'
 
   useEffect(() => {
     syncToken()
@@ -93,19 +95,70 @@ const ReceptionistDashboard = () => {
         </div>
       </header>
 
-      {/* ── Page title ── */}
+      {/* ── Page title & Content ── */}
       <div style={{ padding: '1.5rem 1.25rem 0', maxWidth: '1400px', margin: '0 auto' }}>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h1 style={{ color: '#f4f4f5', fontWeight: 800, fontSize: '1.4rem', margin: 0 }}>
-            📋 Booking Management
-          </h1>
-          <p style={{ color: '#71717a', fontSize: '0.85rem', marginTop: '0.3rem' }}>
-            View, manage, and process all turf bookings.
-          </p>
+        
+        {/* ── Tab Switcher ── */}
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', borderBottom: '1px solid #27272a', paddingBottom: '0.75rem' }}>
+          <button
+            onClick={() => setActiveTab('bookings')}
+            style={{
+              padding: '0.6rem 1.2rem',
+              borderRadius: '10px',
+              background: activeTab === 'bookings' ? 'linear-gradient(135deg, #d97706, #b45309)' : 'transparent',
+              border: activeTab === 'bookings' ? 'none' : '1px solid #27272a',
+              color: activeTab === 'bookings' ? '#fff' : '#a1a1aa',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            📋 Bookings
+          </button>
+          <button
+            onClick={() => setActiveTab('slots')}
+            style={{
+              padding: '0.6rem 1.2rem',
+              borderRadius: '10px',
+              background: activeTab === 'slots' ? 'linear-gradient(135deg, #d97706, #b45309)' : 'transparent',
+              border: activeTab === 'slots' ? 'none' : '1px solid #27272a',
+              color: activeTab === 'slots' ? '#fff' : '#a1a1aa',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            ⚡ Slots Grid
+          </button>
         </div>
 
-        {/* ── Embed the full BookingManagement component ── */}
-        <BookingManagement />
+        {activeTab === 'bookings' ? (
+          <div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h1 style={{ color: '#f4f4f5', fontWeight: 800, fontSize: '1.4rem', margin: 0 }}>
+                📋 Booking Management
+              </h1>
+              <p style={{ color: '#71717a', fontSize: '0.85rem', marginTop: '0.3rem' }}>
+                View, manage, and process all turf bookings.
+              </p>
+            </div>
+            <BookingManagement />
+          </div>
+        ) : (
+          <div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h1 style={{ color: '#f4f4f5', fontWeight: 800, fontSize: '1.4rem', margin: 0 }}>
+                ⚡ Slot Management
+              </h1>
+              <p style={{ color: '#71717a', fontSize: '0.85rem', marginTop: '0.3rem' }}>
+                View, block/unblock, and edit prices for turf slots.
+              </p>
+            </div>
+            <SlotManagement />
+          </div>
+        )}
       </div>
     </div>
   )
