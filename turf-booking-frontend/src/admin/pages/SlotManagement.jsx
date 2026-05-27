@@ -6,7 +6,7 @@ const slotColors = {
   available: { bg: 'rgba(74, 222, 128, 0.1)', border: 'rgba(74, 222, 128, 0.2)', color: '#4ade80', label: 'Available' },
   booked: { bg: 'rgba(248, 113, 113, 0.1)', border: 'rgba(248, 113, 113, 0.2)', color: '#f87171', label: 'Booked' },
   on_hold: { bg: 'rgba(251, 191, 36, 0.1)', border: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', label: 'On Hold' },
-  blocked: { bg: 'rgba(113, 113, 122, 0.1)', border: 'rgba(113, 113, 122, 0.2)', color: '#71717a', label: 'Blocked' },
+  blocked: { bg: 'rgba(248, 113, 113, 0.1)', border: 'rgba(248, 113, 113, 0.2)', color: '#f87171', label: 'Booked' }, // Treat legacy blocked slots as booked
   expired: { bg: 'rgba(39, 39, 42, 0.5)', border: 'rgba(63, 63, 70, 0.3)', color: '#52525b', label: 'Expired' },
 }
 
@@ -26,8 +26,7 @@ const SlotManagement = () => {
   const [generating, setGenerating] = useState(false)
 
   // Slot action modal
-  const [actionSlot, setActionSlot] = useState(null)   // { slot, mode: 'block'|'price' }
-  const [blockReason, setBlockReason] = useState('Maintenance')
+  const [actionSlot, setActionSlot] = useState(null)   // { slot, mode: 'menu'|'price' }
   const [newPrice, setNewPrice] = useState('')
   const [applyToAllDays, setApplyToAllDays] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -68,14 +67,15 @@ const SlotManagement = () => {
     finally { setGenerating(false) }
   }
 
-  const handleBlock = async () => {
+  const handleBookToggle = async () => {
     setSaving(true)
     try {
       const slot = actionSlot.slot
-      const newStatus = slot.status === 'blocked' ? 'available' : 'blocked'
+      const isCurrentlyBooked = ['booked', 'blocked'].includes(slot.status)
+      const newStatus = isCurrentlyBooked ? 'available' : 'booked'
       const payload = { 
         status: newStatus, 
-        blocked_reason: blockReason,
+        blocked_reason: null,
         turf_id: selectedTurf,
         ...(slot._id.startsWith('temp-') ? {
           date: selectedDate,
@@ -85,7 +85,7 @@ const SlotManagement = () => {
         } : {})
       }
       await adminApi.put(`/slots/${slot._id}/status`, payload)
-      showToast(`Slot ${newStatus === 'blocked' ? 'blocked' : 'unblocked'}`)
+      showToast(`Slot ${newStatus === 'booked' ? 'booked' : 'unbooked'}`)
       setActionSlot(null); fetchSlots()
     } catch (err) { showToast(err?.response?.data?.message || 'Failed', 'error') }
     finally { setSaving(false) }
@@ -161,9 +161,8 @@ const SlotManagement = () => {
           {[
             { label: 'Total', value: summary.total, color: '#71717a' },
             { label: 'Available', value: summary.available, color: '#4ade80' },
-            { label: 'Booked', value: summary.booked, color: '#f87171' },
+            { label: 'Booked', value: summary.booked + (summary.blocked || 0), color: '#f87171' },
             { label: 'On Hold', value: summary.on_hold, color: '#fbbf24' },
-            { label: 'Blocked', value: summary.blocked, color: '#a1a1aa' },
           ].map(s => (
             <div key={s.label} style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '12px', padding: '0.75rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.1rem', flex: 1, minWidth: '90px', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
               <span style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>{s.value}</span>
@@ -215,21 +214,24 @@ const SlotManagement = () => {
             </h3>
             {/* Legend */}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              {Object.entries(slotColors).slice(0, 4).map(([k, v]) => (
-                <div key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                  <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: v.bg, border: `1px solid ${v.border}` }} />
-                  <span style={{ fontSize: '0.65rem', color: '#71717a', fontWeight: 700 }}>{v.label}</span>
-                </div>
-              ))}
+              {['available', 'booked', 'on_hold'].map(k => {
+                const v = slotColors[k]
+                return (
+                  <div key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                    <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: v.bg, border: `1px solid ${v.border}` }} />
+                    <span style={{ fontSize: '0.65rem', color: '#71717a', fontWeight: 700 }}>{v.label}</span>
+                  </div>
+                )
+              })}
             </div>
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2 sm:gap-2.5">
             {slots.map(slot => {
               const s = slotColors[slot.status] || slotColors.expired
-              const isClickable = ['available', 'blocked'].includes(slot.status)
+              const isClickable = ['available', 'booked', 'blocked'].includes(slot.status)
               return (
                 <button key={slot._id}
-                  onClick={() => { if (isClickable) setActionSlot({ slot, mode: slot.status === 'blocked' ? 'block' : 'menu' }) }}
+                  onClick={() => { if (isClickable) setActionSlot({ slot, mode: 'menu' }) }}
                   style={{
                     background: s.bg, border: `1px solid ${s.border}`, borderRadius: '10px',
                     padding: '0.65rem 0.5rem', textAlign: 'center', cursor: isClickable ? 'pointer' : 'default',
@@ -241,7 +243,7 @@ const SlotManagement = () => {
                   <div style={{ fontSize: '0.8rem', fontWeight: 800, color: s.color }}>{slot.start_time}</div>
                   <div style={{ fontSize: '0.75rem', fontWeight: 800, color: s.color, margin: '0.1rem 0' }}>→ {slot.end_time}</div>
                   <div style={{ fontSize: '0.75rem', color: '#f4f4f5', fontWeight: 800 }}>₹{slot.price}</div>
-                  {slot.status === 'blocked' && <Lock size={10} color="#64748b" style={{ marginTop: '0.25rem', display: 'block', margin: '0.25rem auto 0' }} />}
+                  {['booked', 'blocked'].includes(slot.status) && <Lock size={10} color="#64748b" style={{ marginTop: '0.25rem', display: 'block', margin: '0.25rem auto 0' }} />}
                 </button>
               )
             })}
@@ -260,9 +262,9 @@ const SlotManagement = () => {
 
             {actionSlot.mode === 'menu' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                <button onClick={() => setActionSlot(a => ({ ...a, mode: 'block' }))}
+                <button onClick={handleBookToggle} disabled={saving}
                   style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.2)', color: '#f87171', fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Lock size={14} /> Block this slot
+                  <Lock size={14} /> {saving ? 'Processing...' : ['booked', 'blocked'].includes(actionSlot.slot.status) ? 'Unbook this slot' : 'Book this slot'}
                 </button>
                 <button onClick={() => { setNewPrice(actionSlot.slot.price); setActionSlot(a => ({ ...a, mode: 'price' })) }}
                   style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'rgba(96, 165, 250, 0.1)', border: '1px solid rgba(96, 165, 250, 0.2)', color: '#60a5fa', fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -271,26 +273,6 @@ const SlotManagement = () => {
                 <button onClick={() => setActionSlot(null)} style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: '#18181b', border: '1px solid #27272a', color: '#71717a', fontWeight: 700, cursor: 'pointer', fontSize: '0.85rem', marginTop: '0.25rem' }}>
                   Cancel
                 </button>
-              </div>
-            )}
-
-            {actionSlot.mode === 'block' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div>
-                  <label style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700, display: 'block', marginBottom: '0.4rem' }}>Reason</label>
-                  <select value={blockReason} onChange={e => setBlockReason(e.target.value)}
-                    style={{ width: '100%', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }}>
-                    {['Maintenance', 'Holiday', 'Private Event', 'Booked'].map(r => <option key={r} value={r}>{r}</option>)}
-                  </select>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                  <button onClick={() => setActionSlot(null)} style={{ flex: 1, padding: '0.7rem', borderRadius: '12px', background: '#18181b', border: '1px solid #27272a', color: '#71717a', fontWeight: 700, cursor: 'pointer' }}>
-                    Cancel
-                  </button>
-                  <button onClick={handleBlock} disabled={saving} style={{ flex: 2, padding: '0.7rem', borderRadius: '12px', background: '#dc2626', border: 'none', color: '#fff', fontWeight: 800, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
-                    {saving ? 'Blocking...' : actionSlot.slot.status === 'blocked' ? 'Unblock' : 'Block Slot'}
-                  </button>
-                </div>
               </div>
             )}
 
