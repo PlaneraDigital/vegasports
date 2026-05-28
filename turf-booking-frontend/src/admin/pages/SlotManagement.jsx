@@ -12,6 +12,15 @@ const slotColors = {
 
 const today = () => new Date().toISOString().split('T')[0]
 
+// Convert HH:MM (24h) to h:MM AM/PM (12h)
+const to12h = (t) => {
+  if (!t) return t
+  const [h, m] = t.split(':').map(Number)
+  const suffix = h >= 12 ? 'PM' : 'AM'
+  const hour   = h % 12 || 12
+  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`
+}
+
 const SlotManagement = () => {
   const [turfs, setTurfs] = useState([])
   const [selectedTurf, setSelectedTurf] = useState('')
@@ -244,8 +253,8 @@ const SlotManagement = () => {
                   onMouseEnter={e => { if (isClickable) e.currentTarget.style.transform = 'translateY(-2px)' }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)' }}
                 >
-                  <div style={{ fontSize: '0.8rem', fontWeight: 800, color: s.color }}>{slot.start_time}</div>
-                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: s.color, margin: '0.1rem 0' }}>→ {slot.end_time}</div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 800, color: s.color }}>{to12h(slot.start_time)}</div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: 800, color: s.color, margin: '0.1rem 0' }}>→ {to12h(slot.end_time)}</div>
                   <div style={{ fontSize: '0.75rem', color: '#f4f4f5', fontWeight: 800 }}>₹{slot.price}</div>
                   {['booked', 'blocked'].includes(slot.status) && <Lock size={10} color="#64748b" style={{ marginTop: '0.25rem', display: 'block', margin: '0.25rem auto 0' }} />}
                   {isBookedByAdmin && (
@@ -265,7 +274,7 @@ const SlotManagement = () => {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '20px', padding: '1.75rem', maxWidth: '360px', width: '90%', fontFamily: "'Plus Jakarta Sans', sans-serif", boxShadow: '0 25px 50px rgba(0,0,0,0.1)' }}>
             <h3 style={{ margin: '0 0 0.25rem', color: '#f4f4f5', fontWeight: 800, fontSize: '1rem' }}>
-              Slot: {actionSlot.slot.start_time} – {actionSlot.slot.end_time}
+              Slot: {to12h(actionSlot.slot.start_time)} – {to12h(actionSlot.slot.end_time)}
             </h3>
             <p style={{ color: '#71717a', fontSize: '0.8rem', margin: '0 0 1.25rem', fontWeight: 600 }}>Current price: ₹{actionSlot.slot.price}</p>
 

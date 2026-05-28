@@ -9,6 +9,15 @@ import {
   ArrowUpRight, Clock, CheckCircle, XCircle, AlertCircle,
 } from 'lucide-react'
 
+// Convert HH:MM (24h) to h:MM AM/PM (12h)
+const to12h = (t) => {
+  if (!t) return t
+  const [h, m] = t.split(':').map(Number)
+  const suffix = h >= 12 ? 'PM' : 'AM'
+  const hour   = h % 12 || 12
+  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`
+}
+
 // ─── Reusable Stat Card ───────────────────────────────────────────────────────
 const StatCard = ({ icon: Icon, label, value, sub, color = '#4ade80', iconBg }) => (
   <div style={{
@@ -238,7 +247,7 @@ const Dashboard = () => {
                     </td>
                     <td style={{ padding: '0.875rem 0.75rem', fontSize: '0.8rem', color: '#a1a1aa' }}>
                       {b.date ? new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                      <div style={{ color: '#52525b', fontSize: '0.7rem', marginTop: '1px' }}>{b.start_time} – {b.end_time}</div>
+                      <div style={{ color: '#52525b', fontSize: '0.7rem', marginTop: '1px' }}>{to12h(b.start_time)} – {to12h(b.end_time)}</div>
                     </td>
                     <td style={{ padding: '0.875rem 0.75rem', fontSize: '0.85rem', color: '#4ade80', fontWeight: 800 }}>
                       ₹{b.total_amount?.toLocaleString('en-IN')}

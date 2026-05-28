@@ -2,6 +2,15 @@ import { useState, useEffect, useCallback } from 'react'
 import { adminApi, api } from '../utils/adminApi'
 import { Search, Filter, X, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Eye, Banknote } from 'lucide-react'
 
+// Convert HH:MM (24h) to h:MM AM/PM (12h)
+const to12h = (t) => {
+  if (!t) return t
+  const [h, m] = t.split(':').map(Number)
+  const suffix = h >= 12 ? 'PM' : 'AM'
+  const hour   = h % 12 || 12
+  return `${hour}:${String(m).padStart(2, '0')} ${suffix}`
+}
+
 const statusStyle = {
   confirmed: { color: '#4ade80', bg: 'rgba(74, 222, 128, 0.1)', label: 'Confirmed' },
   pending:   { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)', label: 'Pending'   },
@@ -216,7 +225,7 @@ const BookingManagement = () => {
                     <td style={{ ...td, color: '#a1a1aa', fontWeight: 600 }}>{b.turf_name_snapshot || b.turf_id?.name || '—'}</td>
                     <td style={td}>
                       <div style={{ color: '#f4f4f5', fontWeight: 700 }}>{b.date ? new Date(b.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</div>
-                      <div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>{b.start_time} – {b.end_time}</div>
+                      <div style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 600 }}>{to12h(b.start_time)} – {to12h(b.end_time)}</div>
                     </td>
                     <td style={{ ...td, color: '#4ade80', fontWeight: 800 }}>₹{b.total_amount?.toLocaleString('en-IN')}</td>
                     <td style={td}>
@@ -287,7 +296,7 @@ const BookingManagement = () => {
                 ]),
                 { label: 'Turf', value: detailBooking.turf_name_snapshot || detailBooking.turf_id?.name },
                 { label: 'Date', value: detailBooking.date ? new Date(detailBooking.date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '—' },
-                { label: 'Time', value: `${detailBooking.start_time} – ${detailBooking.end_time}` },
+                { label: 'Time', value: `${to12h(detailBooking.start_time)} – ${to12h(detailBooking.end_time)}` },
                 { label: 'Amount', value: `₹${detailBooking.total_amount?.toLocaleString('en-IN')}` },
                 { label: 'Payment Status', value: detailBooking.payment?.status },
                 { label: 'Payment Method', value: detailBooking.booked_by_admin ? 'Admin (No payment)' : (detailBooking.payment?.gateway ? detailBooking.payment.gateway.charAt(0).toUpperCase() + detailBooking.payment.gateway.slice(1) : '—') },
