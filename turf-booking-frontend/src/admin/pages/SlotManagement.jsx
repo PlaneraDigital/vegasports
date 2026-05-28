@@ -34,6 +34,9 @@ const SlotManagement = () => {
   const [toast, setToast] = useState(null)
   const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000) }
 
+  // Detect if logged-in user is a caretaker/receptionist (not admin)
+  const isCaretaker = !!localStorage.getItem('receptionistToken')
+
   useEffect(() => {
     api.get('/api/turfs').then(r => setTurfs(r.data.turfs)).catch(() => { })
   }, [])
@@ -228,6 +231,7 @@ const SlotManagement = () => {
           <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2 sm:gap-2.5">
             {slots.map(slot => {
               const s = slotColors[slot.status] || slotColors.expired
+              const isBookedByAdmin = ['booked', 'blocked'].includes(slot.status) && slot.booked_by?.role === 'admin'
               const isClickable = ['available', 'booked', 'blocked'].includes(slot.status)
               return (
                 <button key={slot._id}
@@ -244,6 +248,11 @@ const SlotManagement = () => {
                   <div style={{ fontSize: '0.75rem', fontWeight: 800, color: s.color, margin: '0.1rem 0' }}>→ {slot.end_time}</div>
                   <div style={{ fontSize: '0.75rem', color: '#f4f4f5', fontWeight: 800 }}>₹{slot.price}</div>
                   {['booked', 'blocked'].includes(slot.status) && <Lock size={10} color="#64748b" style={{ marginTop: '0.25rem', display: 'block', margin: '0.25rem auto 0' }} />}
+                  {isBookedByAdmin && (
+                    <div style={{ marginTop: '0.2rem', fontSize: '0.55rem', fontWeight: 800, color: '#c084fc', background: 'rgba(192,132,252,0.12)', borderRadius: '4px', padding: '0.1rem 0.3rem', display: 'inline-block' }}>
+                      ADMIN
+                    </div>
+                  )}
                 </button>
               )
             })}
@@ -262,10 +271,25 @@ const SlotManagement = () => {
 
             {actionSlot.mode === 'menu' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                <button onClick={handleBookToggle} disabled={saving}
-                  style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.2)', color: '#f87171', fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <Lock size={14} /> {saving ? 'Processing...' : ['booked', 'blocked'].includes(actionSlot.slot.status) ? 'Unbook this slot' : 'Book this slot'}
-                </button>
+                {/* Booked-by-Admin remark banner */}
+                {['booked', 'blocked'].includes(actionSlot.slot.status) && actionSlot.slot.booked_by?.role === 'admin' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(192,132,252,0.08)', border: '1px solid rgba(192,132,252,0.25)', borderRadius: '10px', padding: '0.6rem 0.875rem', marginBottom: '0.15rem' }}>
+                    <Lock size={13} color="#c084fc" />
+                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#c084fc' }}>Booked by Admin</span>
+                    {actionSlot.slot.booked_by?.name && (
+                      <span style={{ fontSize: '0.72rem', color: '#a855f7', marginLeft: 'auto' }}>{actionSlot.slot.booked_by.name}</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Only admins can book/unbook */}
+                {!isCaretaker && (
+                  <button onClick={handleBookToggle} disabled={saving}
+                    style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.2)', color: '#f87171', fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Lock size={14} /> {saving ? 'Processing...' : ['booked', 'blocked'].includes(actionSlot.slot.status) ? 'Unbook this slot' : 'Book this slot'}
+                  </button>
+                )}
+
                 <button onClick={() => { setNewPrice(actionSlot.slot.price); setActionSlot(a => ({ ...a, mode: 'price' })) }}
                   style={{ padding: '0.75rem 1rem', borderRadius: '12px', background: 'rgba(96, 165, 250, 0.1)', border: '1px solid rgba(96, 165, 250, 0.2)', color: '#60a5fa', fontWeight: 800, cursor: 'pointer', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   ₹ Update price

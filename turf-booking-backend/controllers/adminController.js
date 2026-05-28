@@ -148,7 +148,7 @@ const getAdminSlots = async (req, res) => {
         { date: { $gte: startOfDay, $lte: endOfDay } },
         { date: prevDay }
       ]
-    });
+    }).populate("booked_by", "name role");
 
     const slotsFromDb = relevantBookings.filter(s => s.date.getTime() === startOfDay.getTime()).sort((a,b) => a.start_time.localeCompare(b.start_time));
     const crossoverBookings = relevantBookings.filter(s => {
@@ -223,13 +223,14 @@ const updateSlotStatus = async (req, res) => {
   try {
     const { status, blocked_reason, turf_id, date, start_time, end_time, price } = req.body;
     const { id } = req.params;
+    const booked_by = status === "booked" ? req.user._id : null;
 
     if (id.startsWith("temp-")) {
-      await Slot.create({ turf_id, date: new Date(date), start_time, end_time, price, status, blocked_reason });
+      await Slot.create({ turf_id, date: new Date(date), start_time, end_time, price, status, blocked_reason, booked_by });
       return res.status(200).json({ message: "Slot created and status updated" });
     }
 
-    await Slot.findByIdAndUpdate(id, { status, blocked_reason });
+    await Slot.findByIdAndUpdate(id, { status, blocked_reason, booked_by });
     res.status(200).json({ message: "Slot status updated" });
   } catch (error) { res.status(500).json({ message: "Error updating status", error: error.message }); }
 };
