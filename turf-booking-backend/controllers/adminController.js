@@ -223,14 +223,49 @@ const updateSlotStatus = async (req, res) => {
   try {
     const { status, blocked_reason, turf_id, date, start_time, end_time, price } = req.body;
     const { id } = req.params;
-    const booked_by = status === "booked" ? req.user._id : null;
+    const isBooking   = status === "booked";
+    const isUnbooking = status === "available";
+    const booked_by   = isBooking ? req.user._id : null;
+
+    let slotId = id;
 
     if (id.startsWith("temp-")) {
-      await Slot.create({ turf_id, date: new Date(date), start_time, end_time, price, status, blocked_reason, booked_by });
-      return res.status(200).json({ message: "Slot created and status updated" });
+      const newSlot = await Slot.create({ turf_id, date: new Date(date), start_time, end_time, price, status, blocked_reason, booked_by });
+      slotId = newSlot._id;
+    } else {
+      await Slot.findByIdAndUpdate(id, { status, blocked_reason, booked_by });
     }
 
-    await Slot.findByIdAndUpdate(id, { status, blocked_reason, booked_by });
+    // ── Create a Booking record when admin books a slot ──
+    if (isBooking) {
+      const turf = await Turf.findById(turf_id);
+      const slotDate = date ? new Date(date) : new Date();
+      await Booking.create({
+        user_id:  req.user._id,
+        turf_id,
+        slot_ids: [slotId],
+        date: slotDate,
+        start_time: start_time || "",
+        end_time:   end_time   || "",
+        total_amount: price || 0,
+        turf_name_snapshot:    turf?.name || "",
+        turf_address_snapshot: turf?.location?.address || "",
+        price_per_slot_snapshot: price || 0,
+        payment: { status: "paid", gateway: "admin", paid_at: new Date() },
+        booking_status: "confirmed",
+        booked_by_admin: true,
+        admin_id: req.user._id,
+      });
+    }
+
+    // ── Cancel the admin Booking record when admin unbooks a slot ──
+    if (isUnbooking && !id.startsWith("temp-")) {
+      await Booking.findOneAndUpdate(
+        { slot_ids: id, booked_by_admin: true, booking_status: { $in: ["confirmed", "pending"] } },
+        { $set: { booking_status: "cancelled", "cancellation.cancelled_at": new Date(), "cancellation.reason": "Other", "cancellation.cancelled_by": "admin", "cancellation.refund_status": "na" } }
+      );
+    }
+
     res.status(200).json({ message: "Slot status updated" });
   } catch (error) { res.status(500).json({ message: "Error updating status", error: error.message }); }
 };

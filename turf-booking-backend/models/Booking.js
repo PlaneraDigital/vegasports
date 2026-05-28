@@ -44,7 +44,7 @@ const bookingSchema = new mongoose.Schema(
       transaction_id: { type: String, default: null },
       gateway: {
         type: String,
-        enum: ["razorpay", "stripe", "paytm", "cashfree", "cash"],
+        enum: ["razorpay", "stripe", "paytm", "cashfree", "cash", "admin"],
         default: "razorpay",
       },
       paid_at:  { type: Date, default: null },
@@ -91,6 +91,10 @@ const bookingSchema = new mongoose.Schema(
       },
       refund_ids: [{ type: String }],
     },
+
+    // True when an admin booked this slot directly from the Slot Management panel
+    booked_by_admin: { type: Boolean, default: false },
+    admin_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
   },
   { timestamps: { createdAt: "created_at" } }
 );

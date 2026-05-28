@@ -17,6 +17,7 @@ const payStyle = {
   failed:       { color: '#f87171', bg: 'rgba(248, 113, 113, 0.1)', label: 'Failed'       },
   refunded:     { color: '#c084fc', bg: 'rgba(192, 132, 252, 0.1)', label: 'Refunded'     },
   cancelled:    { color: '#71717a', bg: 'rgba(113, 113, 122, 0.1)', label: 'N/A'          },
+  admin:        { color: '#c084fc', bg: 'rgba(192, 132, 252, 0.1)', label: 'Admin'        },
 }
 
 const StatusBadge = ({ status, map }) => {
@@ -204,8 +205,13 @@ const BookingManagement = () => {
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   >
                     <td style={td}>
-                      <div style={{ fontWeight: 800, color: '#f4f4f5', fontSize: '0.85rem' }}>{b.user_id?.name || '—'}</div>
-                      <div style={{ fontSize: '0.7rem', color: '#71717a', fontWeight: 600 }}>{b.user_id?.phone}</div>
+                      <div style={{ fontWeight: 800, color: '#f4f4f5', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                        {b.booked_by_admin ? (
+                          <span style={{ background: 'rgba(192,132,252,0.12)', color: '#c084fc', borderRadius: '5px', padding: '0.15rem 0.4rem', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.04em' }}>ADMIN</span>
+                        ) : (b.user_id?.name || '—')}
+                        {b.booked_by_admin && <span style={{ color: '#f4f4f5', fontSize: '0.8rem' }}>{b.user_id?.name}</span>}
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#71717a', fontWeight: 600 }}>{b.booked_by_admin ? 'Slot booked by Admin' : b.user_id?.phone}</div>
                     </td>
                     <td style={{ ...td, color: '#a1a1aa', fontWeight: 600 }}>{b.turf_name_snapshot || b.turf_id?.name || '—'}</td>
                     <td style={td}>
@@ -215,13 +221,13 @@ const BookingManagement = () => {
                     <td style={{ ...td, color: '#4ade80', fontWeight: 800 }}>₹{b.total_amount?.toLocaleString('en-IN')}</td>
                     <td style={td}>
                       <StatusBadge
-                        status={b.booking_status === 'cancelled' && b.payment?.status === 'pending' ? 'cancelled' : b.payment?.status}
+                        status={b.booking_status === 'cancelled' && b.payment?.status === 'pending' ? 'cancelled' : (b.booked_by_admin ? 'admin' : b.payment?.status)}
                         map={payStyle}
                       />
                     </td>
                     <td style={td}>
                       <div style={{ color: '#f4f4f5', fontSize: '0.75rem', fontWeight: 600 }}>
-                        {b.payment?.gateway ? b.payment.gateway.charAt(0).toUpperCase() + b.payment.gateway.slice(1) : '—'}
+                        {b.booked_by_admin ? 'Admin' : (b.payment?.gateway ? b.payment.gateway.charAt(0).toUpperCase() + b.payment.gateway.slice(1) : '—')}
                       </div>
                     </td>
                     <td style={td}><StatusBadge status={b.booking_status} map={statusStyle} /></td>
@@ -272,14 +278,19 @@ const BookingManagement = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
               {[
                 { label: 'Booking ID', value: detailBooking._id },
-                { label: 'User', value: `${detailBooking.user_id?.name} (${detailBooking.user_id?.phone})` },
-                { label: 'Email', value: detailBooking.user_id?.email },
+                ...(detailBooking.booked_by_admin ? [
+                  { label: 'Type', value: '🛡️ Admin Booked Slot' },
+                  { label: 'Admin', value: detailBooking.user_id?.name },
+                ] : [
+                  { label: 'User', value: `${detailBooking.user_id?.name} (${detailBooking.user_id?.phone})` },
+                  { label: 'Email', value: detailBooking.user_id?.email },
+                ]),
                 { label: 'Turf', value: detailBooking.turf_name_snapshot || detailBooking.turf_id?.name },
                 { label: 'Date', value: detailBooking.date ? new Date(detailBooking.date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '—' },
                 { label: 'Time', value: `${detailBooking.start_time} – ${detailBooking.end_time}` },
                 { label: 'Amount', value: `₹${detailBooking.total_amount?.toLocaleString('en-IN')}` },
                 { label: 'Payment Status', value: detailBooking.payment?.status },
-                { label: 'Payment Method', value: detailBooking.payment?.gateway ? detailBooking.payment.gateway.charAt(0).toUpperCase() + detailBooking.payment.gateway.slice(1) : '—' },
+                { label: 'Payment Method', value: detailBooking.booked_by_admin ? 'Admin (No payment)' : (detailBooking.payment?.gateway ? detailBooking.payment.gateway.charAt(0).toUpperCase() + detailBooking.payment.gateway.slice(1) : '—') },
                 { label: 'Booking Status', value: detailBooking.booking_status },
                 { label: 'Slots', value: detailBooking.slot_ids?.length ? `${detailBooking.slot_ids.length} slot(s)` : '—' },
                 ...(detailBooking.cancellation?.cancelled_at ? [
