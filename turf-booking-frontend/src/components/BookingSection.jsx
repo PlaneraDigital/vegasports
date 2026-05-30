@@ -376,6 +376,7 @@ export default function BookingSection({ turf }) {
                   const isBooked = ["booked", "on_hold", "blocked"].includes(slot.status);
                   const isSel = selectedSlots.some(s => s._id === slot._id);
                   const isBlockedBySelection = selectedSlots.some(s => s._id !== slot._id && isOverlapping(s.start_time, s.end_time, slot.start_time, slot.end_time));
+                  const isAdjacent = selectedSlots.some(selected => slot.end_time === selected.start_time || slot.start_time === selected.end_time);
 
                   const isToday = selectedDate.toDateString() === new Date().toDateString();
                   const now = new Date();
@@ -383,15 +384,16 @@ export default function BookingSection({ turf }) {
                   const [sh, sm] = slot.start_time.split(":").map(Number);
                   const slotMins = sh * 60 + sm;
                   const isPast = isToday && slotMins < (currentMins + 30);
+                  const isGrayedOut = isBooked || isPast || (isBlockedBySelection && !isSel) || (isAdjacent && !isSel);
 
                   return (
-                    <button key={slot._id} disabled={isBooked || isPast || (isBlockedBySelection && !isSel)} onClick={() => toggleSlot(slot)}
-                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-emerald-600 border-emerald-600 text-white shadow-xl scale-[1.02]' : (isBooked || isPast || (isBlockedBySelection && !isSel)) ? 'bg-zinc-900 border-zinc-800 text-zinc-700 cursor-not-allowed grayscale' : 'bg-zinc-700 border-zinc-700 text-zinc-200 hover:border-emerald-500 hover:shadow-lg'}`}>
+                    <button key={slot._id} disabled={isGrayedOut} onClick={() => toggleSlot(slot)}
+                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-emerald-600 border-emerald-600 text-white shadow-xl scale-[1.02]' : isGrayedOut ? 'bg-zinc-950/40 border-zinc-900/60 text-zinc-700 cursor-not-allowed grayscale opacity-30' : 'bg-zinc-700 border-zinc-700 text-zinc-200 hover:border-emerald-500 hover:shadow-lg'}`}>
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-sm font-black tracking-tight whitespace-nowrap">{fmtRange(slot.start_time, slot.end_time)}</span>
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isSel ? 'text-zinc-300' : 'text-zinc-400'}`}>₹{slot.price}</span>
-                        <span className={`text-[9px] font-bold mt-1 ${isSel ? 'text-white/80' : (isBooked || isPast) ? 'text-red-500' : 'text-emerald-500'}`}>
-                          {isBooked || isPast ? "Booked" : "✓ Available"}
+                        <span className={`text-[9px] font-bold mt-1 ${isSel ? 'text-white/80' : (isBooked || isPast || (isAdjacent && !isSel)) ? 'text-red-500' : 'text-emerald-500'}`}>
+                          {isBooked || isPast ? "Booked" : (isAdjacent && !isSel) ? "Blocked" : "✓ Available"}
                         </span>
                       </div>
                     </button>

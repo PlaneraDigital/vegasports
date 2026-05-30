@@ -92,62 +92,148 @@ function ErrorScreen({ message, onBack }) {
    IMAGE GALLERY
 ────────────────────────── */
 function ImageGallery({ images, isMobile = false }) {
-  const [active, setActive] = useState(0);
+  const [zoomIndex, setZoomIndex] = useState(null);
 
   if (!images || images.length === 0) {
     return (
-      <div className={`w-full ${isMobile ? 'h-[500px]' : 'h-[400px]'} bg-zinc-900 rounded-none md:rounded-2xl flex items-center justify-center text-zinc-500 border-0 md:border border-zinc-800`}>
+      <div className={`w-full ${isMobile ? 'h-[250px] sm:h-[350px]' : 'h-[400px]'} bg-zinc-900 rounded-none md:rounded-2xl flex items-center justify-center text-zinc-500 border-0 md:border border-zinc-800`}>
         No images available
       </div>
     );
   }
 
-  const prev = () => setActive(p => p === 0 ? images.length - 1 : p - 1);
-  const next = () => setActive(p => p === images.length - 1 ? 0 : p + 1);
+  const count = images.length;
+  const heightClass = isMobile ? 'h-[250px] sm:h-[350px]' : 'h-[300px] md:h-[460px]';
 
-  return (
-    <div className="relative">
-      <div className={`relative w-full overflow-hidden ${isMobile ? 'rounded-none' : 'rounded-2xl'} group ${isMobile ? 'border-0' : 'border border-zinc-800'}`}>
-        <img
-          key={active}
-          src={images[active].url}
-          alt={images[active].label || "turf"}
-          className={`w-full ${isMobile ? 'h-[500px]' : 'h-[300px] md:h-[460px]'} object-cover`}
-          onError={e => { e.target.src = "/images/turf1.jpg"; }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+  const renderGridContent = () => {
+    if (count === 1) {
+      return (
+        <div className={`w-full overflow-hidden ${isMobile ? 'rounded-none' : 'rounded-2xl'} border border-zinc-800 ${heightClass} cursor-pointer group`} onClick={() => setZoomIndex(0)}>
+          <img
+            src={images[0].url}
+            alt={images[0].label || "turf"}
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
+            onError={e => { e.target.src = "/images/turf1.jpg"; }}
+          />
+        </div>
+      );
+    }
 
-        {images.length > 1 && (
-          <>
-            <button onClick={prev}
-              className={`absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white p-2.5 rounded-full opacity-0 ${!isMobile ? 'group-hover:opacity-100' : 'md:opacity-0 md:group-hover:opacity-100'} transition-all duration-200 backdrop-blur-md shadow-sm`}>
-              <ChevronLeft size={18} />
-            </button>
-            <button onClick={next}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black text-white p-2.5 rounded-full opacity-0 ${!isMobile ? 'group-hover:opacity-100' : 'md:opacity-0 md:group-hover:opacity-100'} transition-all duration-200 backdrop-blur-md shadow-sm`}>
-              <ChevronRight size={18} />
-            </button>
-          </>
-        )}
-
-        <span className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-          {active + 1} / {images.length}
-        </span>
-      </div>
-
-      {images.length > 1 && (
-        <div className={`${isMobile ? 'hidden' : 'flex'} gap-2 mt-2.5 overflow-x-auto pb-0.5`}>
+    if (count === 2) {
+      return (
+        <div className={`grid grid-cols-2 gap-2.5 w-full overflow-hidden ${isMobile ? 'rounded-none' : 'rounded-2xl'} border border-zinc-800 ${heightClass}`}>
           {images.map((img, i) => (
-            <button key={i} onClick={() => setActive(i)}
-              className={`flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all duration-150 ${i === active ? "border-emerald-600 opacity-100 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
-                }`}>
-              <img src={img.url} alt="" className="w-full h-full object-cover"
-                onError={e => { e.target.src = "/images/turf1.jpg"; }} />
-            </button>
+            <div key={i} className="h-full overflow-hidden cursor-pointer group" onClick={() => setZoomIndex(i)}>
+              <img
+                src={img.url}
+                alt={img.label || `turf-${i}`}
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
+                onError={e => { e.target.src = "/images/turf1.jpg"; }}
+              />
+            </div>
           ))}
         </div>
+      );
+    }
+
+    // 3 or more images: divide into proper 3 equal sections (columns)
+    return (
+      <div className={`grid grid-cols-3 gap-2.5 w-full overflow-hidden ${isMobile ? 'rounded-none' : 'rounded-2xl'} border border-zinc-800 ${heightClass}`}>
+        <div className="h-full overflow-hidden cursor-pointer group" onClick={() => setZoomIndex(0)}>
+          <img
+            src={images[0].url}
+            alt={images[0].label || "turf-0"}
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
+            onError={e => { e.target.src = "/images/turf1.jpg"; }}
+          />
+        </div>
+        <div className="h-full overflow-hidden cursor-pointer group" onClick={() => setZoomIndex(1)}>
+          <img
+            src={images[1].url}
+            alt={images[1].label || "turf-1"}
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
+            onError={e => { e.target.src = "/images/turf1.jpg"; }}
+          />
+        </div>
+        <div className="h-full overflow-hidden cursor-pointer group relative" onClick={() => setZoomIndex(2)}>
+          <img
+            src={images[2].url}
+            alt={images[2].label || "turf-2"}
+            className="w-full h-full object-cover group-hover:scale-[1.02] transition-all duration-300"
+            onError={e => { e.target.src = "/images/turf1.jpg"; }}
+          />
+          {count > 3 && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-base font-black tracking-wider group-hover:bg-black/50 transition-all select-none">
+              +{count - 3} photos
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      {renderGridContent()}
+
+      {/* Lightbox Zoom Modal */}
+      {zoomIndex !== null && (
+        <div 
+          className="fixed inset-0 z-[500] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 select-none animate-in fade-in duration-200" 
+          onClick={() => setZoomIndex(null)}
+        >
+          {/* Close button */}
+          <button 
+            onClick={() => setZoomIndex(null)} 
+            className="absolute top-6 right-6 text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 p-3 rounded-full transition-all border border-zinc-800 shadow-xl z-[510]"
+          >
+            <XCircle size={24} />
+          </button>
+
+          {/* Prev button */}
+          {images.length > 1 && (
+            <button 
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                setZoomIndex(p => p === 0 ? images.length - 1 : p - 1); 
+              }}
+              className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 p-3.5 rounded-full transition-all border border-zinc-800 shadow-xl z-[510]"
+            >
+              <ChevronLeft size={24} />
+            </button>
+          )}
+
+          {/* Zoomed Image */}
+          <div className="relative max-w-full max-h-[85vh] flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={images[zoomIndex].url}
+              alt={images[zoomIndex].label || "zoomed turf"}
+              className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl border border-zinc-800/50 animate-in zoom-in-95 duration-200"
+              onError={e => { e.target.src = "/images/turf1.jpg"; }}
+            />
+          </div>
+
+          {/* Next button */}
+          {images.length > 1 && (
+            <button 
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                setZoomIndex(p => p === images.length - 1 ? 0 : p + 1); 
+              }}
+              className="absolute right-6 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white bg-zinc-900/80 hover:bg-zinc-800 p-3.5 rounded-full transition-all border border-zinc-800 shadow-xl z-[510]"
+            >
+              <ChevronRight size={24} />
+            </button>
+          )}
+
+          {/* Details / Pagination */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 select-none text-center bg-zinc-900/90 border border-zinc-800 px-5 py-2.5 rounded-2xl shadow-xl z-[510]">
+            {images[zoomIndex].label && <span className="text-zinc-200 text-sm font-bold tracking-tight">{images[zoomIndex].label}</span>}
+            <span className="text-zinc-500 text-[11px] font-bold uppercase tracking-widest">{zoomIndex + 1} / {images.length}</span>
+          </div>
+        </div>
       )}
-    </div>
+    </>
   );
 }
 

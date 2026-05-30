@@ -130,7 +130,21 @@ const BookingManagement = () => {
         </div>
       )}
 
-
+      {/* ── Filters ── */}
+      <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '16px', padding: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+        {/* Date */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 700 }}>Date</label>
+          <input type="date" value={filters.date} onChange={e => setFilters(p => ({ ...p, date: e.target.value }))}
+            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.8rem', outline: 'none' }} />
+        </div>
+        {filters.date && (
+          <button onClick={() => setFilters({ status: '', turf_id: '', date: '' })}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.2)', borderRadius: '10px', padding: '0.65rem 0.875rem', color: '#f87171', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+            <X size={13} /> Clear
+          </button>
+        )}
+      </div>
 
       {/* ── Info Bar ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
