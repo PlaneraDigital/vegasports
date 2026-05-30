@@ -27,7 +27,7 @@ const isOverlapping = (s1, e1, s2, e2) => {
 // ─── Create Booking (Hold Slots) ──────────────────────────────────────────────
 const createBooking = async (req, res) => {
   try {
-    const { turf_id, date, slot_ids } = req.body;
+    const { turf_id, date, slot_ids, duration } = req.body;
     const user_id = req.user._id;
 
     if (!turf_id || !date || !slot_ids || slot_ids.length === 0) {
@@ -52,8 +52,22 @@ const createBooking = async (req, res) => {
     const getPrice = (tStr) => {
       const [h, mm] = tStr.split(":").map(Number);
       const m = h * 60 + mm;
-      if (m >= MORNING_START && m < MORNING_END) return turf.pricing?.morning?.price ?? turf.price_per_hour;
-      return turf.pricing?.evening?.price ?? turf.price_per_hour;
+      const slotDuration = duration ? Number(duration) : (turf.slot_duration_minutes || 60);
+      const baseDuration = turf.slot_duration_minutes || 60;
+
+      // Check hourly overrides first
+      if (turf.pricing_overrides?.hourly_pricing?.length > 0) {
+        const override = turf.pricing_overrides.hourly_pricing.find(p => p.start_time === tStr);
+        if (override) {
+          return Math.round((override.price / baseDuration) * slotDuration);
+        }
+      }
+
+      const basePrice = (m >= MORNING_START && m < MORNING_END)
+        ? (turf.pricing?.morning?.price ?? turf.price_per_hour)
+        : (turf.pricing?.evening?.price ?? turf.price_per_hour);
+
+      return Math.round((basePrice / baseDuration) * slotDuration);
     };
 
     let finalSlotIds = [];
@@ -66,8 +80,8 @@ const createBooking = async (req, res) => {
         const startTime = parts.length > 1 ? parts[1] : parts[0];
         const [h, mm] = startTime.split(":").map(Number);
         const startMins = h * 60 + mm;
-        const duration = turf.slot_duration_minutes || 60;
-        const endMins = (startMins + duration) % 1440;
+        const slotDuration = duration ? Number(duration) : (turf.slot_duration_minutes || 60);
+        const endMins = (startMins + slotDuration) % 1440;
         const endTime = `${String(Math.floor(endMins/60)).padStart(2,'0')}:${String(endMins%60).padStart(2,'0')}`;
         
         const clash = existingBooked.find(b => isOverlapping(startTime, endTime, b.start_time, b.end_time));

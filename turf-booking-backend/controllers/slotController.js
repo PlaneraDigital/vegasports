@@ -78,18 +78,25 @@ const getSlotsByTurfAndDate = async (req, res) => {
     // ── Morning/Evening price helper ──────────────────────────────────────────
     const MORNING_START = 7 * 60;
     const MORNING_END   = 19 * 60;
+    const duration = req.query.duration ? Number(req.query.duration) : (turf.slot_duration_minutes || 60);
+
     const getPriceForSlot = (startMinutes, sT) => {
       // 1. Check granular hourly overrides first
       if (turf.pricing_overrides?.hourly_pricing?.length > 0) {
         const override = turf.pricing_overrides.hourly_pricing.find(p => p.start_time === sT);
-        if (override) return override.price;
+        if (override) {
+          const baseDuration = turf.slot_duration_minutes || 60;
+          return Math.round((override.price / baseDuration) * duration);
+        }
       }
 
       const normMins = startMinutes % 1440;
-      if (normMins >= MORNING_START && normMins < MORNING_END) {
-        return turf.pricing?.morning?.price ?? turf.price_per_hour;
-      }
-      return turf.pricing?.evening?.price ?? turf.price_per_hour;
+      const basePrice = (normMins >= MORNING_START && normMins < MORNING_END)
+        ? (turf.pricing?.morning?.price ?? turf.price_per_hour)
+        : (turf.pricing?.evening?.price ?? turf.price_per_hour);
+
+      const baseDuration = turf.slot_duration_minutes || 60;
+      return Math.round((basePrice / baseDuration) * duration);
     };
 
     // ── IST Time Check for is_past ────────────────────────────────────────────
@@ -103,7 +110,6 @@ const getSlotsByTurfAndDate = async (req, res) => {
     const dayName = days[startOfDay.getUTCDay()];
     const schedule = turf.operating_hours ? turf.operating_hours[dayName] : null;
     
-    const duration = turf.slot_duration_minutes || 60;
     const interval = turf.slot_interval_minutes || 30; // Step by 30 mins even if 1hr long
 
     let finalSlots = [];

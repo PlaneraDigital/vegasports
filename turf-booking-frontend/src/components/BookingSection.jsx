@@ -112,7 +112,7 @@ function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
 }
 
 /* ─── Summary Modal ──────────────────────────────────────────────────────── */
-function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSuccess, onFullSuccess }) {
+function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, duration, onAdvanceSuccess, onFullSuccess }) {
   const [booking, setBooking] = useState(false);
   const [err, setErr] = useState(null);
   const [payType, setPayType] = useState("advance");
@@ -128,7 +128,7 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, onAdvanceSu
       const d = new Date(selectedSlots[0].date);
       const date = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
 
-      const bRes = await api.post("/api/bookings", { turf_id: turf._id, date, slot_ids });
+      const bRes = await api.post("/api/bookings", { turf_id: turf._id, date, slot_ids, duration });
       const booking_id = bRes.data.booking_id;
 
       if (payType === "advance") {
@@ -226,8 +226,12 @@ export default function BookingSection({ turf }) {
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSlots, setSelectedSlots] = useState([]);
-  const [activeTab, setActiveTab] = useState("morning");
+  const [activeTab, setActiveTab] = useState(() => {
+    const hours = new Date().getHours();
+    return hours >= 19 ? "evening" : "morning";
+  });
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  const [duration, setDuration] = useState(() => turf?.slot_duration_minutes || 60);
 
   // Success states
   const [advanceResult, setAdvanceResult] = useState(null);
@@ -252,14 +256,14 @@ export default function BookingSection({ turf }) {
       setLoadingSlots(true);
       try {
         const dStr = `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`;
-        const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dStr}`);
+        const res = await api.get(`/api/slots?turf_id=${turf._id}&date=${dStr}&duration=${duration}`);
         setSlots(res.data.slots || []);
         setSelectedSlots([]);
       } catch (err) { console.error(err); }
       finally { setLoadingSlots(false); }
     };
     fetchSlots();
-  }, [selectedDate, turf]);
+  }, [selectedDate, turf, duration]);
 
   if (advanceResult) return <RedCardScreen advanceResult={advanceResult} turf={turf} onGoTicket={() => navigate(`/ticket/${confirmedId}`)} onGoHome={() => navigate("/")} />;
   if (fullResult) return <BlueCardScreen booking={{ ...fullResult, start_time: selectedSlots[0]?.start_time, end_time: selectedSlots[selectedSlots.length - 1]?.end_time }} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
@@ -296,39 +300,60 @@ export default function BookingSection({ turf }) {
             <p className="text-zinc-500 font-medium">{turf.name}</p>
           </div>
 
-          <div ref={calRef} className="relative">
-            <button onClick={() => setCalOpen(!calOpen)} className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:border-zinc-600 transition-all text-zinc-200">
-              <CalendarDays size={16} className="text-zinc-500" />
-              {selectedDate.getDate()} {MONTHS[selectedDate.getMonth()]}
-            </button>
-            {calOpen && (
-              <div className="absolute top-full right-0 mt-2 bg-zinc-800 border border-zinc-700 rounded-2xl p-4 shadow-2xl z-[150] w-[280px]">
-                <div className="flex justify-between items-center mb-4 px-1">
-                  <span className="font-black text-sm text-zinc-100">{MONTHS[viewMonth]} {viewYear}</span>
-                  <div className="flex gap-1">
-                    <button onClick={prevMonth} disabled={isPrevDisabled} className="p-1 disabled:opacity-20 text-zinc-400"><ChevronUp size={16} /></button>
-                    <button onClick={nextMonth} className="p-1 text-zinc-400"><ChevronDown size={16} /></button>
+          <div className="flex items-center gap-3">
+            {/* Duration Dropdown */}
+            <div className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 px-3.5 py-2.5 rounded-xl text-sm font-bold shadow-sm text-zinc-200">
+              <Clock size={16} className="text-zinc-500" />
+              <select
+                value={duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                className="bg-transparent border-none outline-none text-zinc-200 cursor-pointer font-bold pr-1"
+                style={{ appearance: 'none', WebkitAppearance: 'none', MozAppearance: 'none' }}
+              >
+                <option value={30} className="bg-zinc-800 text-zinc-200 font-bold">30 Mins (0.5 hr)</option>
+                <option value={60} className="bg-zinc-800 text-zinc-200 font-bold">1 Hour (1.0 hr)</option>
+                <option value={90} className="bg-zinc-800 text-zinc-200 font-bold">1.5 Hours</option>
+                <option value={120} className="bg-zinc-800 text-zinc-200 font-bold">2 Hours</option>
+                <option value={150} className="bg-zinc-800 text-zinc-200 font-bold">2.5 Hours</option>
+                <option value={180} className="bg-zinc-800 text-zinc-200 font-bold">3 Hours</option>
+              </select>
+            </div>
+
+            {/* Date Selector */}
+            <div ref={calRef} className="relative">
+              <button onClick={() => setCalOpen(!calOpen)} className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:border-zinc-600 transition-all text-zinc-200">
+                <CalendarDays size={16} className="text-zinc-500" />
+                {selectedDate.getDate()} {MONTHS[selectedDate.getMonth()]}
+              </button>
+              {calOpen && (
+                <div className="absolute top-full right-0 mt-2 bg-zinc-800 border border-zinc-700 rounded-2xl p-4 shadow-2xl z-[150] w-[280px]">
+                  <div className="flex justify-between items-center mb-4 px-1">
+                    <span className="font-black text-sm text-zinc-100">{MONTHS[viewMonth]} {viewYear}</span>
+                    <div className="flex gap-1">
+                      <button onClick={prevMonth} disabled={isPrevDisabled} className="p-1 disabled:opacity-20 text-zinc-400"><ChevronUp size={16} /></button>
+                      <button onClick={nextMonth} className="p-1 text-zinc-400"><ChevronDown size={16} /></button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-7 gap-1 text-center mb-2">
+                    {DAYS_SHORT.map(d => <span key={d} className="text-[10px] font-black text-zinc-500 uppercase">{d}</span>)}
+                  </div>
+                  <div className="grid grid-cols-7 gap-1">
+                    {calCells.map((d, i) => {
+                      if (d === null) return <div key={`empty-${i}`} />;
+                      const dObj = new Date(viewYear, viewMonth, d);
+                      const isPast = dObj < today;
+                      const isSel = dObj.toDateString() === selectedDate.toDateString();
+                      return (
+                        <button key={i} disabled={isPast} onClick={() => { setSelectedDate(dObj); setCalOpen(false); }}
+                          className={`aspect-square text-xs font-bold rounded-lg transition-all ${isSel ? 'bg-emerald-600 text-white' : isPast ? 'text-zinc-700 cursor-not-allowed' : 'text-zinc-300 hover:bg-zinc-700'}`}>
+                          {d}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-                <div className="grid grid-cols-7 gap-1 text-center mb-2">
-                  {DAYS_SHORT.map(d => <span key={d} className="text-[10px] font-black text-zinc-500 uppercase">{d}</span>)}
-                </div>
-                <div className="grid grid-cols-7 gap-1">
-                  {calCells.map((d, i) => {
-                    if (d === null) return <div key={`empty-${i}`} />;
-                    const dObj = new Date(viewYear, viewMonth, d);
-                    const isPast = dObj < today;
-                    const isSel = dObj.toDateString() === selectedDate.toDateString();
-                    return (
-                      <button key={i} disabled={isPast} onClick={() => { setSelectedDate(dObj); setCalOpen(false); }}
-                        className={`aspect-square text-xs font-bold rounded-lg transition-all ${isSel ? 'bg-emerald-600 text-white' : isPast ? 'text-zinc-700 cursor-not-allowed' : 'text-zinc-300 hover:bg-zinc-700'}`}>
-                        {d}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </header>
 
@@ -397,6 +422,7 @@ export default function BookingSection({ turf }) {
         onClose={() => setIsSummaryOpen(false)}
         selectedSlots={selectedSlots}
         turf={turf}
+        duration={duration}
         onAdvanceSuccess={(res, id) => { setConfirmedId(id); setAdvanceResult(res); setIsSummaryOpen(false); }}
         onFullSuccess={(res) => { setFullResult(res); setIsSummaryOpen(false); }}
       />

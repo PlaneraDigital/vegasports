@@ -1,32 +1,32 @@
 import { useState, useEffect, useCallback } from 'react'
 import { adminApi, api } from '../utils/adminApi'
-import { Search, Filter, X, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Eye, Banknote } from 'lucide-react'
+import { Filter, X, AlertCircle, CheckCircle, ChevronLeft, ChevronRight, Eye, Banknote } from 'lucide-react'
 
 // Convert HH:MM (24h) to h:MM AM/PM (12h)
 const to12h = (t) => {
   if (!t) return t
   const [h, m] = t.split(':').map(Number)
   const suffix = h >= 12 ? 'PM' : 'AM'
-  const hour   = h % 12 || 12
+  const hour = h % 12 || 12
   return `${hour}:${String(m).padStart(2, '0')} ${suffix}`
 }
 
 const statusStyle = {
   confirmed: { color: '#4ade80', bg: 'rgba(74, 222, 128, 0.1)', label: 'Confirmed' },
-  pending:   { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)', label: 'Pending'   },
+  pending: { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)', label: 'Pending' },
   cancelled: { color: '#f87171', bg: 'rgba(248, 113, 113, 0.1)', label: 'Cancelled' },
   completed: { color: '#60a5fa', bg: 'rgba(96, 165, 250, 0.1)', label: 'Completed' },
-  failed:    { color: '#a1a1aa', bg: 'rgba(113, 113, 122, 0.1)', label: 'Failed'   },
+  failed: { color: '#a1a1aa', bg: 'rgba(113, 113, 122, 0.1)', label: 'Failed' },
 }
 
 const payStyle = {
-  paid:         { color: '#4ade80', bg: 'rgba(74, 222, 128, 0.1)', label: 'Paid'         },
+  paid: { color: '#4ade80', bg: 'rgba(74, 222, 128, 0.1)', label: 'Paid' },
   advance_paid: { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)', label: 'Advance Paid' },
-  pending:      { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)', label: 'Pending'      },
-  failed:       { color: '#f87171', bg: 'rgba(248, 113, 113, 0.1)', label: 'Failed'       },
-  refunded:     { color: '#c084fc', bg: 'rgba(192, 132, 252, 0.1)', label: 'Refunded'     },
-  cancelled:    { color: '#71717a', bg: 'rgba(113, 113, 122, 0.1)', label: 'N/A'          },
-  admin:        { color: '#c084fc', bg: 'rgba(192, 132, 252, 0.1)', label: 'Admin'        },
+  pending: { color: '#fbbf24', bg: 'rgba(251, 191, 36, 0.1)', label: 'Pending' },
+  failed: { color: '#f87171', bg: 'rgba(248, 113, 113, 0.1)', label: 'Failed' },
+  refunded: { color: '#c084fc', bg: 'rgba(192, 132, 252, 0.1)', label: 'Refunded' },
+  cancelled: { color: '#71717a', bg: 'rgba(113, 113, 122, 0.1)', label: 'N/A' },
+  admin: { color: '#c084fc', bg: 'rgba(192, 132, 252, 0.1)', label: 'Admin' },
 }
 
 const StatusBadge = ({ status, map }) => {
@@ -47,7 +47,6 @@ const BookingManagement = () => {
   const [turfs, setTurfs] = useState([])
 
   const [filters, setFilters] = useState({ status: '', turf_id: '', date: '' })
-  const [search, setSearch] = useState('')
 
   const [detailBooking, setDetailBooking] = useState(null)
   const [cancelModal, setCancelModal] = useState(null)
@@ -57,15 +56,15 @@ const BookingManagement = () => {
 
   const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000) }
 
-  useEffect(() => { api.get('/api/turfs').then(r => setTurfs(r.data.turfs)).catch(() => {}) }, [])
+  useEffect(() => { api.get('/api/turfs').then(r => setTurfs(r.data.turfs)).catch(() => { }) }, [])
 
   const fetchBookings = useCallback(async (p = 1) => {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: p, limit: 10 })
-      if (filters.status)  params.set('status', filters.status)
+      if (filters.status) params.set('status', filters.status)
       if (filters.turf_id) params.set('turf_id', filters.turf_id)
-      if (filters.date)    params.set('date', filters.date)
+      if (filters.date) params.set('date', filters.date)
       const { data } = await adminApi.get(`/bookings?${params}`)
       setBookings(data.bookings)
       setTotal(data.total)
@@ -109,13 +108,7 @@ const BookingManagement = () => {
     } catch (err) { showToast(err?.response?.data?.message || 'Failed to record cash payment', 'error') }
   }
 
-  const filteredBookings = search
-    ? bookings.filter(b =>
-        b.user_id?.name?.toLowerCase().includes(search.toLowerCase()) ||
-        b.user_id?.phone?.includes(search) ||
-        b.user_id?.email?.toLowerCase().includes(search.toLowerCase())
-      )
-    : bookings
+  const filteredBookings = bookings
 
   const th = { textAlign: 'left', padding: '0.75rem 1rem', fontSize: '0.7rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }
   const td = { padding: '0.875rem 1rem', fontSize: '0.8rem', color: '#9ca3af', verticalAlign: 'top' }
@@ -137,45 +130,7 @@ const BookingManagement = () => {
         </div>
       )}
 
-      {/* ── Filters ── */}
-      <div style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '16px', padding: '1.25rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
-        {/* Search */}
-        <div style={{ position: 'relative', flex: 1, minWidth: '180px' }}>
-          <Search size={14} style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: '#71717a' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name, phone, email..."
-            style={{ width: '100%', boxSizing: 'border-box', background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.65rem 0.875rem 0.65rem 2.5rem', color: '#f4f4f5', fontSize: '0.8rem', outline: 'none' }} />
-        </div>
-        {/* Status */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-          <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 700 }}>Status</label>
-          <select value={filters.status} onChange={e => setFilters(p => ({ ...p, status: e.target.value }))}
-            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.8rem', outline: 'none' }}>
-            <option value="">All Status</option>
-            {['pending', 'confirmed', 'completed', 'cancelled', 'failed'].map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
-          </select>
-        </div>
-        {/* Turf */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-          <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 700 }}>Turf</label>
-          <select value={filters.turf_id} onChange={e => setFilters(p => ({ ...p, turf_id: e.target.value }))}
-            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.8rem', outline: 'none', maxWidth: '180px' }}>
-            <option value="">All Turfs</option>
-            {turfs.map(t => <option key={t._id} value={t._id}>{t.name}</option>)}
-          </select>
-        </div>
-        {/* Date */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-          <label style={{ color: '#71717a', fontSize: '0.7rem', fontWeight: 700 }}>Date</label>
-          <input type="date" value={filters.date} onChange={e => setFilters(p => ({ ...p, date: e.target.value }))}
-            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.8rem', outline: 'none' }} />
-        </div>
-        {(filters.status || filters.turf_id || filters.date) && (
-          <button onClick={() => setFilters({ status: '', turf_id: '', date: '' })}
-            style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.2)', borderRadius: '10px', padding: '0.65rem 0.875rem', color: '#f87171', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
-            <X size={13} /> Clear
-          </button>
-        )}
-      </div>
+
 
       {/* ── Info Bar ── */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -241,32 +196,32 @@ const BookingManagement = () => {
                     </td>
                     <td style={td}><StatusBadge status={b.booking_status} map={statusStyle} /></td>
                     <td style={td}>
-                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                          <button onClick={() => setDetailBooking(b)}
-                            style={{ background: 'rgba(96, 165, 250, 0.1)', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#60a5fa', display: 'flex' }} title="View">
-                            <Eye size={14} />
-                          </button>
-                          {b.payment?.status === 'advance_paid' && (
-                            <>
-                              <button onClick={() => handleMarkFullyPaid(b)}
-                                style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid rgba(74, 222, 128, 0.2)', borderRadius: '8px', padding: '0.35rem 0.6rem', cursor: 'pointer', color: '#4ade80', fontSize: '0.7rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-                                title="Mark Fully Paid">
-                                ✅ Mark Paid
-                              </button>
-                              <button onClick={() => handleMarkPaidCash(b)}
-                                style={{ background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '8px', padding: '0.35rem 0.6rem', cursor: 'pointer', color: '#fbbf24', fontSize: '0.7rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}
-                                title="Payment in Cash">
-                                💵 Cash
-                              </button>
-                            </>
-                          )}
-                          {['pending', 'confirmed'].includes(b.booking_status) && (
-                            <button onClick={() => setCancelModal(b)}
-                              style={{ background: 'rgba(248, 113, 113, 0.1)', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#f87171', display: 'flex' }} title="Cancel">
-                              <X size={14} />
+                      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                        <button onClick={() => setDetailBooking(b)}
+                          style={{ background: 'rgba(96, 165, 250, 0.1)', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#60a5fa', display: 'flex' }} title="View">
+                          <Eye size={14} />
+                        </button>
+                        {b.payment?.status === 'advance_paid' && (
+                          <>
+                            <button onClick={() => handleMarkFullyPaid(b)}
+                              style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid rgba(74, 222, 128, 0.2)', borderRadius: '8px', padding: '0.35rem 0.6rem', cursor: 'pointer', color: '#4ade80', fontSize: '0.7rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                              title="Mark Fully Paid">
+                              ✅ Mark Paid
                             </button>
-                          )}
-                        </div>
+                            <button onClick={() => handleMarkPaidCash(b)}
+                              style={{ background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.2)', borderRadius: '8px', padding: '0.35rem 0.6rem', cursor: 'pointer', color: '#fbbf24', fontSize: '0.7rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                              title="Payment in Cash">
+                              💵 Cash
+                            </button>
+                          </>
+                        )}
+                        {['pending', 'confirmed'].includes(b.booking_status) && (
+                          <button onClick={() => setCancelModal(b)}
+                            style={{ background: 'rgba(248, 113, 113, 0.1)', border: 'none', borderRadius: '8px', padding: '0.45rem', cursor: 'pointer', color: '#f87171', display: 'flex' }} title="Cancel">
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
