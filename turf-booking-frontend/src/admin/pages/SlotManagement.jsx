@@ -8,6 +8,7 @@ const slotColors = {
   on_hold: { bg: 'rgba(251, 191, 36, 0.1)', border: 'rgba(251, 191, 36, 0.2)', color: '#fbbf24', label: 'On Hold' },
   blocked: { bg: 'rgba(248, 113, 113, 0.1)', border: 'rgba(248, 113, 113, 0.2)', color: '#f87171', label: 'Booked' }, // Treat legacy blocked slots as booked
   expired: { bg: 'rgba(39, 39, 42, 0.5)', border: 'rgba(63, 63, 70, 0.3)', color: '#52525b', label: 'Expired' },
+  unavailable: { bg: 'rgba(39, 39, 42, 0.3)', border: 'rgba(63, 63, 70, 0.2)', color: '#71717a', label: 'Unavailable' },
 }
 
 const today = () => new Date().toISOString().split('T')[0]
@@ -19,6 +20,18 @@ const to12h = (t) => {
   const suffix = h >= 12 ? 'PM' : 'AM'
   const hour   = h % 12 || 12
   return `${hour}:${String(m).padStart(2, '0')} ${suffix}`
+}
+
+const isOverlapping = (s1, e1, s2, e2) => {
+  const toMins = (t) => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + m;
+  };
+  let start1 = toMins(s1), end1 = toMins(e1);
+  let start2 = toMins(s2), end2 = toMins(e2);
+  if (end1 <= start1) end1 += 1440;
+  if (end2 <= start2) end2 += 1440;
+  return start1 < end2 && start2 < end1;
 }
 
 const SlotManagement = () => {
@@ -126,6 +139,18 @@ const SlotManagement = () => {
     finally { setSaving(false) }
   }
 
+  const bookedSlotsInDb = slots.filter(s => ['booked', 'on_hold', 'blocked'].includes(s.status) && !s._id.startsWith('temp-'));
+  const isOverlapSlot = (slot) => {
+    if (!slot._id.startsWith('temp-')) return false;
+    return bookedSlotsInDb.some(b => isOverlapping(b.start_time, b.end_time, slot.start_time, slot.end_time));
+  };
+
+  const total = slots.length;
+  const available = slots.filter(s => s.status === 'available' && !isOverlapSlot(s)).length;
+  const booked = slots.filter(s => ['booked', 'blocked'].includes(s.status) && !isOverlapSlot(s)).length;
+  const on_hold = slots.filter(s => s.status === 'on_hold' && !isOverlapSlot(s)).length;
+  const unavailable = slots.filter(s => isOverlapSlot(s)).length;
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
@@ -168,13 +193,14 @@ const SlotManagement = () => {
       </div>
 
       {/* ── Summary Strip ── */}
-      {summary && (
+      {slots.length > 0 && (
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {[
-            { label: 'Total', value: summary.total, color: '#71717a' },
-            { label: 'Available', value: summary.available, color: '#4ade80' },
-            { label: 'Booked', value: summary.booked + (summary.blocked || 0), color: '#f87171' },
-            { label: 'On Hold', value: summary.on_hold, color: '#fbbf24' },
+            { label: 'Total', value: total, color: '#71717a' },
+            { label: 'Available', value: available, color: '#4ade80' },
+            { label: 'Booked', value: booked, color: '#f87171' },
+            { label: 'On Hold', value: on_hold, color: '#fbbf24' },
+            { label: 'Unavailable', value: unavailable, color: '#71717a' },
           ].map(s => (
             <div key={s.label} style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '12px', padding: '0.75rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.1rem', flex: 1, minWidth: '90px', textAlign: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
               <span style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>{s.value}</span>
@@ -226,7 +252,7 @@ const SlotManagement = () => {
             </h3>
             {/* Legend */}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-              {['available', 'booked', 'on_hold'].map(k => {
+              {['available', 'booked', 'on_hold', 'unavailable'].map(k => {
                 const v = slotColors[k]
                 return (
                   <div key={k} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
@@ -239,11 +265,14 @@ const SlotManagement = () => {
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(130px,1fr))] gap-2 sm:gap-2.5">
             {slots.map(slot => {
-              const s = slotColors[slot.status] || slotColors.expired
+              const isOverlap = isOverlapSlot(slot)
+              const statusKey = isOverlap ? 'unavailable' : slot.status
+              const s = slotColors[statusKey] || slotColors.expired
               const isBookedByAdmin = ['booked', 'blocked'].includes(slot.status) && slot.booked_by?.role === 'admin'
-              const isClickable = ['available', 'booked', 'blocked'].includes(slot.status)
+              const isClickable = ['available', 'booked', 'blocked'].includes(slot.status) && !isOverlap
               return (
                 <button key={slot._id}
+                  disabled={!isClickable}
                   onClick={() => { if (isClickable) setActionSlot({ slot, mode: 'menu' }) }}
                   style={{
                     background: s.bg, border: `1px solid ${s.border}`, borderRadius: '10px',
@@ -256,7 +285,12 @@ const SlotManagement = () => {
                   <div style={{ fontSize: '0.8rem', fontWeight: 800, color: s.color }}>{to12h(slot.start_time)}</div>
                   <div style={{ fontSize: '0.75rem', fontWeight: 800, color: s.color, margin: '0.1rem 0' }}>→ {to12h(slot.end_time)}</div>
                   <div style={{ fontSize: '0.75rem', color: '#f4f4f5', fontWeight: 800 }}>₹{slot.price}</div>
-                  {['booked', 'blocked'].includes(slot.status) && <Lock size={10} color="#64748b" style={{ marginTop: '0.25rem', display: 'block', margin: '0.25rem auto 0' }} />}
+                  {['booked', 'blocked'].includes(slot.status) && !isOverlap && <Lock size={10} color="#64748b" style={{ marginTop: '0.25rem', display: 'block', margin: '0.25rem auto 0' }} />}
+                  {isOverlap && (
+                    <div style={{ marginTop: '0.2rem', fontSize: '0.55rem', fontWeight: 800, color: '#71717a', background: 'rgba(113,113,122,0.1)', borderRadius: '4px', padding: '0.1rem 0.3rem', display: 'inline-block' }}>
+                      UNAVAILABLE
+                    </div>
+                  )}
                   {isBookedByAdmin && (
                     <div style={{ marginTop: '0.2rem', fontSize: '0.55rem', fontWeight: 800, color: '#c084fc', background: 'rgba(192,132,252,0.12)', borderRadius: '4px', padding: '0.1rem 0.3rem', display: 'inline-block' }}>
                       ADMIN

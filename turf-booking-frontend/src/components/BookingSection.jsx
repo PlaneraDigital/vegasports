@@ -10,7 +10,6 @@ import {
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 
-/* ─── Helpers ─────────────────────────────────────────────────────────────── */
 function fmtTime(t) {
   if (!t) return "";
   const [h, m] = t.split(":").map(Number);
@@ -42,16 +41,13 @@ const isOverlapping = (s1, e1, s2, e2) => {
     const [h, m] = t.split(":").map(Number);
     return h * 60 + m;
   };
-  let start1 = toMins(s1);
-  let end1 = toMins(e1);
-  let start2 = toMins(s2);
-  let end2 = toMins(e2);
+  let start1 = toMins(s1), end1 = toMins(e1);
+  let start2 = toMins(s2), end2 = toMins(e2);
   if (end1 <= start1) end1 += 1440;
   if (end2 <= start2) end2 += 1440;
   return start1 < end2 && start2 < end1;
 };
 
-/* ─── Success Screens ─────────────────────────────────────────────────────── */
 function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
   const { balance_due, balance_link_url } = advanceResult;
   return (
@@ -62,7 +58,6 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
         </div>
         <h2 className="text-2xl font-black text-zinc-100 mb-2">Advance Paid!</h2>
         <p className="text-zinc-500 text-sm mb-6">Slot secured at {turf.name}</p>
-
         <div className="bg-red-900/20 rounded-2xl p-6 text-left mb-6 border border-red-900/30">
           <p className="text-red-400 font-black text-sm mb-3">🔴 RED CARD: BALANCE DUE</p>
           <div className="space-y-2 text-xs">
@@ -70,7 +65,6 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
             <div className="flex justify-between"><span className="text-red-500/60 font-bold uppercase">Status</span><span className="text-red-400 font-bold">Pending Clearance</span></div>
           </div>
         </div>
-
         {balance_link_url && (
           <div className="mb-6 p-4 bg-zinc-950 rounded-2xl border border-zinc-800">
             <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Scan to pay remaining</p>
@@ -78,7 +72,6 @@ function RedCardScreen({ booking, advanceResult, turf, onGoTicket, onGoHome }) {
             <a href={balance_link_url} target="_blank" rel="noreferrer" className="text-blue-400 font-bold text-xs underline">Pay Balance Online ↗</a>
           </div>
         )}
-
         <button onClick={onGoTicket} className="w-full py-4 bg-zinc-800 text-white font-bold rounded-2xl mb-3 hover:bg-zinc-700 transition-colors">View Ticket</button>
         <button onClick={onGoHome} className="w-full py-3 text-zinc-500 font-bold text-sm hover:text-zinc-300">Return Home</button>
       </div>
@@ -95,7 +88,6 @@ function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
         </div>
         <h2 className="text-2xl font-black text-zinc-100 mb-2">You're Pitch Ready!</h2>
         <p className="text-zinc-500 text-sm mb-6">Full payment confirmed at {turf.name}</p>
-
         <div className="bg-emerald-900/20 rounded-2xl p-6 text-left mb-8 border border-emerald-900/30">
           <p className="text-emerald-400 font-black text-sm mb-3">🔵 BLUE CARD: FULL ACCESS</p>
           <div className="space-y-2 text-xs">
@@ -103,7 +95,6 @@ function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
             <div className="flex justify-between"><span className="text-emerald-500/60 font-bold uppercase">Paid</span><span className="text-emerald-400 font-black">₹{booking.total_amount}</span></div>
           </div>
         </div>
-
         <button onClick={onGoTicket} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl mb-3 hover:bg-emerald-700 transition-all">View Ticket</button>
         <button onClick={onGoHome} className="w-full py-3 text-zinc-400 font-bold text-sm hover:text-zinc-200">Return Home</button>
       </div>
@@ -111,7 +102,6 @@ function BlueCardScreen({ booking, turf, onGoTicket, onGoHome }) {
   );
 }
 
-/* ─── Summary Modal ──────────────────────────────────────────────────────── */
 function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, duration, onAdvanceSuccess, onFullSuccess }) {
   const [booking, setBooking] = useState(false);
   const [err, setErr] = useState(null);
@@ -127,10 +117,8 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, duration, o
       const slot_ids = selectedSlots.map(s => s._id);
       const d = new Date(selectedSlots[0].date);
       const date = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
-
       const bRes = await api.post("/api/bookings", { turf_id: turf._id, date, slot_ids, duration });
       const booking_id = bRes.data.booking_id;
-
       if (payType === "advance") {
         const oRes = await api.post("/api/payment/create-advance-order", { booking_id });
         const options = {
@@ -189,7 +177,6 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, duration, o
               </div>
             </div>
           </div>
-
           <div className="mt-6 p-4 rounded-2xl bg-red-950/20 border border-red-900/30 flex items-start gap-3 text-left">
             <Wallet size={20} className="text-red-500 mt-0.5 flex-shrink-0" />
             <div>
@@ -200,7 +187,6 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, duration, o
             </div>
           </div>
         </div>
-
         <div className="p-8 bg-zinc-800 border-t border-zinc-700">
           <div className="flex justify-between items-end mb-6">
             <span className="text-zinc-500 text-sm font-bold mb-1">Payable Now</span>
@@ -219,7 +205,6 @@ function BookingSummaryModal({ isOpen, onClose, selectedSlots, turf, duration, o
   );
 }
 
-/* ─── Main Component ─────────────────────────────────────────────────────── */
 export default function BookingSection({ turf }) {
   const navigate = useNavigate();
   const [slots, setSlots] = useState([]);
@@ -233,12 +218,10 @@ export default function BookingSection({ turf }) {
   const [isSummaryOpen, setIsSummaryOpen] = useState(false);
   const [duration, setDuration] = useState(() => turf?.slot_duration_minutes || 60);
 
-  // Success states
   const [advanceResult, setAdvanceResult] = useState(null);
   const [fullResult, setFullResult] = useState(null);
   const [confirmedId, setConfirmedId] = useState(null);
 
-  // Calendar state
   const calRef = useRef(null);
   const [calOpen, setCalOpen] = useState(false);
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
@@ -264,6 +247,17 @@ export default function BookingSection({ turf }) {
     };
     fetchSlots();
   }, [selectedDate, turf, duration]);
+
+  // Compute overlap slots client-side — same logic as SlotManagement
+  const bookedSlots = slots.filter(s => ['booked', 'blocked'].includes(s.status) && s.booked_by);
+  const isOverlapSlot = (slot) => {
+    if (!['booked', 'blocked'].includes(slot.status)) return false;
+    if (slot.booked_by) return false; // it's a real booking itself, not an overlap
+    return bookedSlots.some(b =>
+      b._id !== slot._id &&
+      isOverlapping(b.start_time, b.end_time, slot.start_time, slot.end_time)
+    );
+  };
 
   if (advanceResult) return <RedCardScreen advanceResult={advanceResult} turf={turf} onGoTicket={() => navigate(`/ticket/${confirmedId}`)} onGoHome={() => navigate("/")} />;
   if (fullResult) return <BlueCardScreen booking={{ ...fullResult, start_time: selectedSlots[0]?.start_time, end_time: selectedSlots[selectedSlots.length - 1]?.end_time }} turf={turf} onGoTicket={() => navigate(`/ticket/${fullResult.booking_id}`)} onGoHome={() => navigate("/")} />;
@@ -299,9 +293,7 @@ export default function BookingSection({ turf }) {
             <h1 className="text-3xl font-black mb-1">Time slots available</h1>
             <p className="text-zinc-500 font-medium">{turf.name}</p>
           </div>
-
           <div className="flex items-center gap-3">
-            {/* Duration Dropdown */}
             <div className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 px-3.5 py-2.5 rounded-xl text-sm font-bold shadow-sm text-zinc-200">
               <Clock size={16} className="text-zinc-500" />
               <select
@@ -318,8 +310,6 @@ export default function BookingSection({ turf }) {
                 <option value={180} className="bg-zinc-800 text-zinc-200 font-bold">3 Hours</option>
               </select>
             </div>
-
-            {/* Date Selector */}
             <div ref={calRef} className="relative">
               <button onClick={() => setCalOpen(!calOpen)} className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:border-zinc-600 transition-all text-zinc-200">
                 <CalendarDays size={16} className="text-zinc-500" />
@@ -373,10 +363,10 @@ export default function BookingSection({ turf }) {
             ) : visibleSlots.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                 {visibleSlots.map(slot => {
-                  const isBooked = ["booked", "on_hold", "blocked"].includes(slot.status);
+                  const isOverlap = isOverlapSlot(slot);
+                  const isReallyBooked = ["booked", "on_hold", "blocked"].includes(slot.status) && !isOverlap;
                   const isSel = selectedSlots.some(s => s._id === slot._id);
                   const isBlockedBySelection = selectedSlots.some(s => s._id !== slot._id && isOverlapping(s.start_time, s.end_time, slot.start_time, slot.end_time));
-                  const isAdjacent = selectedSlots.some(selected => slot.end_time === selected.start_time || slot.start_time === selected.end_time);
 
                   const isToday = selectedDate.toDateString() === new Date().toDateString();
                   const now = new Date();
@@ -384,16 +374,26 @@ export default function BookingSection({ turf }) {
                   const [sh, sm] = slot.start_time.split(":").map(Number);
                   const slotMins = sh * 60 + sm;
                   const isPast = isToday && slotMins < (currentMins + 30);
-                  const isGrayedOut = isBooked || isPast || (isBlockedBySelection && !isSel) || (isAdjacent && !isSel);
+
+                  const isGrayedOut = isReallyBooked || isPast || isOverlap || (isBlockedBySelection && !isSel);
 
                   return (
                     <button key={slot._id} disabled={isGrayedOut} onClick={() => toggleSlot(slot)}
-                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel ? 'bg-emerald-600 border-emerald-600 text-white shadow-xl scale-[1.02]' : isGrayedOut ? 'bg-zinc-950/40 border-zinc-900/60 text-zinc-700 cursor-not-allowed grayscale opacity-30' : 'bg-zinc-700 border-zinc-700 text-zinc-200 hover:border-emerald-500 hover:shadow-lg'}`}>
+                      className={`group relative py-6 px-4 rounded-3xl border-2 transition-all duration-300 ${isSel
+                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-xl scale-[1.02]'
+                        : isGrayedOut
+                          ? 'bg-zinc-950/40 border-zinc-900/60 text-zinc-700 cursor-not-allowed grayscale opacity-30'
+                          : 'bg-zinc-700 border-zinc-700 text-zinc-200 hover:border-emerald-500 hover:shadow-lg'
+                        }`}>
                       <div className="flex flex-col items-center gap-0.5">
                         <span className="text-sm font-black tracking-tight whitespace-nowrap">{fmtRange(slot.start_time, slot.end_time)}</span>
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isSel ? 'text-zinc-300' : 'text-zinc-400'}`}>₹{slot.price}</span>
-                        <span className={`text-[9px] font-bold mt-1 ${isSel ? 'text-white/80' : (isBooked || isPast || (isAdjacent && !isSel)) ? 'text-red-500' : 'text-emerald-500'}`}>
-                          {isBooked || isPast ? "Booked" : (isAdjacent && !isSel) ? "Blocked" : "✓ Available"}
+                        <span className={`text-[9px] font-bold mt-1 ${isSel ? 'text-white/80'
+                          : (isReallyBooked || isPast) ? 'text-red-500'
+                            : isOverlap ? 'text-zinc-500'
+                              : 'text-emerald-500'
+                          }`}>
+                          {(isReallyBooked || isPast) ? "Booked" : isOverlap ? "Unavailable" : "✓ Available"}
                         </span>
                       </div>
                     </button>
