@@ -38,6 +38,12 @@ const StatusBadge = ({ status, map }) => {
   )
 }
 
+// Today's date in YYYY-MM-DD (IST)
+const getTodayStr = () => {
+  const now = new Date(Date.now() + 330 * 60 * 1000) // IST offset
+  return now.toISOString().slice(0, 10)
+}
+
 const BookingManagement = () => {
   const [bookings, setBookings] = useState([])
   const [total, setTotal] = useState(0)
@@ -46,7 +52,7 @@ const BookingManagement = () => {
   const [loading, setLoading] = useState(false)
   const [turfs, setTurfs] = useState([])
 
-  const [filters, setFilters] = useState({ status: '', turf_id: '', date: '' })
+  const [filters, setFilters] = useState({ status: '', turf_id: '', date: getTodayStr() })
 
   const [detailBooking, setDetailBooking] = useState(null)
   const [cancelModal, setCancelModal] = useState(null)
@@ -61,7 +67,9 @@ const BookingManagement = () => {
   const fetchBookings = useCallback(async (p = 1) => {
     setLoading(true)
     try {
-      const params = new URLSearchParams({ page: p, limit: 10 })
+      // Use a larger limit when viewing a specific day so all slots show without extra pages
+      const perPage = filters.date ? 50 : 10
+      const params = new URLSearchParams({ page: p, limit: perPage })
       if (filters.status) params.set('status', filters.status)
       if (filters.turf_id) params.set('turf_id', filters.turf_id)
       if (filters.date) params.set('date', filters.date)
@@ -138,10 +146,16 @@ const BookingManagement = () => {
           <input type="date" value={filters.date} onChange={e => setFilters(p => ({ ...p, date: e.target.value }))}
             style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.8rem', outline: 'none' }} />
         </div>
-        {filters.date && (
-          <button onClick={() => setFilters({ status: '', turf_id: '', date: '' })}
+        {/* Today shortcut */}
+        <button
+          onClick={() => setFilters(p => ({ ...p, date: getTodayStr() }))}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: filters.date === getTodayStr() ? 'rgba(74,222,128,0.15)' : 'rgba(255,255,255,0.04)', border: `1px solid ${filters.date === getTodayStr() ? 'rgba(74,222,128,0.35)' : '#27272a'}`, borderRadius: '10px', padding: '0.65rem 0.875rem', color: filters.date === getTodayStr() ? '#4ade80' : '#71717a', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
+          Today
+        </button>
+        {filters.date && filters.date !== getTodayStr() && (
+          <button onClick={() => setFilters({ status: '', turf_id: '', date: getTodayStr() })}
             style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', background: 'rgba(248, 113, 113, 0.1)', border: '1px solid rgba(248, 113, 113, 0.2)', borderRadius: '10px', padding: '0.65rem 0.875rem', color: '#f87171', fontSize: '0.8rem', fontWeight: 700, cursor: 'pointer' }}>
-            <X size={13} /> Clear
+            <X size={13} /> Reset to Today
           </button>
         )}
       </div>

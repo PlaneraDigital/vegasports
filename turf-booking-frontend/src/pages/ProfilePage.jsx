@@ -25,11 +25,11 @@ function fmtDate(d) {
 }
 
 const STATUS_CONFIG = {
-  confirmed: { label: "Confirmed", color: "bg-green-50 border-green-200 text-green-700", icon: CheckCircle2 },
-  pending:   { label: "Pending",   color: "bg-yellow-50 border-yellow-200 text-yellow-700", icon: Clock },
-  cancelled: { label: "Cancelled", color: "bg-red-50 border-red-200 text-red-700",         icon: XCircle },
-  completed: { label: "Completed", color: "bg-blue-50 border-blue-200 text-blue-700",       icon: CheckCircle2 },
-  failed:    { label: "Failed",    color: "bg-zinc-800 border-zinc-700 text-gray-500",      icon: AlertCircle },
+  confirmed: { label: "Confirmed",     color: "bg-green-50 border-green-200 text-green-700",   icon: CheckCircle2 },
+  pending:   { label: "Pending",       color: "bg-yellow-50 border-yellow-200 text-yellow-700", icon: Clock },
+  cancelled: { label: "Cancelled",     color: "bg-red-50 border-red-200 text-red-700",          icon: XCircle },
+  completed: { label: "Completed",     color: "bg-blue-50 border-blue-200 text-blue-700",        icon: CheckCircle2 },
+  failed:    { label: "Hold Expired",  color: "bg-zinc-800 border-zinc-600 text-zinc-400",       icon: AlertCircle },
 };
 
 const CANCEL_REASONS = ["Changed plans", "Emergency", "Weather", "Other"];
@@ -266,9 +266,20 @@ export default function ProfilePage() {
     }));
   };
 
+  // ── Auto-refresh every 30s while there are pending bookings (hold expiry detection) ──
+  useEffect(() => {
+    const hasPending = bookings.some(b => b.booking_status === "pending");
+    if (!hasPending) return;
+    const id = setInterval(() => {
+      fetchBookings(false);
+    }, 30_000);
+    return () => clearInterval(id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookings]);
+
   // ── Shared fetch helper so we can call it from multiple places ───────────────
-  const fetchBookings = async () => {
-    setLoading(true);
+  const fetchBookings = async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       const res = await api.get("/api/bookings");
@@ -276,7 +287,7 @@ export default function ProfilePage() {
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load bookings.");
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
@@ -297,7 +308,7 @@ export default function ProfilePage() {
 
   if (!authUser) return null;
 
-  const FILTERS = ["all", "confirmed", "pending", "cancelled", "completed"];
+  const FILTERS = ["all", "confirmed", "pending", "cancelled", "completed", "failed"];
   const filtered = filter === "all" ? bookings : bookings.filter((b) => b.booking_status === filter);
 
   const stats = {
@@ -567,7 +578,11 @@ export default function ProfilePage() {
                     : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
                 }`}
               >
-                {f === "all" ? `All (${bookings.length})` : f}
+                {f === "all"
+                ? `All (${bookings.length})`
+                : f === "failed"
+                ? `Expired (${bookings.filter(b => b.booking_status === 'failed').length})`
+                : f}
               </button>
             ))}
           </div>

@@ -4,8 +4,49 @@ const crypto   = require("crypto");
 const Booking  = require("../models/Booking");
 const Slot     = require("../models/Slot");
 const razorpay = require("../config/razorpay");
+const { releaseExpiredHolds } = require("../utils/holdManager");
 
 const ADVANCE_AMOUNT = 200; // ₹200 fixed advance
+
+// ─── Refund Logic (Internal Helper) ────────────────────────────────────────────
+const processRefund = async (booking) => {
+  try {
+    const paymentIds = new Set();
+    if (booking.payment.razorpay_payment_id) paymentIds.add(booking.payment.razorpay_payment_id);
+    if (booking.payment.transaction_id) paymentIds.add(booking.payment.transaction_id);
+
+    if (paymentIds.size === 0) return { status: "na", message: "No payments to refund" };
+
+    const refundResults = [];
+    for (const pid of paymentIds) {
+      try {
+        const refund = await razorpay.payments.refund(pid, {
+          notes: { 
+            booking_id: booking._id.toString(), 
+            reason: booking.cancellation?.reason || "Booking Cancelled" 
+          }
+        });
+        refundResults.push(refund.id);
+      } catch (err) {
+        console.error(`Refund failed for payment ${pid}:`, err.message);
+      }
+    }
+
+    if (refundResults.length > 0) {
+      booking.cancellation.refund_status = "processed";
+      booking.cancellation.refund_ids = (booking.cancellation.refund_ids || []).concat(refundResults);
+      await booking.save();
+      return { status: "processed", refund_ids: refundResults };
+    }
+
+    booking.cancellation.refund_status = "failed";
+    await booking.save();
+    return { status: "failed", message: "Refund initiation failed for all payments" };
+  } catch (error) {
+    console.error("processRefund error:", error.message);
+    return { status: "failed", error: error.message };
+  }
+};
 
 // ─── Create Full Payment Razorpay Order ──────────────────────────────────────
 const createOrder = async (req, res) => {
@@ -13,10 +54,21 @@ const createOrder = async (req, res) => {
     const { booking_id } = req.body;
     const user_id = req.user._id;
 
+    // Release expired holds first
+    await releaseExpiredHolds();
+
     if (!booking_id) return res.status(400).json({ message: "booking_id is required" });
 
     const booking = await Booking.findOne({ _id: booking_id, user_id });
     if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+    // Check if hold has expired (booking auto-failed by holdManager or manually)
+    if (booking.booking_status === "failed") {
+      return res.status(410).json({
+        message: "Your hold on the slot has expired (10-minute limit). Please start a new booking.",
+        expired: true
+      });
+    }
 
     if (booking.booking_status !== "pending")
       return res.status(400).json({ message: `Cannot create order for booking with status: ${booking.booking_status}` });
@@ -66,6 +118,7 @@ const verifyPayment = async (req, res) => {
     if (booking.payment.razorpay_order_id !== razorpay_order_id)
       return res.status(400).json({ message: "Order ID mismatch" });
 
+    // ── Signature verification (always do this first to validate the payment is genuine) ──
     const body     = razorpay_order_id + "|" + razorpay_payment_id;
     const expected = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(body).digest("hex");
 
@@ -74,6 +127,30 @@ const verifyPayment = async (req, res) => {
       booking.payment.status = "failed";
       await booking.save();
       return res.status(400).json({ message: "Payment verification failed. Invalid signature." });
+    }
+
+    // ── Check if the hold has expired (booking was auto-marked failed by holdManager) ──
+    if (booking.booking_status === "failed") {
+      // Signature is valid, so a real payment was made. Store details and trigger refund.
+      console.warn(`[PaymentController] Expired booking ${booking._id} received a genuine payment. Triggering automatic refund.`);
+      booking.payment.razorpay_payment_id = razorpay_payment_id;
+      booking.payment.transaction_id      = razorpay_payment_id;
+      booking.payment.status              = "paid"; // temporarily mark paid so refund works
+      booking.cancellation = {
+        cancelled_at:  new Date(),
+        reason:        "Other",
+        cancelled_by:  "admin",
+        refund_amount: booking.total_amount,
+        refund_status: "pending"
+      };
+      await booking.save();
+      // Trigger immediate refund
+      await processRefund(booking);
+      return res.status(410).json({
+        message: "Your slot hold expired before payment was completed. A full refund has been initiated automatically.",
+        expired: true,
+        refund_initiated: true
+      });
     }
 
     booking.booking_status              = "confirmed";
@@ -115,10 +192,21 @@ const createAdvanceOrder = async (req, res) => {
     const { booking_id } = req.body;
     const user_id = req.user._id;
 
+    // Release expired holds first
+    await releaseExpiredHolds();
+
     if (!booking_id) return res.status(400).json({ message: "booking_id is required" });
 
     const booking = await Booking.findOne({ _id: booking_id, user_id });
     if (!booking) return res.status(404).json({ message: "Booking not found" });
+
+    // Check if hold has expired
+    if (booking.booking_status === "failed") {
+      return res.status(410).json({
+        message: "Your hold on the slot has expired (10-minute limit). Please start a new booking.",
+        expired: true
+      });
+    }
 
     if (booking.booking_status !== "pending")
       return res.status(400).json({ message: `Cannot create advance order for booking with status: ${booking.booking_status}` });
@@ -172,7 +260,7 @@ const verifyAdvancePayment = async (req, res) => {
     if (booking.payment.razorpay_order_id !== razorpay_order_id)
       return res.status(400).json({ message: "Order ID mismatch" });
 
-    // Verify signature
+    // ── Signature verification (always do first to validate the payment is genuine) ──
     const body     = razorpay_order_id + "|" + razorpay_payment_id;
     const expected = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET).update(body).digest("hex");
 
@@ -180,6 +268,30 @@ const verifyAdvancePayment = async (req, res) => {
       booking.payment.status = "failed";
       await booking.save();
       return res.status(400).json({ message: "Advance payment verification failed." });
+    }
+
+    // ── Check if the hold has expired (booking was auto-failed by holdManager) ──
+    if (booking.booking_status === "failed") {
+      // Real payment received but hold expired — store details and refund immediately
+      console.warn(`[PaymentController] Expired booking ${booking._id} received a genuine advance payment. Triggering automatic refund.`);
+      booking.payment.razorpay_payment_id = razorpay_payment_id;
+      booking.payment.transaction_id      = razorpay_payment_id;
+      booking.payment.advance_amount      = ADVANCE_AMOUNT;
+      booking.payment.status              = "paid"; // temporarily so refund works
+      booking.cancellation = {
+        cancelled_at:  new Date(),
+        reason:        "Other",
+        cancelled_by:  "admin",
+        refund_amount: ADVANCE_AMOUNT,
+        refund_status: "pending"
+      };
+      await booking.save();
+      await processRefund(booking);
+      return res.status(410).json({
+        message: "Your slot hold expired before advance payment was completed. A full refund has been initiated automatically.",
+        expired: true,
+        refund_initiated: true
+      });
     }
 
     // Mark advance as paid
@@ -453,44 +565,6 @@ const markPaidCash = async (req, res) => {
   }
 };
 
-// ─── Refund Logic (Internal Helper) ──────────────────────────────────────────
-const processRefund = async (booking) => {
-  try {
-    const paymentIds = new Set();
-    if (booking.payment.razorpay_payment_id) paymentIds.add(booking.payment.razorpay_payment_id);
-    if (booking.payment.transaction_id) paymentIds.add(booking.payment.transaction_id);
-
-    if (paymentIds.size === 0) return { status: "na", message: "No payments to refund" };
-
-    const refundResults = [];
-    for (const pid of paymentIds) {
-      try {
-        const refund = await razorpay.payments.refund(pid, {
-          notes: { 
-            booking_id: booking._id.toString(), 
-            reason: booking.cancellation?.reason || "Booking Cancelled" 
-          }
-        });
-        refundResults.push(refund.id);
-      } catch (err) {
-        console.error(`Refund failed for payment ${pid}:`, err.message);
-      }
-    }
-
-    if (refundResults.length > 0) {
-      booking.cancellation.refund_status = "processed";
-      booking.cancellation.refund_ids = (booking.cancellation.refund_ids || []).concat(refundResults);
-      await booking.save();
-      return { status: "processed", refund_ids: refundResults };
-    }
-
-    booking.cancellation.refund_status = "failed";
-    await booking.save();
-    return { status: "failed", message: "Refund initiation failed for all payments" };
-  } catch (error) {
-    console.error("processRefund error:", error.message);
-    return { status: "failed", error: error.message };
-  }
-};
+// ─── Refund helper was moved to the top of the file so verifyPayment can call it.
 
 module.exports = { createOrder, verifyPayment, createAdvanceOrder, verifyAdvancePayment, balanceWebhook, markFullyPaid, markPaidCash, processRefund };

@@ -6,6 +6,7 @@ const Turf = require("../models/Turf");
 const User = require("../models/User");
 const { sendCancellationEmail } = require("../utils/sendEmail");
 const generateInvoice = require("../utils/generateInvoice");
+const { releaseExpiredHolds } = require("../utils/holdManager");
 
 const HOLD_MINUTES = 10; 
 
@@ -29,6 +30,9 @@ const createBooking = async (req, res) => {
   try {
     const { turf_id, date, slot_ids, duration } = req.body;
     const user_id = req.user._id;
+
+    // Release any expired holds before checking slot availability
+    await releaseExpiredHolds();
 
     if (!turf_id || !date || !slot_ids || slot_ids.length === 0) {
       return res.status(400).json({ message: "turf_id, date and slot_ids are required" });
@@ -138,6 +142,7 @@ const createBooking = async (req, res) => {
 const getUserBookings = async (req, res) => {
   try {
     const user_id = req.user._id;
+    await releaseExpiredHolds();
     const bookings = await Booking.find({ user_id }).sort({ created_at: -1 })
       .populate("turf_id", "name location.address location.city images")
       .populate("slot_ids", "start_time end_time price status date");
@@ -148,6 +153,7 @@ const getUserBookings = async (req, res) => {
 const getBookingById = async (req, res) => {
   try {
     const user_id = req.user._id;
+    await releaseExpiredHolds();
     const booking = await Booking.findOne({ _id: req.params.id, user_id })
       .populate("turf_id", "name location.address location.city images rating")
       .populate("slot_ids", "start_time end_time price status date");
@@ -217,6 +223,7 @@ const cancelBooking = async (req, res) => {
 
 const getUpcomingBookings = async (req, res) => {
   try {
+    await releaseExpiredHolds();
     const bookings = await Booking.find({ user_id: req.user._id, date: { $gte: new Date().setUTCHours(0,0,0,0) }, booking_status: { $in: ["pending", "confirmed"] } })
       .sort({ date: 1 }).populate("turf_id", "name location.address").populate("slot_ids", "start_time end_time price");
     res.status(200).json({ bookings });
@@ -225,6 +232,7 @@ const getUpcomingBookings = async (req, res) => {
 
 const getBookingHistory = async (req, res) => {
   try {
+    await releaseExpiredHolds();
     const bookings = await Booking.find({ user_id: req.user._id, booking_status: { $in: ["completed", "cancelled", "failed"] } })
       .sort({ created_at: -1 }).populate("turf_id", "name location.address").populate("slot_ids", "start_time end_time");
     res.status(200).json({ bookings });

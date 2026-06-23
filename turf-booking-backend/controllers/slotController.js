@@ -1,5 +1,6 @@
 const Slot = require("../models/Slot");
 const Turf = require("../models/Turf");
+const { releaseExpiredHolds } = require("../utils/holdManager");
 
 // ─── Helper: validate HH:MM format ───────────────────────────────────────────
 const isValidTime = (t) =>
@@ -38,6 +39,9 @@ const getSlotsByTurfAndDate = async (req, res) => {
     if (!turf_id || !date) {
       return res.status(400).json({ message: "turf_id and date are required" });
     }
+
+    // Release any expired holds before computing slot availability
+    await releaseExpiredHolds();
 
     const parsedDate = new Date(date);
     if (isNaN(parsedDate.getTime())) {
@@ -139,11 +143,13 @@ const getSlotsByTurfAndDate = async (req, res) => {
 
           // Check if this slot overlaps with ANY booked slot on the same day
           const overlap = existingBookedSlots.find(booked => 
+            ["booked", "on_hold", "blocked"].includes(booked.status) &&
             isOverlapping(sT, eT, booked.start_time, booked.end_time)
           );
 
           // Check if this slot overlaps with a crossover booking from the previous day
           const prevDayOverlap = crossoverBookings.find(booked => {
+            if (!["booked", "on_hold", "blocked"].includes(booked.status)) return false;
             const [psh, psm] = booked.start_time.split(":").map(Number);
             const [peh, pem] = booked.end_time.split(":").map(Number);
             let pemins = peh * 60 + pem;

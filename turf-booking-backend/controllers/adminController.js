@@ -5,6 +5,7 @@ const User     = require("../models/User");
 const Turf     = require("../models/Turf");
 const Slot     = require("../models/Slot");
 const Booking  = require("../models/Booking");
+const { releaseExpiredHolds } = require("../utils/holdManager");
 
 // ─── Generate Token ───────────────────────────────────────────────────────────
 const generateToken = (userId) => {
@@ -133,6 +134,9 @@ const getAdminSlots = async (req, res) => {
   try {
     const { turf_id, date } = req.query;
     if (!turf_id || !date) return res.status(400).json({ message: "turf_id and date are required" });
+
+    // Release any expired holds before showing admin view
+    await releaseExpiredHolds();
     const [y, m, d] = date.split("-").map(Number);
     const startOfDay = new Date(Date.UTC(y, m - 1, d));
     const endOfDay   = new Date(Date.UTC(y, m - 1, d, 23, 59, 59, 999));
@@ -197,6 +201,7 @@ const getAdminSlots = async (req, res) => {
           const exact = slotsFromDb.find(s => s.start_time === sT);
           const overlap = slotsFromDb.find(booked => ["booked", "on_hold", "blocked"].includes(booked.status) && isOverlapping(sT, eT, booked.start_time, booked.end_time));
           const prevDayOverlap = crossoverBookings.find(booked => {
+            if (!["booked", "on_hold", "blocked"].includes(booked.status)) return false;
             const [psh, psm] = booked.start_time.split(":").map(Number);
             const [peh, pem] = booked.end_time.split(":").map(Number);
             let pemins = peh * 60 + pem;
@@ -313,20 +318,34 @@ const updateSlotPrice = async (req, res) => {
 
 const getAllBookings = async (req, res) => {
   try {
+    await releaseExpiredHolds();
     const { status, turf_id, date, page = 1, limit = 10 } = req.query;
     const filter = {};
     if (status) filter.booking_status = status;
     if (turf_id) filter.turf_id = turf_id;
-    if (date) { const startOfDay = new Date(date); startOfDay.setUTCHours(0, 0, 0, 0); const endOfDay = new Date(date); endOfDay.setUTCHours(23, 59, 59, 999); filter.date = { $gte: startOfDay, $lte: endOfDay }; }
+    if (date) {
+      const startOfDay = new Date(date); startOfDay.setUTCHours(0, 0, 0, 0);
+      const endOfDay   = new Date(date); endOfDay.setUTCHours(23, 59, 59, 999);
+      filter.date = { $gte: startOfDay, $lte: endOfDay };
+    }
+    // When viewing a specific day sort by slot timing; otherwise show newest bookings first
+    const sortOrder = date ? { start_time: 1 } : { created_at: -1 };
     const skip = (Number(page) - 1) * Number(limit);
     const total = await Booking.countDocuments(filter);
-    const bookings = await Booking.find(filter).sort({ created_at: -1 }).skip(skip).limit(Number(limit)).populate("user_id", "name email phone").populate("turf_id", "name location.city location.address").populate("slot_ids", "start_time end_time price status");
+    const bookings = await Booking.find(filter)
+      .sort(sortOrder)
+      .skip(skip)
+      .limit(Number(limit))
+      .populate("user_id", "name email phone")
+      .populate("turf_id", "name location.city location.address")
+      .populate("slot_ids", "start_time end_time price status");
     res.status(200).json({ message: "Bookings fetched successfully", total, page: Number(page), limit: Number(limit), pages: Math.ceil(total / Number(limit)), bookings });
   } catch (error) { res.status(500).json({ message: "Server error", error: error.message }); }
 };
 
 const getBookingByIdAdmin = async (req, res) => {
   try {
+    await releaseExpiredHolds();
     const booking = await Booking.findById(req.params.id).populate("user_id", "name email phone").populate("turf_id", "name location.city location.address price_per_hour").populate("slot_ids", "start_time end_time price status date");
     if (!booking) return res.status(404).json({ message: "Booking not found" });
     res.status(200).json({ message: "Booking fetched successfully", booking });

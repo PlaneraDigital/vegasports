@@ -3,9 +3,19 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
+const { releaseExpiredHolds } = require("./utils/holdManager");
 
 dotenv.config();
 connectDB();
+
+// ─── Background: Release expired slot holds every 60 seconds ────────────────────
+setInterval(async () => {
+  try {
+    await releaseExpiredHolds();
+  } catch (err) {
+    console.error("[HoldManager Background] Error:", err.message);
+  }
+}, 60 * 1000); // every 60 seconds
 
 const app = express();
 app.use(cors({
