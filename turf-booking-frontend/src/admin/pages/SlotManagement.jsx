@@ -42,6 +42,7 @@ const SlotManagement = () => {
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
   const [fetched, setFetched] = useState(false)
+  const [duration, setDuration] = useState(60)
 
   // Generate slots form
   const [genForm, setGenForm] = useState({ price: '', peak_hour_price: '', peak_start: '', peak_end: '' })
@@ -57,7 +58,7 @@ const SlotManagement = () => {
   const showToast = (msg, type = 'success') => { setToast({ msg, type }); setTimeout(() => setToast(null), 3000) }
 
   // Detect if logged-in user is a caretaker/receptionist (not admin)
-  const isCaretaker = !!localStorage.getItem('receptionistToken')
+  const isCaretaker = window.location.pathname.includes('/receptionist')
 
   useEffect(() => {
     api.get('/api/turfs').then(r => setTurfs(r.data.turfs)).catch(() => { })
@@ -67,7 +68,7 @@ const SlotManagement = () => {
     if (!selectedTurf || !selectedDate) return
     setLoading(true); setFetched(false)
     try {
-      const { data } = await adminApi.get(`/slots?turf_id=${selectedTurf}&date=${selectedDate}`)
+      const { data } = await adminApi.get(`/slots?turf_id=${selectedTurf}&date=${selectedDate}&duration=${duration}`)
       setSlots(data.slots)
       setSummary(data.summary)
       setFetched(true)
@@ -185,6 +186,18 @@ const SlotManagement = () => {
           <input type="date" value={selectedDate} onChange={e => { setSelectedDate(e.target.value); setFetched(false); setSlots([]) }}
             min={today()}
             style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+          <label style={{ color: '#71717a', fontSize: '0.75rem', fontWeight: 700 }}>Duration</label>
+          <select value={duration} onChange={e => { setDuration(Number(e.target.value)); setFetched(false); setSlots([]) }}
+            style={{ background: '#18181b', border: '1px solid #27272a', borderRadius: '10px', padding: '0.6rem 0.875rem', color: '#f4f4f5', fontSize: '0.85rem', outline: 'none' }}>
+            <option value={30}>30 Mins</option>
+            <option value={60}>1 Hour</option>
+            <option value={90}>1.5 Hours</option>
+            <option value={120}>2 Hours</option>
+            <option value={150}>2.5 Hours</option>
+            <option value={180}>3 Hours</option>
+          </select>
         </div>
         <button onClick={fetchSlots} disabled={!selectedTurf || !selectedDate || loading}
           style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: 'linear-gradient(135deg,#00844d,#006b3e)', border: 'none', borderRadius: '10px', padding: '0.6rem 1.25rem', color: '#fff', fontWeight: 800, fontSize: '0.85rem', cursor: 'pointer', opacity: !selectedTurf ? 0.5 : 1, boxShadow: '0 4px 12px rgba(22,163,74,0.15)' }}>

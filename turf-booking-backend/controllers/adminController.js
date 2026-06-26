@@ -166,7 +166,7 @@ const getAdminSlots = async (req, res) => {
     const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
     const dayName = dayNames[startOfDay.getUTCDay()];
     const schedule = turf.operating_hours ? turf.operating_hours[dayName] : null;
-    const duration = turf.slot_duration_minutes || 60;
+    const duration = req.query.duration ? Number(req.query.duration) : (turf.slot_duration_minutes || 60);
     const interval = turf.slot_interval_minutes || 30;
     const isOverlapping = (s1, e1, s2, e2) => {
       const toMins = (t) => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
@@ -189,12 +189,21 @@ const getAdminSlots = async (req, res) => {
           // 1. Check granular hourly overrides first
           if (turf.pricing_overrides?.hourly_pricing?.length > 0) {
             const override = turf.pricing_overrides.hourly_pricing.find(p => p.start_time === sT);
-            if (override) return override.price;
+            if (override) {
+              const baseDuration = turf.slot_duration_minutes || 60;
+              return Math.round((override.price / baseDuration) * duration);
+            }
           }
 
           const norm = startMins % 1440;
-          if (norm >= 420 && norm < 1140) return turf.pricing?.morning?.price ?? turf.price_per_hour;
-          return turf.pricing?.evening?.price ?? turf.price_per_hour;
+          let basePrice = turf.price_per_hour;
+          if (norm >= 420 && norm < 1140) {
+            basePrice = turf.pricing?.morning?.price ?? turf.price_per_hour;
+          } else {
+            basePrice = turf.pricing?.evening?.price ?? turf.price_per_hour;
+          }
+          const baseDuration = turf.slot_duration_minutes || 60;
+          return Math.round((basePrice / baseDuration) * duration);
         };
         for (let tM = startMin; tM < endMin; tM += interval) {
           const sT = formatTime(tM); const eT = formatTime(tM + duration);
